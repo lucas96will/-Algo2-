@@ -1,2 +1,2 @@
 # -Algo2-
-Tabla hash!
+Closed hash table implementation!
