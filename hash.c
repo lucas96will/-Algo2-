@@ -88,7 +88,7 @@ size_t busqueda_tabla(const hash_t* hash, const char* clave) {
         pos++; //lineal
     }
 
-    return -1;
+    return 0;
 }
 
 bool tabla_redimensionar(hash_t* hash) {
