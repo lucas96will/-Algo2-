@@ -281,7 +281,11 @@ void hash_destruir(hash_t *hash) {
     while (pos < hash->capacidad) {
         if (hash->tabla[pos].estado == OCUPADO) {
             if (hash->f_destruccion != NULL) {
+                hash->f_destruccion(hash->tabla[pos].clave);
                 hash->f_destruccion(hash->tabla[pos].dato);
+            } else {
+                free(hash->tabla[pos].clave);
+                free(hash->tabla[pos].dato);
             }
         }
         pos++;
