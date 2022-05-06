@@ -6,7 +6,6 @@
 #define CAPACIDAD_INICIAL 101 //Num_primo
 #define MULTIPLICADOR_REDIMENSION 2 //Ir probando
 #define FACTOR_DE_CARGA 0.5 //Ir probando
-#define MAX_REPOSICIONES 3
 
 typedef enum {VACIO, BORRADO, OCUPADO} estado_t;
 
@@ -127,7 +126,11 @@ void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool mis
         hash->tabla[pos].dato = dato;
         hash->cantidad++;
     } else {
-        hash->f_destruccion(dato);
+        if(hash->f_destruccion != NULL) {
+            hash->f_destruccion(dato);
+        } else {
+            free(dato);
+        }
         hash->tabla[pos].dato = dato;
     }
 }
@@ -176,7 +179,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
         }
 
     }
-    char copia[strlen(clave)];
+    char* copia = malloc(strlen(clave)*sizeof(char));
     strcpy(copia, clave);
     size_t largo_tabla = hash->capacidad;
     size_t pos = clave_obtener_posicion(copia, largo_tabla);
@@ -228,8 +231,9 @@ void *hash_obtener(const hash_t *hash, const char *clave) {
     if(!hash_pertenece(hash, clave)) {
         return NULL;
     }
+
     size_t posicion_encontrada = busqueda_tabla(hash, clave);
-    if(posicion_encontrada == -1) return NULL; // CAMBIAR ESTO PORQUE SI PERTENECE LA DEBERIA ENCONTRAR EN LOS PRIMEROS 3 ESPACIOS
+
     return hash->tabla[posicion_encontrada].dato;
 }
 
@@ -237,9 +241,8 @@ bool hash_pertenece(const hash_t *hash, const char *clave) {
     size_t posicion = clave_obtener_posicion(clave, hash->capacidad);
 
     bool seguir = true, encontrado;
-    size_t contador = 0;
 
-    while(posicion < hash->capacidad && contador < MAX_REPOSICIONES && seguir) {
+    while(posicion < hash->capacidad && seguir) {
         char* clave_pos = hash->tabla[posicion].clave;
         estado_t estado_pos = hash->tabla[posicion].estado;
 
@@ -252,8 +255,7 @@ bool hash_pertenece(const hash_t *hash, const char *clave) {
             encontrado = true;
         }
         else if((estado_pos == OCUPADO && strcmp(clave_pos, clave) != 0) || estado_pos == BORRADO) {
-            contador++;
-            posicion += contador;
+            posicion++;
             encontrado = false;
         }
     }
