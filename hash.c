@@ -1,3 +1,4 @@
+
 #include "hash.h"
 #include <stdlib.h>
 #include <string.h>
@@ -23,19 +24,23 @@ struct hash {
     hash_destruir_dato_t f_destruccion;
 };
 
-struct hash_iter;
+struct hash_iter {
+    const hash_t* hash;
+    size_t pos;
+};
 
 /* ******************************************************************
  *                      FUNCIONES AUXILIARES
  * *****************************************************************/
 
 //Funcion de Hashing
-unsigned int fnv_hashing(char* str, unsigned int length) {
+unsigned int fnv_hashing(char* str, size_t length) {
+    unsigned int new_length = (unsigned int) length;
 	const unsigned int fnv_prime = 0x811C9DC5;
 	unsigned int hash = 0;
 	unsigned int i = 0;
 
-	for (i = 0; i < length; str++, i++)
+	for (i = 0; i < new_length; str++, i++)
 	{
 		hash *= fnv_prime;
 		hash ^= (*str);
@@ -75,15 +80,14 @@ size_t clave_obtener_posicion(const char *clave, size_t largo_tabla) {
 
 size_t busqueda_tabla(const hash_t* hash, const char* clave) {
     
-    size_t resultado_hash = fnv_hashing(clave, strlen(clave));
-    size_t pos = resultado_hash % hash->capacidad;
+    size_t largo_tabla = hash->capacidad;
+    size_t pos = clave_obtener_posicion(clave, largo_tabla);
 
     while (pos < hash->capacidad) {
         if (hash->tabla[pos].estado == OCUPADO && strcmp(clave, hash->tabla[pos].clave) == 0) {
             return pos;
         }
-
-        pos = pos + 1; //lineal
+        pos++; //lineal
     }
 
     return -1;
@@ -115,6 +119,18 @@ bool tabla_redimensionar(hash_t* hash) {
 
 }
 
+void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool misma_clave) {
+
+    if (!misma_clave) {
+        hash->tabla[pos].estado = OCUPADO;
+        hash->tabla[pos].clave = clave;
+        hash->tabla[pos].dato = dato;
+        hash->cantidad++;
+    } else {
+        hash->f_destruccion(dato);
+        hash->tabla[pos].dato = dato;
+    }
+}
 
 
 /* *****************************************************************
@@ -153,15 +169,33 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato) {
  */
 bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     
-    if ( (((float)hash->cantidad + (float)hash->borrados) / hash->capacidad) >= (float) FACTOR_DE_CARGA) {
+    if ((float) ((hash->cantidad / hash->capacidad) >= (float) FACTOR_DE_CARGA)) {
         bool redimension = tabla_redimensionar(hash);
         if (!redimension) {
             return false;
         }
 
     }
-    size_t resultado_hash = fnv_hashing(clave, strlen(clave));
-    size_t pos = resultado_hash % hash->capacidad;
+    char copia[strlen(clave)];
+    strcpy(copia, clave);
+    size_t largo_tabla = hash->capacidad;
+    size_t pos = clave_obtener_posicion(copia, largo_tabla);
+
+    while (true) {
+        //Lugar desocupado
+        if (hash->tabla[pos].estado == VACIO) {
+            completar_campo(hash, copia, dato, pos, false); //Misma clave == false
+            break;
+        }
+        //Lugar ocupado y misma clave
+        if (hash->tabla[pos].estado == OCUPADO && strcmp(clave, hash->tabla[pos].clave) == 0) {
+            completar_campo(hash, copia, dato, pos, true); //Misma clave == true
+            break;
+        }
+
+        pos++;
+    }
+    return true;
 }
 
 /* Borra un elemento del hash y devuelve el dato asociado.  Devuelve
@@ -176,13 +210,16 @@ void *hash_borrar(hash_t *hash, const char *clave) {
     }
     size_t posicion_encontrada = busqueda_tabla(hash, clave);
 
+    void* dato = hash->tabla[posicion_encontrada].dato;
+
     // Libero la memoria asociada a la clave que se guardo
-    hash->tabla[posicion_encontrada].clave = NULL;
+    free(hash->tabla[posicion_encontrada].clave);
+
     hash->tabla[posicion_encontrada].estado = BORRADO;
     hash->cantidad--;
     hash->borrados++;
 
-    return hash->tabla[posicion_encontrada].dato;
+    return dato;
 }
 
 
@@ -227,8 +264,8 @@ bool hash_pertenece(const hash_t *hash, const char *clave) {
 /* Devuelve la cantidad de elementos del hash.
  * Pre: La estructura hash fue inicializada
  */
-size_t hash_cantidad(const hash_t *hash){
-    return (hash->cantidad);
+size_t hash_cantidad(const hash_t *hash) {
+    return hash->cantidad;
 }
 
 /* Destruye la estructura liberando la memoria pedida y llamando a la función
@@ -236,7 +273,20 @@ size_t hash_cantidad(const hash_t *hash){
  * Pre: La estructura hash fue inicializada
  * Post: La estructura hash fue destruida
  */
-void hash_destruir(hash_t *hash);
+void hash_destruir(hash_t *hash) {
+    size_t pos =0;
+
+    while (pos < hash->capacidad) {
+        if (hash->tabla[pos].estado == OCUPADO) {
+            if (hash->f_destruccion != NULL) {
+                hash->f_destruccion(hash->tabla[pos].dato);
+            }
+        }
+        pos++;
+    }
+    free(hash->tabla);
+    free(hash);
+}
 
 
 /* *****************************************************************
@@ -246,16 +296,59 @@ void hash_destruir(hash_t *hash);
 /* Iterador del hash */
 
 // Crea iterador
-hash_iter_t *hash_iter_crear(const hash_t *hash);
+hash_iter_t *hash_iter_crear(const hash_t *hash) {
+    hash_iter_t* iter = malloc(sizeof(hash_iter_t));
+    if (!iter) {
+        return NULL;
+    }
+    iter->hash = hash;
+    iter->pos = 0;
+
+    while (true) {
+        if (iter->hash->tabla[iter->pos].estado == OCUPADO || iter->hash->capacidad == iter->pos) {
+            break;
+        }
+        iter->pos++;
+    }
+
+    return iter;
+}
 
 // Avanza iterador
-bool hash_iter_avanzar(hash_iter_t *iter);
+bool hash_iter_avanzar(hash_iter_t *iter) {
+
+    if (hash_iter_al_final(iter)) {
+        return false;
+    }
+
+    while (iter->pos <= iter->hash->capacidad) {
+        iter->pos++;
+        if (iter->hash->tabla[iter->pos].estado == OCUPADO) {
+            break;
+        }
+    }
+    return true;
+}
 
 // Devuelve clave actual, esa clave no se puede modificar ni liberar.
-const char *hash_iter_ver_actual(const hash_iter_t *iter);
+const char *hash_iter_ver_actual(const hash_iter_t *iter) {
+
+    if (hash_iter_al_final(iter)){
+        return NULL;
+    }
+    size_t pos = iter->pos;
+    return iter->hash->tabla[pos].clave;
+}
 
 // Comprueba si terminó la iteración
-bool hash_iter_al_final(const hash_iter_t *iter);
+bool hash_iter_al_final(const hash_iter_t *iter) {
+    if (iter->hash->capacidad != iter->pos) {
+        return false;
+    }
+    return true;
+}
 
 // Destruye iterador
-void hash_iter_destruir(hash_iter_t *iter);
+void hash_iter_destruir(hash_iter_t *iter) {
+    free(iter);
+}
