@@ -19,6 +19,7 @@ struct hash {
     campo_t* tabla;
     size_t cantidad;
     size_t capacidad;
+    size_t borrados;
     hash_destruir_dato_t f_destruccion;
 };
 
@@ -138,6 +139,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato) {
 
     hash->capacidad = CAPACIDAD_INICIAL;
     hash->cantidad = 0;
+    hash->borrados = 0;
     hash->f_destruccion = destruir_dato;
     asignar_tabla(hash);
 
@@ -151,7 +153,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato) {
  */
 bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     
-    if ((float) (hash->cantidad / hash->capacidad) >= (float) FACTOR_DE_CARGA) {
+    if ((float) ((hash->cantidad + hash->borrados) / hash->capacidad) >= (float) FACTOR_DE_CARGA) {
         bool redimension = tabla_redimensionar(hash);
         if (!redimension) {
             return false;
@@ -168,22 +170,32 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
  * Post: El elemento fue borrado de la estructura y se lo devolvió,
  * en el caso de que estuviera guardado.
  */
-void *hash_borrar(hash_t *hash, const char *clave);
+void *hash_borrar(hash_t *hash, const char *clave) {
+    if(!hash_pertenece(hash, clave)) {
+        return NULL;
+    }
+    size_t posicion_encontrada = busqueda_tabla(hash, clave);
 
-/* Obtiene el valor de un elemento del hash, si la clave no se encuentra
- * devuelve NULL.
- * Pre: La estructura hash fue inicializada
- */
+    // Libero la memoria asociada a la clave que se guardo
+    free(hash->tabla[posicion_encontrada].clave);
+
+    hash->tabla[posicion_encontrada].estado = BORRADO;
+    hash->cantidad--;
+    hash->borrados++;
+
+    return hash->tabla[posicion_encontrada].dato;
+}
+
+
 
 void *hash_obtener(const hash_t *hash, const char *clave) {
     if(!hash_pertenece(hash, clave)) {
         return NULL;
     }
-    size_t posicion = busqueda_tabla(hash, clave);
-    return hash->tabla[posicion].dato;
+    size_t posicion_encontrada = busqueda_tabla(hash, clave);
+    if(posicion_encontrada == -1) return NULL; // CAMBIAR ESTO PORQUE SI PERTENECE LA DEBERIA ENCONTRAR EN LOS PRIMEROS 3 ESPACIOS
+    return hash->tabla[posicion_encontrada].dato;
 }
-
-
 
 bool hash_pertenece(const hash_t *hash, const char *clave) {
     size_t posicion = clave_obtener_posicion(clave, hash->capacidad);
@@ -191,7 +203,7 @@ bool hash_pertenece(const hash_t *hash, const char *clave) {
     bool seguir = true, encontrado;
     size_t contador = 0;
 
-    while(posicion < hash->capacidad && contador <= MAX_REPOSICIONES && seguir) {
+    while(posicion < hash->capacidad && contador < MAX_REPOSICIONES && seguir) {
         char* clave_pos = hash->tabla[posicion].clave;
         estado_t estado_pos = hash->tabla[posicion].estado;
 
