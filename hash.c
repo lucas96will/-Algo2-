@@ -1,4 +1,3 @@
-
 #include "hash.h"
 #include <stdlib.h>
 #include <string.h>
@@ -177,10 +176,10 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
         if (!redimension) {
             return false;
         }
-
     }
-    char* copia = malloc(strlen(clave)*sizeof(char));
-    strcpy(copia, clave);
+
+    char* copia = strdup(clave);
+
     size_t largo_tabla = hash->capacidad;
     size_t pos = clave_obtener_posicion(copia, largo_tabla);
 
@@ -285,7 +284,6 @@ void hash_destruir(hash_t *hash) {
                 hash->f_destruccion(hash->tabla[pos].dato);
             } else {
                 free(hash->tabla[pos].clave);
-                free(hash->tabla[pos].dato);
             }
         }
         pos++;
