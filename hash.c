@@ -1,4 +1,6 @@
 #include "hash.h"
+#include <stdlib.h>
+#include <string.h>
 
 #define CAPACIDAD_INICIAL 101 //Num_primo
 #define MULTIPLICADOR_REDIMENSION 2 //Ir probando
@@ -102,6 +104,12 @@ bool tabla_redimensionar(hash_t* hash) {
 
 }
 
+size_t obtener_posicion(const char *clave, size_t largo_tabla) {
+    char copia[strlen(clave)];
+    strcpy(copia, clave);
+    size_t resultado_hash = fnv_hashing(copia, strlen(copia));
+    return resultado_hash % largo_tabla;
+}
 
 
 
@@ -165,10 +173,34 @@ void *hash_borrar(hash_t *hash, const char *clave);
  */
 void *hash_obtener(const hash_t *hash, const char *clave);
 
-/* Determina si clave pertenece o no al hash.
- * Pre: La estructura hash fue inicializada
- */
-bool hash_pertenece(const hash_t *hash, const char *clave);
+
+
+bool hash_pertenece(const hash_t *hash, const char *clave) {
+    size_t clave_pos = obtener_posicion(clave, hash->capacidad);
+    estado_t estado_pos = hash->tabla[clave_pos].estado;
+    char* dato_pos = hash->tabla[clave_pos].dato;
+
+
+    bool seguir = true, encontrado;
+    size_t contador = 0;
+    while(clave_pos < hash->capacidad && contador <= 3 && seguir) {
+        if(estado_pos == VACIO){
+            seguir = false;
+            encontrado = false;
+        }
+        else if(estado_pos == OCUPADO && strcmp(dato_pos, clave) == 0) {
+            seguir = false;
+            encontrado = true;
+        }
+        else if((estado_pos == OCUPADO && strcmp(dato_pos, clave) != 0) || estado_pos == BORRADO) {
+            contador++;
+            clave_pos += contador;
+            encontrado = false;
+        }
+    }
+
+    return encontrado;
+}
 
 /* Devuelve la cantidad de elementos del hash.
  * Pre: La estructura hash fue inicializada
