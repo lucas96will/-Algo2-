@@ -153,7 +153,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato) {
  */
 bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     
-    if ((float) ((hash->cantidad + hash->borrados) / hash->capacidad) >= (float) FACTOR_DE_CARGA) {
+    if ( (((float)hash->cantidad + (float)hash->borrados) / hash->capacidad) >= (float) FACTOR_DE_CARGA) {
         bool redimension = tabla_redimensionar(hash);
         if (!redimension) {
             return false;
@@ -177,8 +177,7 @@ void *hash_borrar(hash_t *hash, const char *clave) {
     size_t posicion_encontrada = busqueda_tabla(hash, clave);
 
     // Libero la memoria asociada a la clave que se guardo
-    free(hash->tabla[posicion_encontrada].clave);
-
+    hash->tabla[posicion_encontrada].clave = NULL;
     hash->tabla[posicion_encontrada].estado = BORRADO;
     hash->cantidad--;
     hash->borrados++;
@@ -228,7 +227,9 @@ bool hash_pertenece(const hash_t *hash, const char *clave) {
 /* Devuelve la cantidad de elementos del hash.
  * Pre: La estructura hash fue inicializada
  */
-size_t hash_cantidad(const hash_t *hash);
+size_t hash_cantidad(const hash_t *hash){
+    return (hash->cantidad);
+}
 
 /* Destruye la estructura liberando la memoria pedida y llamando a la función
  * destruir para cada par (clave, dato).
