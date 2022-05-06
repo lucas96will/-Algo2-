@@ -5,6 +5,7 @@
 #define CAPACIDAD_INICIAL 101 //Num_primo
 #define MULTIPLICADOR_REDIMENSION 2 //Ir probando
 #define FACTOR_DE_CARGA 0.5 //Ir probando
+#define MAX_REPOSICIONES 3
 
 typedef enum {VACIO, BORRADO, OCUPADO} estado_t;
 
@@ -62,6 +63,15 @@ void asignar_tabla(hash_t* hash) {
     }
 }
 
+
+size_t clave_obtener_posicion(const char *clave, size_t largo_tabla) {
+    char copia[strlen(clave)];
+    strcpy(copia, clave);
+    size_t resultado_hash = fnv_hashing(copia, strlen(copia));
+    return resultado_hash % largo_tabla;
+}
+
+
 size_t busqueda_tabla(const hash_t* hash, const char* clave) {
     
     size_t resultado_hash = fnv_hashing(clave, strlen(clave));
@@ -102,13 +112,6 @@ bool tabla_redimensionar(hash_t* hash) {
     free(tabla_anterior);
     return true;
 
-}
-
-size_t obtener_posicion(const char *clave, size_t largo_tabla) {
-    char copia[strlen(clave)];
-    strcpy(copia, clave);
-    size_t resultado_hash = fnv_hashing(copia, strlen(copia));
-    return resultado_hash % largo_tabla;
 }
 
 
@@ -171,30 +174,38 @@ void *hash_borrar(hash_t *hash, const char *clave);
  * devuelve NULL.
  * Pre: La estructura hash fue inicializada
  */
-void *hash_obtener(const hash_t *hash, const char *clave);
+
+void *hash_obtener(const hash_t *hash, const char *clave) {
+    if(!hash_pertenece(hash, clave)) {
+        return NULL;
+    }
+    size_t posicion = busqueda_tabla(hash, clave);
+    return hash->tabla[posicion].dato;
+}
 
 
 
 bool hash_pertenece(const hash_t *hash, const char *clave) {
-    size_t clave_pos = obtener_posicion(clave, hash->capacidad);
-    estado_t estado_pos = hash->tabla[clave_pos].estado;
-    char* dato_pos = hash->tabla[clave_pos].dato;
-
+    size_t posicion = clave_obtener_posicion(clave, hash->capacidad);
 
     bool seguir = true, encontrado;
     size_t contador = 0;
-    while(clave_pos < hash->capacidad && contador <= 3 && seguir) {
+
+    while(posicion < hash->capacidad && contador <= MAX_REPOSICIONES && seguir) {
+        char* clave_pos = hash->tabla[posicion].clave;
+        estado_t estado_pos = hash->tabla[posicion].estado;
+
         if(estado_pos == VACIO){
             seguir = false;
             encontrado = false;
         }
-        else if(estado_pos == OCUPADO && strcmp(dato_pos, clave) == 0) {
+        else if(estado_pos == OCUPADO && strcmp(clave_pos, clave) == 0) {
             seguir = false;
             encontrado = true;
         }
-        else if((estado_pos == OCUPADO && strcmp(dato_pos, clave) != 0) || estado_pos == BORRADO) {
+        else if((estado_pos == OCUPADO && strcmp(clave_pos, clave) != 0) || estado_pos == BORRADO) {
             contador++;
-            clave_pos += contador;
+            posicion += contador;
             encontrado = false;
         }
     }
