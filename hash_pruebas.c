@@ -188,7 +188,6 @@ static void prueba_hash_clave_vacia()
     print_test("Prueba hash pertenece clave vacia, es true", hash_pertenece(hash, clave));
     print_test("Prueba hash borrar clave vacia, es valor", hash_borrar(hash, clave) == valor);
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
-
     hash_destruir(hash);
 }
 
@@ -404,13 +403,13 @@ void pruebas_hash_catedra()
     prueba_iterar_hash_vacio();
     prueba_hash_insertar();
     prueba_hash_reemplazar();
-//    prueba_hash_reemplazar_con_destruir();
-//    prueba_hash_borrar();
-//    prueba_hash_clave_vacia();
-//    prueba_hash_valor_null();
-//    prueba_hash_volumen(5000, true);
-//    prueba_hash_iterar();
-//    prueba_hash_iterar_volumen(5000);
+    prueba_hash_reemplazar_con_destruir();
+    prueba_hash_borrar();
+    prueba_hash_clave_vacia();
+    prueba_hash_valor_null();
+    prueba_hash_volumen(5000, true);
+    prueba_hash_iterar();
+    prueba_hash_iterar_volumen(5000);
 }
 
 void pruebas_volumen_catedra(size_t largo)
