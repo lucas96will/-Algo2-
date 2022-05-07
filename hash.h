@@ -61,18 +61,32 @@ void hash_destruir(hash_t *hash);
 /* Iterador del hash */
 
 // Crea iterador
+// Pre: hash creado
+// Post: crea el iterador posicionado en la primera posicion
+// ocupada del hash
 hash_iter_t *hash_iter_crear(const hash_t *hash);
 
 // Avanza iterador
+// Pre: el iterador fue creado
+// Post: Devuelve true si el iterador avanza a la siguiente posicion
+// en otro caso false
 bool hash_iter_avanzar(hash_iter_t *iter);
 
 // Devuelve clave actual, esa clave no se puede modificar ni liberar.
+// Pre: el iterador fue creado
+// Post: devuelve la clave en la cual el iterador esta posicionado
+// si el iterador se encuentra al final, devuelve NULL
 const char *hash_iter_ver_actual(const hash_iter_t *iter);
 
 // Comprueba si terminó la iteración
+// Pre: el iterador fue creado
+// Post: devuelve true si el iterador se encuentra al final
+// false en otro caso
 bool hash_iter_al_final(const hash_iter_t *iter);
 
 // Destruye iterador
+// Pre: el iterador fue creado
+// Post: se libera la memoria del iterador
 void hash_iter_destruir(hash_iter_t *iter);
 
 #endif  // HASH_H
