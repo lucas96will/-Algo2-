@@ -255,9 +255,12 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     // Obtenemos la posicion (segun nuestra funcion hash)
     size_t pos = clave_obtener_posicion(hash, copia);
 
-    // Retornamos guardar_par
-
-    return guardar_par(hash, copia, dato, pos);
+    // si no se puede guardar par libero la memoria de la copia y retorno false
+    if(guardar_par(hash, copia, dato, pos) == false) {
+        free(copia);
+        return false;
+    }
+    return true;
 }
 
 void *hash_borrar(hash_t *hash, const char *clave) {
