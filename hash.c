@@ -366,7 +366,6 @@ void iter_buscar_ocupado(hash_iter_t* iter) {
  *               PRIMITIVA DEL ITERADOR DEL HASH
  * *****************************************************************/
 
-
 hash_iter_t *hash_iter_crear(const hash_t *hash) {
     hash_iter_t* iter = malloc(sizeof(hash_iter_t));
     if (!iter) {
@@ -392,7 +391,6 @@ bool hash_iter_avanzar(hash_iter_t *iter) {
     return true;
 }
 
-// Devuelve clave actual, esa clave no se puede modificar ni liberar.
 const char *hash_iter_ver_actual(const hash_iter_t *iter) {
 
     if (hash_iter_al_final(iter)){
@@ -402,12 +400,10 @@ const char *hash_iter_ver_actual(const hash_iter_t *iter) {
     return iter->hash->tabla[pos].clave;
 }
 
-// Comprueba si terminó la iteración
 bool hash_iter_al_final(const hash_iter_t *iter) {
     return (iter->pos >= iter->hash->capacidad);
 }
 
-// Destruye iterador
 void hash_iter_destruir(hash_iter_t *iter) {
     free(iter);
 }
