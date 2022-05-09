@@ -227,6 +227,7 @@ static void prueba_hash_volumen(size_t largo, bool debug)
         if (!ok) break;
     }
 
+    printf("Cantidad en el hash: %zu, cantidad de elementos: %zu\n", hash_cantidad(hash), largo);
     if (debug) print_test("Prueba hash almacenar muchos elementos", ok);
     if (debug) print_test("Prueba hash la cantidad de elementos es correcta", hash_cantidad(hash) == largo);
 

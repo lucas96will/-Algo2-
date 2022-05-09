@@ -174,10 +174,9 @@ void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool mis
         hash->tabla[pos].clave = clave;
         hash->tabla[pos].dato = dato;
         hash->cantidad++;
-    } else {
-        // Si guardo el mismo elemento, uso la funcion de destruccion indicada
-        // en los elementos (si existe) y si no libero la clave en la posicion
-        // y guardo la generada, por defecto. (la clave es la misma)
+    } else { // mismo elemento
+        // Uso la funcion de destruccion indicada en los elementos (si existe) y
+        // si no libero la clave en la posicion y guardo la generada (ambas son copias)
         if(hash->f_destruccion != NULL) {
             hash->f_destruccion(hash->tabla[pos].dato);
             hash->f_destruccion(hash->tabla[pos].clave);
@@ -257,10 +256,8 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     // Obtenemos la posicion (segun nuestra funcion hash)
     size_t pos = clave_obtener_posicion(hash, copia);
 
-    // si no se puede guardar par libero la memoria de la copia y retorno false
+    // Si no se puede guardar (por colision o etc) redimensiono y guardo
     while(guardar_par(hash, copia, dato, pos) == false) {
-        //free(copia);
-        //return false;
         tabla_redimensionar(hash);
         pos = clave_obtener_posicion(hash, copia);
     }
