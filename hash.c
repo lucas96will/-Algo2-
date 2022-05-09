@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CAPACIDAD_INICIAL 276 // 276 excelente, 292 muy bueno, 301 bueno
-#define MULTIPLICADOR_REDIMENSION 3 //Ir probando. 2 falla
-#define FACTOR_DE_CARGA 0.7 //Ir probando. con 40k elementos: 0.5 lento, 0.6 maso menos, 0.7 rapido
+#define CAPACIDAD_INICIAL 151 // 276 excelente, 292 muy bueno, 301 bueno
+#define MULTIPLICADOR_REDIMENSION 2 //
+#define FACTOR_DE_CARGA 0.7 // con 40k elementos: 0.5 lento, 0.6 maso menos, 0.7 rapido
+
+#define NO_ENCONTRADO -1
 
 typedef enum {VACIO, BORRADO, OCUPADO} estado_t;
 
@@ -53,7 +55,7 @@ size_t clave_obtener_posicion(const hash_t* hash, const char *clave);
 
 // Pre: hash creado, la clave se encuentra dentro del hash
 // Post: Devuelve la posicion de la clave dentro del hash
-size_t busqueda_tabla(const hash_t* hash, const char* clave);
+int busqueda_tabla(const hash_t* hash, const char* clave);
 
 // Pre: hash creado
 // Post: el hash incrementa su capacidad, la cantidad de borrados
@@ -122,8 +124,8 @@ size_t clave_obtener_posicion(const hash_t* hash, const char *clave) {
     return resultado_hash % hash->capacidad;
 }
 
-size_t busqueda_tabla(const hash_t* hash, const char* clave) {
-    size_t pos = clave_obtener_posicion(hash, clave);
+int busqueda_tabla(const hash_t* hash, const char* clave) {
+    int pos = (int)clave_obtener_posicion(hash, clave);
     while (pos < hash->capacidad) {
         if (hash->tabla[pos].estado == OCUPADO && strcmp(clave, hash->tabla[pos].clave) == 0) {
             return pos;
@@ -131,7 +133,7 @@ size_t busqueda_tabla(const hash_t* hash, const char* clave) {
         pos++; //lineal
     }
 
-    return 0;
+    return NO_ENCONTRADO;
 }
 
 bool tabla_redimensionar(hash_t* hash) {
@@ -256,9 +258,10 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     size_t pos = clave_obtener_posicion(hash, copia);
 
     // si no se puede guardar par libero la memoria de la copia y retorno false
-    if(guardar_par(hash, copia, dato, pos) == false) {
-        free(copia);
-        return false;
+    while(guardar_par(hash, copia, dato, pos) == false) {
+        //free(copia);
+        //return false;
+        tabla_redimensionar(hash);
     }
     return true;
 }
@@ -292,31 +295,11 @@ void *hash_obtener(const hash_t *hash, const char *clave) {
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave) {
-    size_t posicion = clave_obtener_posicion(hash, clave);
-
-    bool seguir = true, encontrado = false;
-
-    while(posicion < hash->capacidad && seguir) {
-        char* clave_pos = hash->tabla[posicion].clave;
-        estado_t estado_pos = hash->tabla[posicion].estado;
-
-        // Si se encuentra una posicion vacia, no pertenece
-        if(estado_pos == VACIO){
-            seguir = false;
-            encontrado = false;
-        }
-        // Si son la misma clave, entonces pertenece
-        else if(estado_pos == OCUPADO && strcmp(clave_pos, clave) == 0) {
-            seguir = false;
-            encontrado = true;
-        }
-        // Si esta ocpado y no son la misma clave o si se encuentra borrado, avanzo a la siguiente posicion
-        else if((estado_pos == OCUPADO && strcmp(clave_pos, clave) != 0) || estado_pos == BORRADO) {
-            posicion++;
-            encontrado = false;
-        }
+    size_t posicion = busqueda_tabla(hash, clave);
+    if(posicion == NO_ENCONTRADO) {
+        return false;
     }
-    return encontrado;
+    return true;
 }
 
 size_t hash_cantidad(const hash_t *hash) {
