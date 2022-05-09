@@ -1,6 +1,9 @@
 #ifndef _ALGO2__ABB_H
 #define _ALGO2__ABB_H
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 typedef struct abb abb_t;
 
 typedef int (*abb_comparar_clave_t) (const char *, const char *);
