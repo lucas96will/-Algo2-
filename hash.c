@@ -55,6 +55,7 @@ size_t clave_obtener_posicion(const hash_t* hash, const char *clave);
 
 // Pre: hash creado, la clave se encuentra dentro del hash
 // Post: Devuelve la posicion de la clave dentro del hash
+// si no se encuentra devuelve NO_ENCONTRADO  (-1)
 int busqueda_tabla(const hash_t* hash, const char* clave);
 
 // Pre: hash creado
