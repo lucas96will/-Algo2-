@@ -329,7 +329,6 @@ void hash_destruir(hash_t *hash) {
 // Post: posiciona el iterador en la siguiente posicion
 // con el estado OCUPADO
 void iter_buscar_ocupado(hash_iter_t* iter) {
-    bool seguir = true;
     while (iter->pos < iter->hash->capacidad) {
         if (iter->hash->tabla[iter->pos].estado == OCUPADO) {
             return;
