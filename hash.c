@@ -181,10 +181,8 @@ void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool mis
         // si no libero la clave en la posicion y guardo la generada (ambas son copias)
         if(hash->f_destruccion != NULL) {
             hash->f_destruccion(hash->tabla[pos].dato);
-            hash->f_destruccion(hash->tabla[pos].clave);
-        } else {
-            free(hash->tabla[pos].clave);
         }
+        free(hash->tabla[pos].clave);
         hash->tabla[pos].clave = clave;
         hash->tabla[pos].dato = dato;
     }
@@ -310,11 +308,9 @@ void hash_destruir(hash_t *hash) {
         // usando free o la funcion de destruccion indicada
         if (hash->tabla[pos].estado == OCUPADO) {
             if (hash->f_destruccion != NULL) {
-                hash->f_destruccion(hash->tabla[pos].clave);
                 hash->f_destruccion(hash->tabla[pos].dato);
-            } else {
-                free(hash->tabla[pos].clave);
             }
+            free(hash->tabla[pos].clave);
         }
         pos++;
     }
