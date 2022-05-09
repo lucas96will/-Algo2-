@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CAPACIDAD_INICIAL 292 // 276 excelente, 292 muy bueno, 301 bueno
+#define CAPACIDAD_INICIAL 101 // 276 excelente, 292 muy bueno, 301 bueno
 #define MULTIPLICADOR_REDIMENSION 3 //
 #define FACTOR_DE_CARGA 0.7 // con 40k elementos: 0.5 lento, 0.6 maso menos, 0.7 rapido
 
@@ -262,6 +262,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
         //free(copia);
         //return false;
         tabla_redimensionar(hash);
+        pos = clave_obtener_posicion(hash, copia);
     }
     return true;
 }
