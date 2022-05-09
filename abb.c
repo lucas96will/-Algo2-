@@ -18,7 +18,7 @@ struct abb {
 };
 
 /* *****************************************************************
- *                    PRIMITIVAS DEL NODO
+ *                    FUNCIONES DEL NODO
  * *****************************************************************/
 
 nodo_t* nodo_crear(void* clave, void* dato) {
