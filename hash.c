@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CAPACIDAD_INICIAL 151 // 276 excelente, 292 muy bueno, 301 bueno
-#define MULTIPLICADOR_REDIMENSION 2 //
+#define CAPACIDAD_INICIAL 276 // 276 excelente, 292 muy bueno, 301 bueno
+#define MULTIPLICADOR_REDIMENSION 3 //
 #define FACTOR_DE_CARGA 0.7 // con 40k elementos: 0.5 lento, 0.6 maso menos, 0.7 rapido
 
 #define NO_ENCONTRADO -1
@@ -271,7 +271,7 @@ void *hash_borrar(hash_t *hash, const char *clave) {
         return NULL;
     }
     // Si la clave pertenece, entonces busco su posicion y el dato
-    size_t posicion_encontrada = busqueda_tabla(hash, clave);
+    int posicion_encontrada = busqueda_tabla(hash, clave);
     void* dato = hash->tabla[posicion_encontrada].dato;
 
     // Libero la memoria asociada a la clave que se guardo
@@ -290,12 +290,12 @@ void *hash_obtener(const hash_t *hash, const char *clave) {
         return NULL;
     }
 
-    size_t posicion_encontrada = busqueda_tabla(hash, clave);
+    int posicion_encontrada = busqueda_tabla(hash, clave);
     return hash->tabla[posicion_encontrada].dato;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave) {
-    size_t posicion = busqueda_tabla(hash, clave);
+    int posicion = busqueda_tabla(hash, clave);
     if(posicion == NO_ENCONTRADO) {
         return false;
     }
