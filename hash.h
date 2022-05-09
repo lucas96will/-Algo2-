@@ -7,11 +7,9 @@
 // Los structs deben llamarse "hash" y "hash_iter".
 struct hash;
 struct hash_iter;
-struct campo;
 
 typedef struct hash hash_t;
 typedef struct hash_iter hash_iter_t;
-typedef struct campo campo_t;
 
 // tipo de función para destruir dato
 typedef void (*hash_destruir_dato_t)(void *);

@@ -12,11 +12,11 @@
 
 typedef enum {VACIO, BORRADO, OCUPADO} estado_t;
 
-struct campo {
+typedef struct campo {
     estado_t estado;
     char* clave;
     void* dato;
-};
+} campo_t;
 
 struct hash {
     campo_t* tabla;
