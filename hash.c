@@ -192,23 +192,19 @@ void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool mis
 bool guardar_par(hash_t* hash, char* copia, void* dato, size_t pos) {
 
     // Recorremos la estructura hasta hallar un espacio vacio u el mismo elemento
-
-    bool guardado = false;
-    while(pos < hash->capacidad && !guardado) {
+    while(pos < hash->capacidad) {
         if (hash->tabla[pos].estado == VACIO) {
             completar_campo(hash, copia, dato, pos, false);
-            guardado = true;
+            return true;
         }
         else if(hash->tabla[pos].estado == OCUPADO && strcmp(copia, hash->tabla[pos].clave) == 0) {
             completar_campo(hash, copia, dato, pos, true);
-            guardado = true;
+            return true;
         }
         pos++;
     }
 
-    // Guardado = false indica que se recorrio el
-    // hash sin encontrar una posicion para guardar
-    return guardado;
+    return false;
 }
 
 bool necesita_redimension(hash_t* hash) {
