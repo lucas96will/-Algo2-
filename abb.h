@@ -56,4 +56,14 @@ size_t abb_cantidad(const abb_t *arbol);
 void abb_destruir(abb_t *arbol);
 
 
+/* *****************************************************************
+ *                    ITER INTERNO DEL ABB
+ * *****************************************************************/
+/*
+ * Pre:
+ * Post:
+ * */
+void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra);
+
+
 #endif //_ALGO2__ABB_H
