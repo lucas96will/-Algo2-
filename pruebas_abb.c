@@ -2,6 +2,13 @@
 #include <string.h>
 #include "testing.h"
 #include "abb.h"
+#include <time.h>
+#include <stdlib.h>
+
+#define TAM_VOLUMEN 5000
+#define TAM_CLAVE 5
+#define TAM_NORMAL 100
+
 
 static void prueba_abb_vacio() {
     
@@ -200,16 +207,98 @@ static void pruebas_abb_borrar() {
 
 }
 
+static char *rand_string(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJK...";
+    if (size) {
+        --size;
+        for (size_t n = 0; n < size; n++) {
+            int key = rand() % (int) (sizeof charset - 1);
+            str[n] = charset[key];
+        }
+        str[size] = '\0';
+    }
+    return str;
+}
+
+
+static void pruebas_iter_in() {
+
+    abb_t* arbol = abb_crear(strcmp, NULL);
+    char** claves = malloc(sizeof(char*) * TAM_NORMAL);
+
+
+    for(int i = 0; i < TAM_NORMAL; i++) {
+        char* clave = malloc(sizeof(char)*TAM_CLAVE);
+        claves[i] = rand_string(clave, sizeof(clave));
+        abb_guardar(arbol, claves[i], claves[i]);
+    }
+
+    // Pruebas genericas del iterador
+    abb_iter_t* iter = abb_iter_in_crear(arbol);
+    print_test("Iterador inorder creado", iter);
+    print_test("Avanzar iterador es posible", abb_iter_in_avanzar(iter));
+    print_test("Obtener iterador no es null", abb_iter_in_ver_actual(iter));
+    print_test("Iterador no se encuentra al final", !abb_iter_in_al_final(iter));
+
+    const char* clave_x = abb_iter_in_ver_actual(iter);
+    // La clave del iterador se encuentra en el arbol
+    print_test("Clave X del iterador se encuentra en el arbol", abb_pertenece(arbol,clave_x));
+    abb_iter_in_avanzar(iter);
+    const char* clave_y = abb_iter_in_ver_actual(iter);
+    print_test("Avanzo y la clave X del iterador se encuentra en el arbol", abb_pertenece(arbol,clave_x));
+    print_test("La clave del iterador es diferente a la anterior", strcmp(clave_x, clave_y) != 0);
+
+    bool avanzar = true;
+    while(!abb_iter_in_al_final(iter)) {
+        avanzar &= abb_iter_in_avanzar(iter);
+    }
+    print_test("Se pudo avanzar hasta el final correctamente", avanzar);
+    print_test("Iterador al final", abb_iter_in_al_final(iter));
+    print_test("No se puede avanzar el iterador", !abb_iter_in_avanzar(iter));
+    print_test("No se puede obtener clave del iterador", !abb_iter_in_ver_actual(iter));
+
+    for(int i = 0; i < TAM_NORMAL; i++) {
+        free(claves[i]);
+    }
+    free(claves);
+    abb_iter_in_destruir(iter);
+    abb_destruir(arbol);
+
+}
+
+static void pruebas_volumen(size_t tam) {
+    abb_t* arbol = abb_crear(strcmp, NULL);
+
+    char** claves = malloc(sizeof(char*)*tam);
+
+    for(int i = 0; i < tam; i++) {
+        char* clave = malloc(sizeof(char)*TAM_CLAVE);
+        claves[i] = rand_string(clave, sizeof(clave));
+        abb_guardar(arbol, claves[i], claves[i]);
+    }
+
+    for(int i = 0; i < tam; i++) {
+        free(claves[i]);
+    }
+    free(claves);
+    abb_destruir(arbol);
+}
+
+
+
+
 
 void pruebas_lista_estudiante() {
-    //..
+    srand(time(NULL));
     prueba_abb_vacio();
     prueba_abb_ejemplo_basico();
     prueba_abb_reemplazar_con_destruir();
     prueba_abb_valor_null();
     prueba_abb_clave_vacia();
     pruebas_abb_borrar();
-
+    pruebas_iter_in();
+    //pruebas_volumen(TAM_VOLUMEN);
 }
 
 

@@ -364,21 +364,23 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol) {
 
 
 bool abb_iter_in_avanzar(abb_iter_t *iter) {
-    if (!abb_iter_in_al_final(iter)) {
+    if (abb_iter_in_al_final(iter)) {
         return false;
     }
     nodo_t* actual = pila_desapilar(iter->pila);
 
-    if (!actual->derecha) {
-        return false;
+    if (actual->derecha) {
+        pila_apilar_abb(iter->pila, actual->derecha);
     }
 
-    pila_apilar_abb(iter->pila, actual->derecha);
     return true;
 }
 
 
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter) {
+    if(abb_iter_in_al_final(iter)){
+        return NULL;
+    }
     nodo_t* tope = pila_ver_tope(iter->pila);
     return tope->clave;
 }
