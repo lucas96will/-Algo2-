@@ -97,16 +97,17 @@ nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_compar
     }
 } // Complejidad: T(n) = T(n/2) + O(1) => complejidad O(log(n))  (Asumo que en el peor de los casos el arbol esta balanceado)
 
+
+
+
 bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nodo_t* actual) {
     
     if (actual == NULL) {
-            //char* copia = strdup(clave);
-            nodo_t* nuevo_nodo = nodo_crear(clave, dato);
-            if(!nuevo_nodo) {
-                return false;
-            }
-            arbol->cantidad++;
-
+        nodo_t* nuevo_nodo = nodo_crear(clave, dato);
+        if(!nuevo_nodo) {
+            return false;
+        }
+        arbol->cantidad++;
 
         if(arbol->f_comparar(padre->clave, clave) > 0) {
         // La clave es mayor ? -> voy al hijo izquierdo
@@ -122,6 +123,8 @@ bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nod
             if(arbol->f_destruir != NULL) {
                 arbol->f_destruir(actual->dato);
             }
+            free(actual->clave);
+            actual->clave = strdup(clave);
             actual->dato = dato;
             return true;
         }
@@ -210,61 +213,59 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     return _abb_guardar(arbol, clave, dato, NULL, actual);
 }
 
+void abb_borrar_0_hijos(abb_t* arbol, par_padre_hijo_t* referencia) {
+    if (!referencia->padre){
+        arbol->raiz= NULL;
+    }
+    else if(arbol->f_comparar(referencia->padre->clave, referencia->elem_a_borrar->clave) > 0) {
+        referencia->padre->izquierda = NULL;
+    } else {
+        referencia->padre->derecha = NULL;
+    }
+    arbol->cantidad--;
+    nodo_destruir(referencia->elem_a_borrar, arbol->f_destruir);
+}
+
+void abb_borrar_1_hijo(abb_t* arbol, par_padre_hijo_t* referencia, nodo_t* reemplazante) {
+    if (!referencia->padre) {
+        arbol->raiz = reemplazante;
+    } else if(arbol->f_comparar(referencia->padre->clave, referencia->elem_a_borrar->clave) > 0) {
+        referencia->padre->izquierda = reemplazante;
+    } else {
+        referencia->padre->derecha = reemplazante;
+    }
+    arbol->cantidad--;
+    nodo_destruir(referencia->elem_a_borrar, arbol->f_destruir);
+}
+
+
 void *abb_borrar(abb_t *arbol, const char *clave) {
     if(!abb_pertenece(arbol, clave)) {
         return NULL;
     }
     par_padre_hijo_t* par_padre_hijo = abb_obtener_elem_a_borrar(NULL, arbol->raiz, clave, arbol->f_comparar);
     
-    void* dato_borrado = NULL;
+    void* dato_borrado = par_padre_hijo->elem_a_borrar->dato;
 
-    if (!par_padre_hijo->elem_a_borrar->izquierda && !par_padre_hijo->elem_a_borrar->derecha ) { //Elem a borrar no tiene hijos
-        if (!par_padre_hijo->padre){
-            arbol->raiz= NULL;
-        }
-        else if(arbol->f_comparar(par_padre_hijo->padre->clave, par_padre_hijo->elem_a_borrar->clave) > 0) {
-            par_padre_hijo->padre->izquierda = NULL;
-        } else {
-            par_padre_hijo->padre->derecha = NULL;
-        }
-        
-        arbol->cantidad--;
-        dato_borrado = par_padre_hijo->elem_a_borrar->dato;
-        nodo_destruir(par_padre_hijo->elem_a_borrar, arbol->f_destruir);
-        
-    } else if  (par_padre_hijo->elem_a_borrar->izquierda && !par_padre_hijo->elem_a_borrar->derecha ) { //Elem a borrar tiene hijo izq
-        
-        if (!par_padre_hijo->padre) {
-            arbol->raiz = par_padre_hijo->elem_a_borrar->izquierda;
-        } else if(arbol->f_comparar(par_padre_hijo->padre->clave, par_padre_hijo->elem_a_borrar->clave) > 0) {
-            par_padre_hijo->padre->izquierda = par_padre_hijo->elem_a_borrar->izquierda;
-        } else {
-            par_padre_hijo->padre->derecha = par_padre_hijo->elem_a_borrar->izquierda;
-        }
-        arbol->cantidad--;
-        dato_borrado = par_padre_hijo->elem_a_borrar->dato;
-        nodo_destruir(par_padre_hijo->elem_a_borrar, arbol->f_destruir);
-        
-    } else if (!par_padre_hijo->elem_a_borrar->izquierda && par_padre_hijo->elem_a_borrar->derecha ) { //Elem a borrar tiene hijo der
+    if (!par_padre_hijo->elem_a_borrar->izquierda && !par_padre_hijo->elem_a_borrar->derecha ) {
+        //Elem a borrar no tiene hijos
+        abb_borrar_0_hijos(arbol, par_padre_hijo);
 
-        if (!par_padre_hijo->padre) {
-            arbol->raiz = par_padre_hijo->elem_a_borrar->derecha;
-        } else if(arbol->f_comparar(par_padre_hijo->padre->clave, par_padre_hijo->elem_a_borrar->clave) > 0) {
-            par_padre_hijo->padre->izquierda = par_padre_hijo->elem_a_borrar->derecha;
-        } else {
-            par_padre_hijo->padre->derecha = par_padre_hijo->elem_a_borrar->derecha;
-        }
-        arbol->cantidad--;
-        dato_borrado = par_padre_hijo->elem_a_borrar->dato;
-        nodo_destruir(par_padre_hijo->elem_a_borrar, arbol->f_destruir);
+    } else if  (par_padre_hijo->elem_a_borrar->izquierda && !par_padre_hijo->elem_a_borrar->derecha ) {
+        //Elem a borrar tiene hijo izq
+        abb_borrar_1_hijo(arbol, par_padre_hijo, par_padre_hijo->elem_a_borrar->izquierda);
+
+    } else if (!par_padre_hijo->elem_a_borrar->izquierda && par_padre_hijo->elem_a_borrar->derecha ) {
+        //Elem a borrar tiene hijo der
+        abb_borrar_1_hijo(arbol, par_padre_hijo, par_padre_hijo->elem_a_borrar->derecha);
         
-    } else if (par_padre_hijo->elem_a_borrar->izquierda && par_padre_hijo->elem_a_borrar->derecha ) { //Elem a borrar tiene dos hijos
+    } else if (par_padre_hijo->elem_a_borrar->izquierda && par_padre_hijo->elem_a_borrar->derecha ) {
+        //Elem a borrar tiene dos hijos
 
         nodo_t* reemplazante = busqueda_reemplazante(par_padre_hijo->elem_a_borrar);
         char* clave_reemp = strdup(reemplazante->clave);
         void* dato_reemp = abb_borrar(arbol, clave_reemp);
 
-        dato_borrado = par_padre_hijo->elem_a_borrar->dato;
         par_padre_hijo->elem_a_borrar->dato = dato_reemp;
         free(par_padre_hijo->elem_a_borrar->clave);
         par_padre_hijo->elem_a_borrar->clave = clave_reemp;
