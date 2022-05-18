@@ -2,6 +2,7 @@
 #include <string.h>
 #include "testing.h"
 #include "abb.h"
+#include "pila.h"
 #include <time.h>
 #include <stdlib.h>
 
@@ -222,24 +223,61 @@ static char *rand_string(char *str, size_t size)
     return str;
 }
 
+void destruir_arreglo_claves(char** claves, size_t tam) {
+    for(int i = 0; i < tam; i++) {
+        free(claves[i]);
+    }
+}
+
+bool iniciar_arreglo_claves(char** claves, size_t tam) {
+    int k;
+    bool seguir = true;
+    for(k = 0; k < tam && seguir; k++) {
+        claves[k] = malloc(sizeof(char)*TAM_CLAVE);
+        if(!claves[k]) {
+            seguir = false;
+        }
+    }
+    if(!seguir) {
+        destruir_arreglo_claves(claves, k-1);
+        return false;
+    }
+
+    for(int i = 0; i < tam; i++){
+        rand_string(claves[i], TAM_CLAVE);
+    }
+    return true;
+}
+
+
 
 static void pruebas_iter_in() {
 
     abb_t* arbol = abb_crear(strcmp, NULL);
     char** claves = malloc(sizeof(char*) * TAM_NORMAL);
     if(!claves) {
+        abb_destruir(arbol);
         return;
     }
 
+    if(!iniciar_arreglo_claves(claves, TAM_NORMAL)) {
+        abb_destruir(arbol);
+        free(claves);
+        return;
+    }
 
     for(int i = 0; i < TAM_NORMAL; i++) {
-        char* clave = malloc(sizeof(char)*TAM_CLAVE);
-        claves[i] = rand_string(clave, TAM_CLAVE);
         abb_guardar(arbol, claves[i], claves[i]);
     }
 
     // Pruebas genericas del iterador
     abb_iter_t* iter = abb_iter_in_crear(arbol);
+    if(!iter) {
+        destruir_arreglo_claves(claves, TAM_NORMAL);
+        free(claves);
+        abb_destruir(arbol);
+        return;
+    }
     print_test("Iterador inorder creado", iter);
     print_test("Avanzar iterador es posible", abb_iter_in_avanzar(iter));
     print_test("Obtener iterador no es null", abb_iter_in_ver_actual(iter));
@@ -262,9 +300,7 @@ static void pruebas_iter_in() {
     print_test("No se puede avanzar el iterador", !abb_iter_in_avanzar(iter));
     print_test("No se puede obtener clave del iterador", !abb_iter_in_ver_actual(iter));
 
-    for(int i = 0; i < TAM_NORMAL; i++) {
-        free(claves[i]);
-    }
+    destruir_arreglo_claves(claves, TAM_NORMAL);
     free(claves);
     abb_iter_in_destruir(iter);
     abb_destruir(arbol);
@@ -279,10 +315,14 @@ static void pruebas_volumen(const size_t tam) {
         return;
     }
 
+    if(!iniciar_arreglo_claves(claves, tam)) {
+        abb_destruir(arbol);
+        free(claves);
+        return;
+    }
+
     bool guardar_ok = true;
     for(int i = 0; i < tam; i++) {
-        char* clave = malloc(sizeof(char)*TAM_CLAVE);
-        claves[i] = rand_string(clave, TAM_CLAVE);
         guardar_ok &= abb_guardar(arbol, claves[i], claves[i]);
     }
 
@@ -303,9 +343,7 @@ static void pruebas_volumen(const size_t tam) {
     print_test("Se pudo borrar todos los elementos correctamente", abb_cantidad(arbol) == 0);
 
 
-    for(int i = 0; i < tam; i++) {
-        free(claves[i]);
-    }
+    destruir_arreglo_claves(claves, tam);
     free(claves);
     abb_destruir(arbol);
 }
@@ -317,31 +355,45 @@ static void pruebas_iterador_volumen(const size_t tam) {
     char** claves = malloc(sizeof(char*)*tam);
     if(!claves) return;
 
+    if(!iniciar_arreglo_claves(claves, tam)) {
+        abb_destruir(arbol);
+        free(claves);
+        return;
+    }
+
     for(int i = 0; i < tam; i++) {
-        char* clave = malloc(sizeof(char)*TAM_CLAVE);
-        claves[i] = rand_string(clave, TAM_CLAVE);
         abb_guardar(arbol, claves[i], claves[i]);
     }
 
     abb_iter_t* iter = abb_iter_in_crear(arbol);
     if(!iter){
+        destruir_arreglo_claves(claves, tam);
+        free(claves);
         abb_destruir(arbol);
         return;
     }
 
     char** claves_v2 = malloc(sizeof(char*) *abb_cantidad(arbol));
     if(!claves_v2) {
-        for(int i = 0; i < abb_cantidad(arbol); i++) {
-            free(claves[i]);
-        }
+        destruir_arreglo_claves(claves, tam);
+        free(claves);
+        abb_destruir(arbol);
+        abb_iter_in_destruir(iter);
         return;
     }
 
     // Itero mientras voy guardando en un vector en mi vector de claves
+    if(!iniciar_arreglo_claves(claves_v2, abb_cantidad(arbol))) {
+        destruir_arreglo_claves(claves, tam);
+        free(claves);
+        free(claves_v2);
+        abb_destruir(arbol);
+        abb_iter_in_destruir(iter);
+        return;
+    }
 
     for(int i = 0; !abb_iter_in_al_final(iter); i++) {
         const char* actual = abb_iter_in_ver_actual(iter);
-        claves_v2[i] = malloc(sizeof(char)*TAM_CLAVE);
         strcpy(claves_v2[i], actual);
         abb_iter_in_avanzar(iter);
     }
@@ -356,19 +408,41 @@ static void pruebas_iterador_volumen(const size_t tam) {
 
     // Libero toda la memoria pedida
 
-    for(int i = 0; i < tam; i++) {
-        free(claves[i]);
-    }
-    for(int i = 0; i < abb_cantidad(arbol); i++) {
-        free(claves_v2[i]);
-    }
-
+    destruir_arreglo_claves(claves, tam);
+    destruir_arreglo_claves(claves_v2, abb_cantidad(arbol));
     free(claves);
     free(claves_v2);
     abb_iter_in_destruir(iter);
     abb_destruir(arbol);
 }
 
+
+/*bool guardar_inorder(const char clave, void* dato, void* extra) {
+    (pila_t*)
+}*/
+
+
+static void pruebas_iterador_inorder_interno() {
+    abb_t* arbol = abb_crear(strcmp, NULL);
+    char** claves = malloc(sizeof(char*)*TAM_NORMAL);
+    if(!claves) return;
+
+    if(!iniciar_arreglo_claves(claves, TAM_NORMAL)) {
+        abb_destruir(arbol);
+        free(claves);
+        return;
+    }
+
+    for(int i = 0; i < TAM_NORMAL; i++) {
+        abb_guardar(arbol, claves[i], claves[i]);
+    }
+
+
+
+    destruir_arreglo_claves(claves, TAM_NORMAL);
+    free(claves);
+    abb_destruir(arbol);
+}
 
 
 void pruebas_abb_estudiante() {
@@ -382,6 +456,7 @@ void pruebas_abb_estudiante() {
     pruebas_iter_in();
     pruebas_volumen(TAM_VOLUMEN);
     pruebas_iterador_volumen(TAM_VOLUMEN);
+    //pruebas_iterador_inorder_interno();
 }
 
 
