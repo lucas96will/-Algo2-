@@ -10,6 +10,7 @@
 #define TAM_NORMAL 100
 
 
+
 static void prueba_abb_vacio() {
     
     abb_t* abb = abb_crear(NULL, NULL);
@@ -226,11 +227,14 @@ static void pruebas_iter_in() {
 
     abb_t* arbol = abb_crear(strcmp, NULL);
     char** claves = malloc(sizeof(char*) * TAM_NORMAL);
+    if(!claves) {
+        return;
+    }
 
 
     for(int i = 0; i < TAM_NORMAL; i++) {
         char* clave = malloc(sizeof(char)*TAM_CLAVE);
-        claves[i] = rand_string(clave, sizeof(clave));
+        claves[i] = rand_string(clave, TAM_CLAVE);
         abb_guardar(arbol, claves[i], claves[i]);
     }
 
@@ -267,16 +271,37 @@ static void pruebas_iter_in() {
 
 }
 
-static void pruebas_volumen(size_t tam) {
+static void pruebas_volumen(const size_t tam) {
     abb_t* arbol = abb_crear(strcmp, NULL);
 
     char** claves = malloc(sizeof(char*)*tam);
+    if(!claves) {
+        return;
+    }
 
+    bool guardar_ok = true;
     for(int i = 0; i < tam; i++) {
         char* clave = malloc(sizeof(char)*TAM_CLAVE);
-        claves[i] = rand_string(clave, sizeof(clave));
-        abb_guardar(arbol, claves[i], claves[i]);
+        claves[i] = rand_string(clave, TAM_CLAVE);
+        guardar_ok &= abb_guardar(arbol, claves[i], claves[i]);
     }
+
+    print_test("Se pudo guardar gran cantidad de datos correctamente", guardar_ok);
+
+    bool obtener_ok = true;
+    for(int i = 0; i < tam; i++) {
+        char* actual = abb_obtener(arbol, claves[i]);
+        obtener_ok &= (strcmp(actual, claves[i]) == 0);
+    }
+
+    print_test("Se pudo obtener todos los elementos correctamente", obtener_ok);
+
+    for(int i = 0; abb_cantidad(arbol) > 0; i++) {
+        // Puede haber claves repetidas, por lo que a veces el borrar puede devolver null!
+        abb_borrar(arbol, claves[i]);
+    }
+    print_test("Se pudo borrar todos los elementos correctamente", abb_cantidad(arbol) == 0);
+
 
     for(int i = 0; i < tam; i++) {
         free(claves[i]);
@@ -285,12 +310,69 @@ static void pruebas_volumen(size_t tam) {
     abb_destruir(arbol);
 }
 
+static void pruebas_iterador_volumen(const size_t tam) {
+    // Creo arbol y guardo elementos
+
+    abb_t* arbol = abb_crear(strcmp, NULL);
+    char** claves = malloc(sizeof(char*)*tam);
+    if(!claves) return;
+
+    for(int i = 0; i < tam; i++) {
+        char* clave = malloc(sizeof(char)*TAM_CLAVE);
+        claves[i] = rand_string(clave, TAM_CLAVE);
+        abb_guardar(arbol, claves[i], claves[i]);
+    }
+
+    abb_iter_t* iter = abb_iter_in_crear(arbol);
+    if(!iter){
+        abb_destruir(arbol);
+        return;
+    }
+
+    char** claves_v2 = malloc(sizeof(char*) *abb_cantidad(arbol));
+    if(!claves_v2) {
+        for(int i = 0; i < abb_cantidad(arbol); i++) {
+            free(claves[i]);
+        }
+        return;
+    }
+
+    // Itero mientras voy guardando en un vector en mi vector de claves
+
+    for(int i = 0; !abb_iter_in_al_final(iter); i++) {
+        const char* actual = abb_iter_in_ver_actual(iter);
+        claves_v2[i] = malloc(sizeof(char)*TAM_CLAVE);
+        strcpy(claves_v2[i], actual);
+        abb_iter_in_avanzar(iter);
+    }
+
+    bool ordenado = true;
+    for(int i = 0; i < abb_cantidad(arbol)-1 && ordenado; i++) {
+        ordenado &= (strcmp(claves_v2[i], claves_v2[i+1]) < 0);
+    }
+
+    print_test("El iterador inorder itero correctamente sobre toda la estructura", ordenado);
+
+
+    // Libero toda la memoria pedida
+
+    for(int i = 0; i < tam; i++) {
+        free(claves[i]);
+    }
+    for(int i = 0; i < abb_cantidad(arbol); i++) {
+        free(claves_v2[i]);
+    }
+
+    free(claves);
+    free(claves_v2);
+    abb_iter_in_destruir(iter);
+    abb_destruir(arbol);
+}
 
 
 
-
-void pruebas_lista_estudiante() {
-    srand(time(NULL));
+void pruebas_abb_estudiante() {
+    srand((unsigned)time(NULL));
     prueba_abb_vacio();
     prueba_abb_ejemplo_basico();
     prueba_abb_reemplazar_con_destruir();
@@ -298,7 +380,8 @@ void pruebas_lista_estudiante() {
     prueba_abb_clave_vacia();
     pruebas_abb_borrar();
     pruebas_iter_in();
-    //pruebas_volumen(TAM_VOLUMEN);
+    pruebas_volumen(TAM_VOLUMEN);
+    pruebas_iterador_volumen(TAM_VOLUMEN);
 }
 
 
@@ -309,7 +392,7 @@ void pruebas_lista_estudiante() {
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
 
 int main(void) {
-    pruebas_lista_estudiante();
+    pruebas_abb_estudiante();
     return failure_count() > 0;  // Indica si falló alguna prueba.
 }
 

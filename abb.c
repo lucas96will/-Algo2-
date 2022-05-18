@@ -331,7 +331,7 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
     while (actual && continuar) {
         continuar = visitar(actual->clave, actual->dato, extra);
         pila_apilar_abb(pila, actual->derecha);
-        actual = (nodo_t*) pila_desapilar;
+        actual = (nodo_t*) pila_desapilar(pila);
     }
     pila_destruir(pila);
 
