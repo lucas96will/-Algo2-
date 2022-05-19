@@ -1,10 +1,11 @@
-#include <stdio.h>
+#define _POSIX_C_SOURCE 200809L
 #include <string.h>
 #include "testing.h"
 #include "abb.h"
 #include "pila.h"
 #include <time.h>
 #include <stdlib.h>
+
 
 
 #define TAM_VOLUMEN 5000
@@ -81,7 +82,7 @@ static char *rand_string(char *str, size_t size)
 // Post: asigna a cada cadena letras aleatorias
 // devuelve true si se pudo guardar exitosamente o false en otro caso
 bool iniciar_arreglo_claves(char** claves, size_t tam) {
-    int k;
+    size_t k;
     bool seguir = true;
     for(k = 0; k < tam && seguir; k++) {
         claves[k] = malloc(sizeof(char)*TAM_CLAVE);
