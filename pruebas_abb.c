@@ -422,12 +422,27 @@ typedef struct arreglo_ord {
     size_t pos;
 } arreglo_ord_t;
 
+typedef struct extra_encontrado {
+    char* clave;
+    size_t posicion;
+} extra_encontrado_t ;
+
 bool guardar_arreglo_inorder(const char* clave, void* dato, void* extra) {
     arreglo_ord_t* arreglo_ord = (arreglo_ord_t*) extra;
     strcpy(arreglo_ord->arreglo[arreglo_ord->pos], clave);
     arreglo_ord->pos++;
     return true;
 }
+
+bool clave_encontrada(const char* clave, void* dato, void* extra) {
+    extra_encontrado_t* extra_encontrado = (extra_encontrado_t*) extra;
+    if(strcmp(extra_encontrado->clave, clave) == 0) {
+        return false;
+    }
+    extra_encontrado->posicion++;
+    return true;
+}
+
 
 
 static void pruebas_iterador_inorder_interno() {
@@ -466,7 +481,7 @@ static void pruebas_iterador_inorder_interno() {
     arr_ord->tam = abb_cantidad(arbol);
     arr_ord->pos = 0;
 
-    // Uso el iterador interno inorder
+    // Uso el iterador interno inorder para guardar el arreglo ordenado
     abb_in_order(arbol, guardar_arreglo_inorder, arr_ord);
 
     bool ordenado = true;
@@ -476,11 +491,23 @@ static void pruebas_iterador_inorder_interno() {
 
     print_test("El iterador interno inorder itero correctamente sobre toda la estructura", ordenado);
 
+    extra_encontrado_t encontrado;
+    encontrado.posicion = 0;
+    encontrado.clave = strdup(claves_ord[15]);
+
+    // Uso el iterador interno para buscar una clave y guardar su posicion
+    abb_in_order(arbol, clave_encontrada, &encontrado);
+    // Pruebo que la posicion guardada es el 15 (con esto pruebo que no se siguio iterando!
+    print_test("El iterador interno inorder itero hallo una clave", encontrado.posicion == 15);
+
+
+    // Libero la memoria pedida
     destruir_arreglo_claves(claves_ord, TAM_NORMAL);
     destruir_arreglo_claves(claves, TAM_NORMAL);
     free(arr_ord);
     free(claves_ord);
     free(claves);
+    free(encontrado.clave);
     abb_destruir(arbol);
 }
 
