@@ -416,10 +416,18 @@ static void pruebas_iterador_volumen(const size_t tam) {
     abb_destruir(arbol);
 }
 
+typedef struct arreglo_ord {
+    char** arreglo;
+    size_t tam;
+    size_t pos;
+} arreglo_ord_t;
 
-/*bool guardar_inorder(const char clave, void* dato, void* extra) {
-    (pila_t*)
-}*/
+bool guardar_arreglo_inorder(const char* clave, void* dato, void* extra) {
+    arreglo_ord_t* arreglo_ord = (arreglo_ord_t*) extra;
+    strcpy(arreglo_ord->arreglo[arreglo_ord->pos], clave);
+    arreglo_ord->pos++;
+    return true;
+}
 
 
 static void pruebas_iterador_inorder_interno() {
@@ -432,14 +440,46 @@ static void pruebas_iterador_inorder_interno() {
         free(claves);
         return;
     }
-
     for(int i = 0; i < TAM_NORMAL; i++) {
         abb_guardar(arbol, claves[i], claves[i]);
     }
 
+    // Creo un vector donde voy a guardar ordenadamente con el iterador interno
+    char** claves_ord = malloc(sizeof(char*)*abb_cantidad(arbol));
+    if(!claves_ord){
+        destruir_arreglo_claves(claves, TAM_NORMAL);
+        abb_destruir(arbol);
+        free(claves);
+        return;
+    }
 
+    if(!iniciar_arreglo_claves(claves_ord, abb_cantidad(arbol))){
+        destruir_arreglo_claves(claves, TAM_NORMAL);
+        abb_destruir(arbol);
+        free(claves_ord);
+        free(claves);
+        return;
+    }
 
+    arreglo_ord_t* arr_ord = malloc(sizeof(arreglo_ord_t));
+    arr_ord->arreglo = claves_ord;
+    arr_ord->tam = abb_cantidad(arbol);
+    arr_ord->pos = 0;
+
+    // Uso el iterador interno inorder
+    abb_in_order(arbol, guardar_arreglo_inorder, arr_ord);
+
+    bool ordenado = true;
+    for(int i = 0; i < abb_cantidad(arbol)-1 && ordenado; i++) {
+        ordenado &= (strcmp(claves_ord[i], claves_ord[i+1]) < 0);
+    }
+
+    print_test("El iterador interno inorder itero correctamente sobre toda la estructura", ordenado);
+
+    destruir_arreglo_claves(claves_ord, TAM_NORMAL);
     destruir_arreglo_claves(claves, TAM_NORMAL);
+    free(arr_ord);
+    free(claves_ord);
     free(claves);
     abb_destruir(arbol);
 }
@@ -456,7 +496,7 @@ void pruebas_abb_estudiante() {
     pruebas_iter_in();
     pruebas_volumen(TAM_VOLUMEN);
     pruebas_iterador_volumen(TAM_VOLUMEN);
-    //pruebas_iterador_inorder_interno();
+    pruebas_iterador_inorder_interno();
 }
 
 
