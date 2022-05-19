@@ -148,7 +148,6 @@ void abb_borrar_1_hijo(abb_t* arbol, par_padre_hijo_t* referencia, nodo_t* reemp
 void pila_apilar_abb(pila_t* pila, nodo_t* nodo);
 
 
-
 nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_comparar_clave_t f_comparar) {
     if(nodo == NULL) {
         return NULL;
@@ -421,9 +420,6 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol) {
     }
 
     nodo_t* actual = arbol->raiz;
-    if (!actual){
-        return NULL;
-    }
     pila_apilar_abb(iter->pila, actual);
     
     return iter;

@@ -565,6 +565,17 @@ static void pruebas_destruir_abb_pilas() {
     //
 }
 
+static void prueba_crear_iter_abb_vacio() {
+    abb_t* arbol = abb_crear(strcmp, NULL);
+    abb_iter_t* iter = abb_iter_in_crear(arbol);
+
+    print_test("Se pudo crear iter en abb vacio", iter != NULL);
+    print_test("El iter esta al final", abb_iter_in_al_final(iter));
+
+    abb_iter_in_destruir(iter);
+    abb_destruir(arbol);
+}
+
 
 void pruebas_abb_estudiante() {
     srand((unsigned)time(NULL));
@@ -579,6 +590,7 @@ void pruebas_abb_estudiante() {
     pruebas_iterador_volumen(TAM_VOLUMEN);
     pruebas_iterador_inorder_interno();
     pruebas_destruir_abb_pilas();
+    prueba_crear_iter_abb_vacio();
 }
 
 
