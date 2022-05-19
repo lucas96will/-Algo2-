@@ -60,6 +60,25 @@ void nodo_destruir(nodo_t* nodo, abb_destruir_dato_t f_destruir) {
     free(nodo);
 }
 
+/* *****************************************************************
+ *                FUNCIONES DEL PAR PADRE HIJO
+ * *****************************************************************/
+
+/*
+* Crea un par padre hijo.
+ * Pre: Recibe el nodo del padre y el nodo del hijo.
+ * Post: Devolvio el struct padre hijo con sus nodos correspondientes.
+ * */
+par_padre_hijo_t* par_padre_hijo_crear(nodo_t* padre, nodo_t* hijo);
+
+/*
+* Destruye el par padre hijo.
+ * Pre: El par padre hijo fue creado.
+ * Post: El par padre hijo fue destruido.
+ * */
+void par_padre_hijo_destruir(par_padre_hijo_t* par_padre_hijo);
+
+
 par_padre_hijo_t* par_padre_hijo_crear(nodo_t* padre, nodo_t* hijo) {
     par_padre_hijo_t* par_padre_hijo = malloc(sizeof(par_padre_hijo_t));
     if (par_padre_hijo == NULL){
@@ -79,6 +98,56 @@ void par_padre_hijo_destruir(par_padre_hijo_t* par_padre_hijo) {
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES DEL ABB
  * *****************************************************************/
+/*
+* Obtiene el nodo que contenga la misma clave que la pasada por parametro.
+ * Pre: Recibe la raiz del arbol, la clave a buscar y la funcion para comparar claves.
+ * Post: Devolvio el nodo con esa clave.
+ * */
+nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_comparar_clave_t f_comparar);
+
+/*
+* Funcion auxiliar que ayuda a la primitiva de guardado.
+ * Pre: Recibe el arbol, la clave y dato a guardar, el padre del nodo actual y el nodo actual.
+ * Post: Devolvio true si se guardo correctamente, false en caso contrario.
+ * */
+bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nodo_t* actual);
+
+/*
+* Obtiene el par padre hijo, siendo el hijo el elemento a borrar.
+ * Pre: Recibe el padre del primer elemento del arbol, el primer elemento del arbol, la clave a buscar y la funcion de comparacion.
+ * Post: Devolvio el par padre hijo.
+ * */
+par_padre_hijo_t* abb_obtener_elem_a_borrar(nodo_t *padre, nodo_t* hijo, const char *clave, abb_comparar_clave_t f_comparar);
+
+/*
+* Busca el reemplazante para un caso de borrado con dos hijos, que sera el menor de sus hijos mayores.
+ * Pre: Recibe el nodo del que necesito su reemplazante.
+ * Post: Devolvio el nodo reemplazante.
+ * */
+nodo_t* busqueda_reemplazante(nodo_t* nodo);
+
+/*
+* Funcion auxiliar que borra un nodo sin hijos.
+ * Pre: Recibe el arbol, y el par padre hijo, siendo el hijo el elemento a borrar.
+ * Post: Borro al elemento deseado.
+ * */
+void abb_borrar_0_hijos(abb_t* arbol, par_padre_hijo_t* referencia);
+
+/*
+* Funcion auxiliar que borra un nodo con 1 hijo.
+ * Pre: Recibe el arbol,  el par padre hijo, siendo el hijo el elemento a borrar y el reemplazante.
+ * Post: Borro al elemento deseado.
+ * */
+void abb_borrar_1_hijo(abb_t* arbol, par_padre_hijo_t* referencia, nodo_t* reemplazante);
+
+/*
+* Apila los nodos en una pila para replicar el recorrido in order deseado en el iterador externo.
+ * Pre: Recibe la pila, y el nodo actual.
+ * Post: Apilo los elementos correspondientes.
+ * */
+void pila_apilar_abb(pila_t* pila, nodo_t* nodo);
+
+
 
 nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_comparar_clave_t f_comparar) {
     if(nodo == NULL) {
@@ -96,8 +165,6 @@ nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_compar
         return abb_obtener_nodo_misma_clave(nodo->derecha, clave, f_comparar);
     }
 } // Complejidad: T(n) = T(n/2) + O(1) => complejidad O(log(n))  (Asumo que en el peor de los casos el arbol esta balanceado)
-
-
 
 
 bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nodo_t* actual) {
@@ -166,6 +233,31 @@ nodo_t* busqueda_reemplazante(nodo_t* nodo) { //Menor de sus hijos mayores
     return actual;
 }
 
+void abb_borrar_0_hijos(abb_t* arbol, par_padre_hijo_t* referencia) {
+    if (!referencia->padre){
+        arbol->raiz= NULL;
+    }
+    else if(arbol->f_comparar(referencia->padre->clave, referencia->elem_a_borrar->clave) > 0) {
+        referencia->padre->izquierda = NULL;
+    } else {
+        referencia->padre->derecha = NULL;
+    }
+    arbol->cantidad--;
+    nodo_destruir(referencia->elem_a_borrar, arbol->f_destruir);
+}
+
+void abb_borrar_1_hijo(abb_t* arbol, par_padre_hijo_t* referencia, nodo_t* reemplazante) {
+    if (!referencia->padre) {
+        arbol->raiz = reemplazante;
+    } else if(arbol->f_comparar(referencia->padre->clave, referencia->elem_a_borrar->clave) > 0) {
+        referencia->padre->izquierda = reemplazante;
+    } else {
+        referencia->padre->derecha = reemplazante;
+    }
+    arbol->cantidad--;
+    nodo_destruir(referencia->elem_a_borrar, arbol->f_destruir);
+}
+
 void pila_apilar_abb(pila_t* pila, nodo_t* nodo) {
     if (!nodo) {
         return;
@@ -211,31 +303,6 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     nodo_t* actual = arbol->raiz;
 
     return _abb_guardar(arbol, clave, dato, NULL, actual);
-}
-
-void abb_borrar_0_hijos(abb_t* arbol, par_padre_hijo_t* referencia) {
-    if (!referencia->padre){
-        arbol->raiz= NULL;
-    }
-    else if(arbol->f_comparar(referencia->padre->clave, referencia->elem_a_borrar->clave) > 0) {
-        referencia->padre->izquierda = NULL;
-    } else {
-        referencia->padre->derecha = NULL;
-    }
-    arbol->cantidad--;
-    nodo_destruir(referencia->elem_a_borrar, arbol->f_destruir);
-}
-
-void abb_borrar_1_hijo(abb_t* arbol, par_padre_hijo_t* referencia, nodo_t* reemplazante) {
-    if (!referencia->padre) {
-        arbol->raiz = reemplazante;
-    } else if(arbol->f_comparar(referencia->padre->clave, referencia->elem_a_borrar->clave) > 0) {
-        referencia->padre->izquierda = reemplazante;
-    } else {
-        referencia->padre->derecha = reemplazante;
-    }
-    arbol->cantidad--;
-    nodo_destruir(referencia->elem_a_borrar, arbol->f_destruir);
 }
 
 
