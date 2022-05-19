@@ -2,14 +2,107 @@
 #include <string.h>
 #include "testing.h"
 #include "abb.h"
+#include "pila.h"
 #include <time.h>
 #include <stdlib.h>
+
 
 #define TAM_VOLUMEN 5000
 #define TAM_CLAVE 5
 #define TAM_NORMAL 100
 
+/* *****************************************************************
+ *                    STRUCTS AUXILIARES
+ * *****************************************************************/
 
+typedef struct arreglo_ord {
+    char** arreglo;
+    size_t pos;
+} arreglo_ord_t;
+
+typedef struct extra_encontrado {
+    char* clave;
+    size_t posicion;
+} extra_encontrado_t ;
+
+/* *****************************************************************
+ *                    FUNCIONES AUXILIARES
+ * *****************************************************************/
+
+void destruir_pila(void *dato) {
+    pila_destruir(dato);
+}
+
+// Funcion visitar
+// extra es una estructura de tipo arreglo_ord
+// Post: guarda en arreglo_ord las claves
+bool guardar_arreglo_inorder(const char* clave, void* dato, void* extra) {
+    arreglo_ord_t* arreglo_ord = (arreglo_ord_t*) extra;
+    strcpy(arreglo_ord->arreglo[arreglo_ord->pos], clave);
+    arreglo_ord->pos++;
+    return true;
+}
+
+// Funcion visitar
+// extra es una estructura de tipo extra_encontrado_t
+// Post: devuelve true si se encontro la clave dentro de extra, false en otro caso
+bool clave_encontrada(const char* clave, void* dato, void* extra) {
+    extra_encontrado_t* extra_encontrado = (extra_encontrado_t*) extra;
+    if(strcmp(extra_encontrado->clave, clave) == 0) {
+        return false;
+    }
+    extra_encontrado->posicion++;
+    return true;
+}
+
+void destruir_arreglo_claves(char** claves, size_t tam) {
+    for(int i = 0; i < tam; i++) {
+        free(claves[i]);
+    }
+}
+
+// size > 0
+// A la cadena de caracteres str se le asigna letras aleatorias
+static char *rand_string(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJK...";
+    if (size) {
+        --size;
+        for (size_t n = 0; n < size; n++) {
+            int key = rand() % (int) (sizeof charset - 1);
+            str[n] = charset[key];
+        }
+        str[size] = '\0';
+    }
+    return str;
+}
+
+// Pre: claves es un arreglo de cadenas de caracteres inicializado de tam > 0
+// Post: asigna a cada cadena letras aleatorias
+// devuelve true si se pudo guardar exitosamente o false en otro caso
+bool iniciar_arreglo_claves(char** claves, size_t tam) {
+    int k;
+    bool seguir = true;
+    for(k = 0; k < tam && seguir; k++) {
+        claves[k] = malloc(sizeof(char)*TAM_CLAVE);
+        if(!claves[k]) {
+            seguir = false;
+        }
+    }
+    if(!seguir) {
+        destruir_arreglo_claves(claves, k-1);
+        return false;
+    }
+
+    for(int i = 0; i < tam; i++){
+        rand_string(claves[i], TAM_CLAVE);
+    }
+    return true;
+}
+
+/* *****************************************************************
+ *                          PRUEBAS
+ * *****************************************************************/
 
 static void prueba_abb_vacio() {
     
@@ -208,48 +301,6 @@ static void pruebas_abb_borrar() {
 
 }
 
-static char *rand_string(char *str, size_t size)
-{
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJK...";
-    if (size) {
-        --size;
-        for (size_t n = 0; n < size; n++) {
-            int key = rand() % (int) (sizeof charset - 1);
-            str[n] = charset[key];
-        }
-        str[size] = '\0';
-    }
-    return str;
-}
-
-void destruir_arreglo_claves(char** claves, size_t tam) {
-    for(int i = 0; i < tam; i++) {
-        free(claves[i]);
-    }
-}
-
-bool iniciar_arreglo_claves(char** claves, size_t tam) {
-    int k;
-    bool seguir = true;
-    for(k = 0; k < tam && seguir; k++) {
-        claves[k] = malloc(sizeof(char)*TAM_CLAVE);
-        if(!claves[k]) {
-            seguir = false;
-        }
-    }
-    if(!seguir) {
-        destruir_arreglo_claves(claves, k-1);
-        return false;
-    }
-
-    for(int i = 0; i < tam; i++){
-        rand_string(claves[i], TAM_CLAVE);
-    }
-    return true;
-}
-
-
-
 static void pruebas_iter_in() {
 
     abb_t* arbol = abb_crear(strcmp, NULL);
@@ -341,7 +392,6 @@ static void pruebas_volumen(const size_t tam) {
     }
     print_test("Se pudo borrar todos los elementos correctamente", abb_cantidad(arbol) == 0);
 
-
     destruir_arreglo_claves(claves, tam);
     free(claves);
     abb_destruir(arbol);
@@ -352,7 +402,10 @@ static void pruebas_iterador_volumen(const size_t tam) {
 
     abb_t* arbol = abb_crear(strcmp, NULL);
     char** claves = malloc(sizeof(char*)*tam);
-    if(!claves) return;
+    if(!claves) {
+        abb_destruir(arbol);
+        return;
+    }
 
     if(!iniciar_arreglo_claves(claves, tam)) {
         abb_destruir(arbol);
@@ -404,7 +457,6 @@ static void pruebas_iterador_volumen(const size_t tam) {
 
     print_test("El iterador inorder itero correctamente sobre toda la estructura", ordenado);
 
-
     // Libero toda la memoria pedida
 
     destruir_arreglo_claves(claves, tam);
@@ -414,35 +466,6 @@ static void pruebas_iterador_volumen(const size_t tam) {
     abb_iter_in_destruir(iter);
     abb_destruir(arbol);
 }
-
-typedef struct arreglo_ord {
-    char** arreglo;
-    size_t tam;
-    size_t pos;
-} arreglo_ord_t;
-
-typedef struct extra_encontrado {
-    char* clave;
-    size_t posicion;
-} extra_encontrado_t ;
-
-bool guardar_arreglo_inorder(const char* clave, void* dato, void* extra) {
-    arreglo_ord_t* arreglo_ord = (arreglo_ord_t*) extra;
-    strcpy(arreglo_ord->arreglo[arreglo_ord->pos], clave);
-    arreglo_ord->pos++;
-    return true;
-}
-
-bool clave_encontrada(const char* clave, void* dato, void* extra) {
-    extra_encontrado_t* extra_encontrado = (extra_encontrado_t*) extra;
-    if(strcmp(extra_encontrado->clave, clave) == 0) {
-        return false;
-    }
-    extra_encontrado->posicion++;
-    return true;
-}
-
-
 
 static void pruebas_iterador_inorder_interno() {
     abb_t* arbol = abb_crear(strcmp, NULL);
@@ -477,7 +500,6 @@ static void pruebas_iterador_inorder_interno() {
 
     arreglo_ord_t* arr_ord = malloc(sizeof(arreglo_ord_t));
     arr_ord->arreglo = claves_ord;
-    arr_ord->tam = abb_cantidad(arbol);
     arr_ord->pos = 0;
 
     // Uso el iterador interno inorder para guardar el arreglo ordenado
@@ -510,6 +532,38 @@ static void pruebas_iterador_inorder_interno() {
     abb_destruir(arbol);
 }
 
+static void pruebas_destruir_abb_pilas() {
+    abb_t* arbol = abb_crear(strcmp, destruir_pila);
+
+    char *c_gato = "gato";
+    char *c_foca = "foca";
+
+
+    pila_t *valor1a = pila_crear();
+    pila_t *valor2a = pila_crear();
+    pila_t *valor1b = pila_crear();
+    pila_t *valor2b = pila_crear();
+
+    pila_apilar(valor1a, c_gato);
+    pila_apilar(valor2a, c_foca);
+    pila_apilar(valor1b, c_gato);
+    pila_apilar(valor2b, c_foca);
+
+    // Inserto los primeros valores
+
+    abb_guardar(arbol, c_gato, valor1a);
+    abb_guardar(arbol, c_foca, valor1b);
+
+    // Inserto nuevos valores
+
+    abb_guardar(arbol, c_gato, valor2a);
+    abb_guardar(arbol, c_foca, valor2b);
+
+    abb_destruir(arbol);
+
+    //
+}
+
 
 void pruebas_abb_estudiante() {
     srand((unsigned)time(NULL));
@@ -523,6 +577,7 @@ void pruebas_abb_estudiante() {
     pruebas_volumen(TAM_VOLUMEN);
     pruebas_iterador_volumen(TAM_VOLUMEN);
     pruebas_iterador_inorder_interno();
+    pruebas_destruir_abb_pilas();
 }
 
 
