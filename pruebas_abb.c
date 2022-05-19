@@ -2,7 +2,6 @@
 #include <string.h>
 #include "testing.h"
 #include "abb.h"
-#include "pila.h"
 #include <time.h>
 #include <stdlib.h>
 
