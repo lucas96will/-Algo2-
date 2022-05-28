@@ -19,12 +19,6 @@ int comparar_int(const void* a, const void* b) {
     return 0;
 }
 
-void _swap(void** a, void** b) {
-    void** aux = *a;
-    *a = *b;
-    *b = aux;
-
-}
 
 /* ******************************************************************
  *                      PRUEBAS HEAP
@@ -43,12 +37,16 @@ static void prueba_heap_crear() {
 
     heap_destruir(heap, NULL);
 
-    void** vec = malloc(sizeof(void*) * TAM_PRUEBA);
+    /*void** vec = malloc(sizeof(void*) * TAM_PRUEBA);
     for(int i = 0; i < TAM_PRUEBA; i++){
         vec[i] = malloc(sizeof(int));
         *(int*)vec[i] = i+1;
+    }*/
+    int vec2[TAM_PRUEBA] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    void** vec = malloc(sizeof(void*) * TAM_PRUEBA);
+    for(int i = 0; i < TAM_PRUEBA; i++) {
+        vec[i] = &vec2[i];
     }
-
     heap_t* heap_2 = heap_crear_arr(vec, TAM_PRUEBA, comparar_int);
     print_test("Heap crear arr fue creado exitosamente", heap_2 != NULL);
     print_test("El heap tiene 10 elementos", heap_cantidad(heap_2) == 10);
@@ -56,9 +54,7 @@ static void prueba_heap_crear() {
     print_test("Ver max del heap es 10", *(int*)heap_ver_max(heap_2) == 10);
 
 
-    for(int i = 0; i < TAM_PRUEBA; i++){
-        free(vec[i]);
-    }
+
     free(vec);
     heap_destruir(heap_2, NULL);
 }
@@ -68,19 +64,39 @@ static void prueba_heap_encolar() {
 
     heap_t* heap = heap_crear(comparar_int);
 
-    void** vec = malloc(sizeof(int*) * TAM_PRUEBA);
-    for(int i = 0; i < TAM_PRUEBA; i++){
-        vec[i] = malloc(sizeof(int));
-        *(int*)vec[i] = i;
+    int vec[TAM_PRUEBA] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    bool ok = true;
+    for(int i = 0; i < TAM_PRUEBA; i++) {
+        ok &= heap_encolar(heap, &vec[i]);
+        ok &= (*(int*)heap_ver_max(heap) == i + 1);
+    }
+    print_test("Ver max del heap es 10", *(int*)heap_ver_max(heap) == 10);
+
+    print_test("Se pudo encolar un arreglo del 1 al 10 correctamente", ok);
+
+
+    heap_destruir(heap, NULL);
+
+}
+
+static void prueba_heap_desencolar() {
+    printf("\nINICIO DE PRUEBA HEAP DESENCOLAR\n");
+
+    heap_t* heap = heap_crear(comparar_int);
+
+    int vec[TAM_PRUEBA] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    for(int i = 0; i < TAM_PRUEBA; i++) {
+        heap_encolar(heap, &vec[i]);
     }
 
-    //print_test("Se pudo encolar el 1", heap_encolar(heap, vec[0]));
-
-
-    for(int i = 0; i < TAM_PRUEBA; i++){
-        free(vec[i]);
+    bool ok = true;
+    for(int i = 10; !heap_esta_vacio(heap); i--) {
+        ok &= (*(int*)heap_desencolar(heap) == i);
     }
-    free(vec);
+
+    print_test("Se desencolan varios numeros correctamente", ok);
 
     heap_destruir(heap, NULL);
 
@@ -89,9 +105,9 @@ static void prueba_heap_encolar() {
 
 void pruebas_heap_estudiante() {
     prueba_heap_crear();
-//    prueba_heap_encolar();
+    prueba_heap_encolar();
+    prueba_heap_desencolar();
 //    prueba_heap_esta_vacia();
-//    prueba_heap_desencolar();
 //    prueba_heap_cantidad();
 //    prueba_heap_ver_max();
 //    prueba_heap_NULL();

@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define FACTOR_REDIMENSION 2
-#define TAM_INICIAL 20
+#define TAM_INICIAL 30
 #define MULTIPLO_CANTIDAD 4
 
 
@@ -86,10 +86,10 @@ void down_heap(void* arreglo[], size_t tam, cmp_func_t cmp, size_t pos) {
 
 
 void up_heap(void* arreglo[], size_t tam, cmp_func_t cmp, size_t pos) {
-    size_t padre = (pos-1)/2; // no falla
-
+    if(pos == 0) return;
+    size_t padre = (pos-1)/2;
     // Si no hay padre
-    if(padre < 0 || cmp(arreglo[padre], arreglo[pos]) >= 0) {
+    if(cmp(arreglo[padre], arreglo[pos]) >= 0) {
         return;
     }
 
@@ -220,9 +220,11 @@ void *heap_ver_max(const heap_t *heap) {
 void *heap_desencolar(heap_t *heap) {
     if(heap_esta_vacio(heap)) return NULL;
 
-    void* dato = heap->datos[0];
-    heap->datos[0] = heap->datos[heap->cantidad];
-    heap->datos[heap->cantidad] = NULL;
+    void* dato = malloc(sizeof(void*));
+    if(!dato) return NULL;
+
+    memcpy(dato, heap->datos[0], sizeof(void*));
+    memcpy(heap->datos[0], heap->datos[heap->cantidad-1], sizeof(void*));
 
     // Disminuyo en 1 la cantidad
     heap->cantidad--;
@@ -234,9 +236,9 @@ void *heap_desencolar(heap_t *heap) {
 
     // Redimensiono si es el caso
 
-    if(MULTIPLO_CANTIDAD*heap->cantidad <= heap->capacidad && heap->cantidad != 0) {
+   /* if(MULTIPLO_CANTIDAD*heap->cantidad <= heap->capacidad && heap->cantidad != 0) {
         heap_redimensionar(heap, heap->capacidad / FACTOR_REDIMENSION);
-    }
+    }*/
 
     return dato;
 }
