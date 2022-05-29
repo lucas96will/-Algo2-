@@ -227,6 +227,7 @@ void *heap_desencolar(heap_t *heap) {
     memcpy(dato, heap->datos[0], sizeof(void*));
     memcpy(heap->datos[0], heap->datos[heap->cantidad-1], sizeof(void*));
 
+    free(heap->datos[heap->cantidad-1]);
     // Disminuyo en 1 la cantidad
     heap->cantidad--;
 
@@ -235,7 +236,6 @@ void *heap_desencolar(heap_t *heap) {
         down_heap(heap->datos, heap->cantidad, heap->cmp, 0);
     }
 
-    free(heap->datos[heap->cantidad+1]);
     // Redimensiono si es el caso
    /* if(MULTIPLO_CANTIDAD*heap->cantidad <= heap->capacidad && heap->cantidad != 0) {
         heap_redimensionar(heap, heap->capacidad / FACTOR_REDIMENSION);

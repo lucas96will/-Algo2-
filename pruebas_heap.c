@@ -75,6 +75,13 @@ static void prueba_heap_encolar() {
 
     print_test("Se pudo encolar un arreglo del 1 al 10 correctamente", ok);
 
+    // Desencolo todos los elementos
+
+    while(!heap_esta_vacio(heap)) {
+        void* elem = heap_desencolar(heap);
+        free(elem);
+    }
+
 
     heap_destruir(heap, NULL);
 
