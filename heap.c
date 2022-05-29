@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define FACTOR_REDIMENSION 2
-#define TAM_INICIAL 30
+#define TAM_INICIAL 10
 #define MULTIPLO_CANTIDAD 4
 
 
@@ -109,9 +109,7 @@ bool heap_redimensionar(heap_t *heap, size_t nueva_capacidad) {
     if(nueva_capacidad > 0 && datos_nuevo == NULL){
         return false;
     }
-    for(size_t i = heap->capacidad; i < nueva_capacidad; i++){
-        heap->datos[i] = malloc(sizeof(void*));
-    }
+
     heap->datos = datos_nuevo;
     heap->capacidad = nueva_capacidad;
     return true;
@@ -199,6 +197,9 @@ bool heap_encolar(heap_t *heap, void *elem) {
         }
     }
 
+    heap->datos[heap->cantidad] = malloc(sizeof(void*));
+    if(!heap->datos[heap->cantidad]) return NULL;
+
     // Agrego al final
     memcpy(heap->datos[heap->cantidad], elem, sizeof(void*));
     heap->cantidad++;
@@ -234,8 +235,8 @@ void *heap_desencolar(heap_t *heap) {
         down_heap(heap->datos, heap->cantidad, heap->cmp, 0);
     }
 
+    free(heap->datos[heap->cantidad+1]);
     // Redimensiono si es el caso
-
    /* if(MULTIPLO_CANTIDAD*heap->cantidad <= heap->capacidad && heap->cantidad != 0) {
         heap_redimensionar(heap, heap->capacidad / FACTOR_REDIMENSION);
     }*/

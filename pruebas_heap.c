@@ -93,7 +93,10 @@ static void prueba_heap_desencolar() {
 
     bool ok = true;
     for(int i = 10; !heap_esta_vacio(heap); i--) {
-        ok &= (*(int*)heap_desencolar(heap) == i);
+        void* vector[TAM_PRUEBA];
+        vector[i] = heap_desencolar(heap);
+        ok &= (*(int*)vector[i] == i);
+        free(vector[i]);
     }
 
     print_test("Se desencolan varios numeros correctamente", ok);
