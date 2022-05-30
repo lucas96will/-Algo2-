@@ -169,7 +169,16 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
     }
 
     for (size_t i = 0; i < n; i++) {
-		heap->datos[i] = arreglo[i];
+        heap->datos[i] = malloc(sizeof(void*));
+        if(!heap->datos[i]){
+            for(int j = 0; j < i; j++){
+                free(heap->datos[j]);
+            }
+            free(heap->datos);
+            free(heap);
+            return NULL;
+        }
+        memcpy(heap->datos[i], arreglo[i], sizeof(void*));
 	}
 
     heapify(heap->datos, n, cmp);
@@ -207,7 +216,10 @@ bool heap_encolar(heap_t *heap, void *elem) {
         }
     }
 
-    heap->datos[heap->cantidad] = elem;
+    heap->datos[heap->cantidad] = malloc(sizeof(void*));
+    if(!heap->datos[heap->cantidad]) return false;
+
+    memcpy(heap->datos[heap->cantidad], elem, sizeof(void*));
     up_heap(heap->datos, heap->cantidad, heap->cmp, heap->cantidad);
     heap->cantidad++;
 

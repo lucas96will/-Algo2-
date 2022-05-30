@@ -66,31 +66,32 @@ static void prueba_heap_primitivas() {
     print_test("El heap esta vacio", heap_esta_vacio(heap));
     print_test("Encolo al elemento n1", heap_encolar(heap, &n1));
     print_test("El heap no esta vacio", !heap_esta_vacio(heap));
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n1);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n1);
     print_test("La cantidad del heap es 1", heap_cantidad(heap) == 1);
     print_test("Encolo al elemento n2", heap_encolar(heap, &n2));
     print_test("La cantidad del heap es 2", heap_cantidad(heap) == 2);
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n2);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n2);
     print_test("Encolo al elemento n3", heap_encolar(heap, &n3));
     print_test("La cantidad del heap es 3", heap_cantidad(heap) == 3);
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n3);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n3);
     print_test("Encolo al elemento n4", heap_encolar(heap, &n4));
     print_test("La cantidad del heap es 4", heap_cantidad(heap) == 4);
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n4);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n4);
     print_test("Encolo al elemento n5", heap_encolar(heap, &n5));
     print_test("La cantidad del heap es 5", heap_cantidad(heap) == 5);
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n4);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n4);
     print_test("Encolo al elemento n6", heap_encolar(heap, &n6));
     print_test("La cantidad del heap es 6", heap_cantidad(heap) == 6);
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n4);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n4);
 
-    print_test("Desencolar devuelve al mayor elemento", heap_desencolar(heap) == &n4);
+    print_test("Desencolar devuelve al mayor elemento", *(int*)heap_desencolar(heap) == n4);
     print_test("La cantidad del heap es 5", heap_cantidad(heap) == 5);
-    print_test("Maximo es el correcto", heap_ver_max(heap) == &n5);
-    print_test("Desencolar devuelve al mayor elemento", heap_desencolar(heap) == &n5);
+    print_test("Maximo es el correcto", *(int*)heap_ver_max(heap) == n5);
+    print_test("Desencolar devuelve al mayor elemento", *(int*)heap_desencolar(heap) == n5);
     print_test("La cantidad del heap es 4", heap_cantidad(heap) == 4);
-    print_test("Desencolar devuelve al mayor elemento", heap_desencolar(heap) == &n6);
+    print_test("Desencolar devuelve al mayor elemento", *(int*)heap_desencolar(heap) == n6);
     print_test("La cantidad del heap es 3", heap_cantidad(heap) == 3);
+
 
     //Destruyo con algunos elementos
     heap_destruir(heap, NULL);
@@ -217,6 +218,8 @@ static void prueba_heap_desde_arreglo(size_t tam) {
     }
     print_test("Todos los elementos fueron encolados", ok_encolar);
     print_test("El maximo es correcto", *(int*)heap_ver_max(heap) == max);
+
+
 
     bool ok_desencolar = true;
     for (size_t i = 0; i < tam; i++) {
