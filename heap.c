@@ -74,7 +74,7 @@ void down_heap(void* arreglo[], size_t tam, cmp_func_t cmp, size_t pos) {
     }
 
     // Si no hay hijo derecho entonces comparo con el izquierdo (ultimo)
-    if(h_der > tam && cmp(arreglo[pos], arreglo[h_izq]) < 0) {
+    if(h_der >= tam && cmp(arreglo[pos], arreglo[h_izq]) < 0) {
         swap(&arreglo[pos],&arreglo[h_izq]);
     }
     else if(h_der < tam) {
@@ -124,7 +124,7 @@ bool heap_redimensionar(heap_t *heap, size_t nueva_capacidad) {
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
     heapify(elementos, cant, cmp);
 
-    while (cant > 0) {
+    while (cant > 1) {
         swap(&elementos[0], &elementos[cant - 1]);
         cant--;
         down_heap(elementos, cant, cmp, 0);

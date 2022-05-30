@@ -25,8 +25,6 @@ int comparar_int(const void* a, const void* b) {
 //funcion aux que mezcla un arreglo (prueba volumen)
 void mezclar_arreglo(int arreglo[], size_t tam ) {
     
-    srand((unsigned int)time(NULL));
-    
     for (int i = 0; i < tam; i++) {
         size_t random = rand() % tam;
         int temporal = arreglo[i];
@@ -245,14 +243,14 @@ static void prueba_heapsort(size_t tam) {
     mezclar_arreglo(numeros, tam);
 
     for (int i = 0; i < tam; i++) {
-		datos[i] = &numeros[i];
-	}
+        datos[i] = &numeros[i];
+    }
 
     heap_sort(datos, tam, comparar_int);
 
     bool ok_pos = true;
     for (size_t pos = 0; pos < tam; pos++){
-        ok_pos = (*(int*)datos[pos] == pos);
+        ok_pos &= (*(int*)datos[pos] == pos);
         if (!ok_pos) break;
     }
 
@@ -260,6 +258,7 @@ static void prueba_heapsort(size_t tam) {
 }
 
 void pruebas_heap_estudiante() {
+    srand((unsigned int)time(NULL));
     prueba_heap_crear();
     prueba_heap_primitivas();
     pruebas_heap_destruccion_automatica();
