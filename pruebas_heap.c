@@ -211,20 +211,19 @@ static void prueba_heap_desde_arreglo(size_t tam) {
 
     bool ok_encolar = true;
     for (size_t i = 0; i < tam; i++){
-        ok_encolar = heap_encolar(heap, &datos[i]);
+        ok_encolar = heap_encolar(heap, datos[i]);
         if (!ok_encolar) break;
     }
     print_test("Todos los elementos fueron encolados", ok_encolar);
-    print_test("El maximo es correcto", *(int*)heap_ver_max(heap) == max);
-
+    print_test("El maximo es correcto", *(int*)heap_ver_max(heap) == 99);
 
 
     bool ok_desencolar = true;
     for (size_t i = 0; i < tam; i++) {
-        ok_desencolar = (*(int*)heap_desencolar(heap) == max);
+        ok_desencolar &= (*(int*)heap_desencolar(heap) == max);
+        ok_desencolar &= (*(int*)heap_desencolar(heap) == max);
         if (!ok_desencolar) break;
-    
-    max--;
+        max--;
     }
     print_test("Todos los elementos fueron desencolados", ok_desencolar);
 
