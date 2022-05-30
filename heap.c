@@ -196,7 +196,9 @@ void heap_destruir(heap_t *heap, void destruir_elemento(void *e)) {
     for(size_t i = 0; i < heap->cantidad; i++) {
         if(destruir_elemento != NULL) {
             destruir_elemento(heap->datos[i]);
-        }
+        } /*else {
+            free(heap->datos[i]);
+        }*/
     }
     free(heap->datos);
     free(heap);
@@ -242,7 +244,9 @@ void *heap_desencolar(heap_t *heap) {
     void* dato = heap_ver_max(heap);
 
     //Intercambio primero y ultimo
-    swap(&heap->datos[0], &heap->datos[heap->cantidad - 1]); 
+    swap(&heap->datos[0], &heap->datos[heap->cantidad - 1]);
+
+    /*free(heap->datos[heap->cantidad-1]);*/
 
     // Disminuyo en 1 la cantidad
     heap->cantidad--;
