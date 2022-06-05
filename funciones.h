@@ -1,5 +1,5 @@
-#ifndef _ALGO2__ALGOGRAM_H
-#define _ALGO2__ALGOGRAM_H
+#ifndef _ALGO2__FUNCIONES_H
+#define _ALGO2__FUNCIONES_H
 
 #include "user.h"
 #include "publicacion.h"
@@ -71,4 +71,4 @@ bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaci
 void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones);
 
 
-#endif //_ALGO2__ALGOGRAM_H
+#endif //_ALGO2__FUNCIONES_H
