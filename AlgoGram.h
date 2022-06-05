@@ -4,6 +4,20 @@
 #include "user.h"
 #include "publicacion.h"
 #include "hash.h"
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif // _POSIX_C_SOURCE
+#include <stdio.h>
+
+/* *****************************************************************
+ *                          FUNCIONES
+ * *****************************************************************/
+
+int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2);
+
+FILE* resultado_archivo(int cant_argumentos, char** argumentos);
+
+hash_t* user_a_hash(FILE* archivo);
 
 /* *****************************************************************
  *                          USER LOGIN

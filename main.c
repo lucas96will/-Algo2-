@@ -1,4 +1,4 @@
-#include "funciones.c"
+#include "AlgoGram.h"
 #include <stdio.h>
 
 

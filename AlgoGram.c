@@ -1,8 +1,5 @@
 #include "AlgoGram.h"
 #include <string.h>
-#ifndef _POSIX_C_SOURCE
-#define _POSIX_C_SOURCE 200809L
-#endif // _POSIX_C_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 
