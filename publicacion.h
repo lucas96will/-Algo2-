@@ -1,6 +1,7 @@
 #ifndef _ALGO2__PUBLICACION_H
 #define _ALGO2__PUBLICACION_H
 
+#include "structs.h"
 #include "abb.h"
 #include "user.h"
 

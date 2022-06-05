@@ -1,6 +1,7 @@
 #ifndef _ALGO2__PUBLICACION_USER_H
 #define _ALGO2__PUBLICACION_USER_H
 
+#include "structs.h"
 #include "publicacion.h"
 
 typedef struct publicacion_user publicacion_user_t;

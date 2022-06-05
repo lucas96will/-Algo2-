@@ -1,4 +1,4 @@
-#include "struct.c"
+#include "funciones.h"
 #include <string.h>
 
 
@@ -10,8 +10,8 @@ size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant
 
 //Para el heap del feed de cada usuario
 int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2) {
-    publicacion_user_t* p1 = (publicacion_user_t*) p1;
-    publicacion_user_t* p2 = (publicacion_user_t*) p2;
+    publicacion_user_t* p1 = (publicacion_user_t*) publicacion_user_1;
+    publicacion_user_t* p2 = (publicacion_user_t*) publicacion_user_2;
     if(p1->afinidad < p2->afinidad) {
         return -1;
     } else if(p1->afinidad > p2->afinidad) {
