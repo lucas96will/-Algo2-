@@ -1,5 +1,4 @@
 #include "pila.h"
-
 #include <stdlib.h>
 
 #define CAPACIDAD 10

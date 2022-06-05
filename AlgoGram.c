@@ -1,5 +1,11 @@
-#include "struct.c"
+#include "AlgoGram.h"
 #include <string.h>
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif // _POSIX_C_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+
 
 
 size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant_user sera hash->cantidad del hash de usuarios
@@ -10,8 +16,8 @@ size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant
 
 //Para el heap del feed de cada usuario
 int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2) {
-    publicacion_user_t* p1 = (publicacion_user_t*) p1;
-    publicacion_user_t* p2 = (publicacion_user_t*) p2;
+    publicacion_user_t* p1 = (publicacion_user_t*) publicacion_user_1;
+    publicacion_user_t* p2 = (publicacion_user_t*) publicacion_user_2;
     if(p1->afinidad < p2->afinidad) {
         return -1;
     } else if(p1->afinidad > p2->afinidad) {
@@ -40,7 +46,7 @@ FILE* resultado_archivo(int cant_argumentos, char** argumentos) {
 
 // Podriamos incluirla en las funciones del struct user
 hash_t* user_a_hash(FILE* archivo) {
-    
+
     hash_t* usuarios = hash_crear(user_destruir);
     if (!usuarios) {
         return NULL;
@@ -53,7 +59,7 @@ hash_t* user_a_hash(FILE* archivo) {
     size_t contador = 0;
 
     while(linea != EOF) {
-        heap_t* heap_user = heap_crear(comparar_afinidad); 
+        heap_t* heap_user = heap_crear(comparar_afinidad);
         user_t* user = user_crear(cadena, contador, heap_user);
         hash_guardar(usuarios, cadena, user);
         contador++;
