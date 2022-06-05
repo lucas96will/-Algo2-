@@ -1,12 +1,10 @@
 #ifndef _ALGO2__FUNCIONES_H
 #define _ALGO2__FUNCIONES_H
 
+#define _POSIX_C_SOURCE 200809L
 #include "user.h"
 #include "publicacion.h"
 #include "hash.h"
-#ifndef _POSIX_C_SOURCE
-#define _POSIX_C_SOURCE 200809L
-#endif // _POSIX_C_SOURCE
 #include <stdio.h>
 
 /* *****************************************************************
