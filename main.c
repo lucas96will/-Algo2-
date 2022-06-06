@@ -1,4 +1,5 @@
-#include "funciones.c"
+#include "funciones.h"
+#include <string.h>
 #define TAM_MAXIMO 160
 
 
