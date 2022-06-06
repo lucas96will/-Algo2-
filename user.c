@@ -19,7 +19,7 @@ user_t* user_crear(char* nombre, size_t id, heap_t* feed) {
     return user;
 }
 
-void user_actualizar_feed(user_t* user, publicacion_user_t* publicacion_user) {
+void user_actualizar_feed(user_t* user, void* publicacion_user) {
     heap_encolar(user->feed, publicacion_user);
 }
 
