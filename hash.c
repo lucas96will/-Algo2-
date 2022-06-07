@@ -1,7 +1,6 @@
 #include "hash.h"
 #define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
-
 #include <string.h>
 
 #define CAPACIDAD_INICIAL 101 // 276 excelente, 292 muy bueno, 301 bueno

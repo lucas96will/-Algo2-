@@ -1,10 +1,11 @@
 #include "funciones.h"
 #include <string.h>
+#include <stdlib.h>
 
 
 size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant_user sera hash->cantidad del hash de usuarios
-    size_t diferencia = abs((user1->id - user2->id));
-    size_t afinidad = cant_user - diferencia;
+    int diferencia = abs(((int)user1->id - (int)user2->id));
+    size_t afinidad = cant_user - (size_t)diferencia;
     return afinidad;
 }
 
@@ -41,7 +42,7 @@ FILE* resultado_archivo(int cant_argumentos, char** argumentos) {
 // Podriamos incluirla en las funciones del struct user
 hash_t* user_a_hash(FILE* archivo) {
     
-    hash_t* usuarios = hash_crear(user_destruir);
+    hash_t* usuarios = hash_crear((void*)user_destruir);
     if (!usuarios) {
         return NULL;
     }
@@ -128,7 +129,7 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
     size_t id = hash_cantidad(publicaciones);
     abb_t* likes = abb_crear(strcmp, NULL);
     publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
-    hash_guardar(publicaciones, id, publicacion);
+    hash_guardar(publicaciones, (char*)id, publicacion);
     publicacion_a_users(publicacion, users);
 }
 
@@ -139,7 +140,7 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
     size_t cant_users = hash_cantidad(users);
 
     while (!hash_iter_al_final(iter)) { //O(u), siendo u la cantidad de usuarios
-        char* clave_actual = hash_iter_ver_actual(iter);
+        const char* clave_actual = hash_iter_ver_actual(iter);
         user_t* user_actual = (user_t*)hash_obtener(users, clave_actual);
 
         if (user_actual == user_publico) {
@@ -198,7 +199,7 @@ bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publica
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         return false;
     }
-    if (!hash_pertenece(publicaciones, id)) {
+    if (!hash_pertenece(publicaciones, (char*)id)) {
         fprintf(stdout, "%s", "Error: Post inexistente\n");
         return false;
     }
@@ -211,7 +212,7 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
         return;
     }
 
-    publicacion_t* publicacion = hash_obtener(publicaciones, id);
+    publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
 
     abb_guardar(publicacion->likes, user_logeado->nombre, user_logeado);
     fprintf(stdout, "%s", "Post likeado\n");
@@ -227,7 +228,7 @@ bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaci
         return false;
     }
 
-    publicacion_t* publicacion = hash_obtener(publicaciones, id);
+    publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
     abb_t* likes = publicacion->likes;
     if (abb_cantidad(likes) == 0) {
         fprintf(stdout, "%s", "Error: Sin likes\n");
@@ -242,7 +243,7 @@ void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
         return;
     }
 
-    publicacion_t* publicacion = hash_obtener(publicaciones, id);
+    publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
     abb_t* likes = publicacion->likes;
     size_t cant_likes = abb_cantidad(likes);
     fprintf(stdout, "El post tiene %d likes:\n", cant_likes);

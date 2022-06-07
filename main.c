@@ -8,14 +8,14 @@ int main(int argc, char* argv[]) {
     FILE* archivo = resultado_archivo(argc, argv);
     hash_t* users = user_a_hash(archivo);
     user_t* user_logeado = NULL;
-    hash_t* publicaciones_totales = hash_crear(publicacion_destruir);
+    hash_t* publicaciones_totales = hash_crear((void*)publicacion_destruir);
     char comando[TAM_MAXIMO];
 
     while (true){
         scanf("%s", comando);
         //Si se escribe por consola login -> esperar que se escriba un nombre y despues, (siendo user el nombre que se escribio por consola)
         if (strcmp(comando, "login") == 0 || strcmp(comando, "Login") == 0){
-            char* user[TAM_MAXIMO];
+            char user[TAM_MAXIMO];
             scanf("%s", user);
             user_logeado = user_login(users, user, user_logeado);
         }
