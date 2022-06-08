@@ -5,7 +5,7 @@
 #include "publicacion.h"
 #include "publicacion_user.h"
 #include "hash.h"
-#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 
 /* *****************************************************************
@@ -60,7 +60,7 @@ bool verificaciones_alguien_logeado(user_t* user_logeado);
  * Pre:
  * Post:
  */
-void user_logout(user_t* user_logeado);
+void* user_logout(user_t* user_logeado);
 
 
 /* *****************************************************************

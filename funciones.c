@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "funciones.h"
 #include <string.h>
 #include <stdlib.h>
@@ -91,7 +92,7 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
 
     user_t* user_login = (user_t*)hash_obtener(users, user);
 
-    fprintf(stdout, "Hola %s", user);
+    fprintf(stdout, "Hola %s\n", user);
     return user_login;
 }
 
@@ -107,14 +108,13 @@ bool verificaciones_alguien_logeado(user_t* user_logeado) {
     return true;
 }
 
-void user_logout(user_t* user_logeado) {
+void* user_logout(user_t* user_logeado) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
-        return;
+        return NULL;
     }
 
-    user_logeado = NULL;
-
     fprintf(stdout, "%s", "Adios\n");
+    return NULL;
 }
 
 /* *****************************************************************
@@ -186,9 +186,9 @@ void ver_proximo_post(user_t* user_logeado) {
     char* mensaje = publicacion->mensaje;
     size_t cant_likes = abb_cantidad(publicacion->likes);
 
-    fprintf(stdout, "Post ID %d\n", id);
+    fprintf(stdout, "Post ID %ld\n", id);
     fprintf(stdout, "%s dijo: %s\n", user_publico, mensaje);
-    fprintf(stdout, "Likes: %d\n", cant_likes);
+    fprintf(stdout, "Likes: %ld\n", cant_likes);
 }
 
 /* *****************************************************************
@@ -246,7 +246,7 @@ void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
     publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
     abb_t* likes = publicacion->likes;
     size_t cant_likes = abb_cantidad(likes);
-    fprintf(stdout, "El post tiene %d likes:\n", cant_likes);
+    fprintf(stdout, "El post tiene %ld likes:\n", cant_likes);
 
     abb_iter_t* iter = abb_iter_in_crear(likes);
 

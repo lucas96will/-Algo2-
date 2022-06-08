@@ -6,11 +6,14 @@
 int main(int argc, char* argv[]) {
 
     FILE* archivo = resultado_archivo(argc, argv);
+    if(!archivo){
+        return 1;
+    }
     hash_t* users = user_a_hash(archivo);
     user_t* user_logeado = NULL;
     hash_t* publicaciones_totales = hash_crear((void*)publicacion_destruir);
     char comando[TAM_MAXIMO];
-
+    
     while (true){
         scanf("%s", comando);
         //Si se escribe por consola login -> esperar que se escriba un nombre y despues, (siendo user el nombre que se escribio por consola)
@@ -23,7 +26,7 @@ int main(int argc, char* argv[]) {
         
         //Si se escribe por consola logout
         if (strcmp(comando, "logout") == 0 || strcmp(comando, "Logout") == 0){
-            user_logout(user_logeado);
+            user_logeado = user_logout(user_logeado);
         }
 
         //Si se escribe por consola publicar -> esperar que se escriba un mensaje y despues, (siendo mensaje el mensaje que se escribio por consola)
@@ -40,7 +43,7 @@ int main(int argc, char* argv[]) {
 
         if (strcmp(comando, "likear_post") == 0){
             size_t id;
-            scanf("%d", &id);
+            scanf("%ld", &id);
             likear_post(user_logeado, id, publicaciones_totales);
         }
 
@@ -48,7 +51,7 @@ int main(int argc, char* argv[]) {
         //Si se escribe por consola likear_post -> esperar ID (siendo id lo que se escribio por conosla)
         if (strcmp(comando, "mostrar_likes") == 0){
             size_t id;
-            scanf("%d", &id);
+            scanf("%ld", &id);
             mostrar_likes(user_logeado, id, publicaciones_totales);
         }
     }
