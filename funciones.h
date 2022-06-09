@@ -16,6 +16,18 @@
  * Pre:
  * Post:
  */
+void f_user_destruir(void* user);
+
+/*
+ * Pre:
+ * Post:
+ */
+void f_destruir_publicacion(void* publicacion);
+
+/*
+ * Pre:
+ * Post:
+ */
 int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2);
 
 /*

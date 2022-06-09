@@ -1,8 +1,28 @@
 #define _POSIX_C_SOURCE 200809L
 #include "funciones.h"
 #include <string.h>
+#define _OPEN_SYS_ITOA_EXT
 #include <stdlib.h>
 
+#define CANT_MAX_POST 10
+
+char* uinttostr(size_t num){
+    char* str = malloc(sizeof(char)*CANT_MAX_POST);
+    if(str == NULL){
+        return NULL;
+    }
+    sprintf(str, "%zu", num);
+
+    return str;
+}
+
+void f_destruir_user(void* user){
+    user_destruir((user_t*)user);
+}
+
+void f_destruir_publicacion(void* publicacion){
+    publicacion_destruir((publicacion_t*)publicacion);
+}
 
 size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant_user sera hash->cantidad del hash de usuarios
     int diferencia = abs(((int)user1->id - (int)user2->id));
@@ -43,7 +63,7 @@ FILE* resultado_archivo(int cant_argumentos, char** argumentos) {
 // Podriamos incluirla en las funciones del struct user
 hash_t* user_a_hash(FILE* archivo) {
     
-    hash_t* usuarios = hash_crear((void*)user_destruir);
+    hash_t* usuarios = hash_crear(f_destruir_user);
     if (!usuarios) {
         return NULL;
     }
@@ -55,7 +75,8 @@ hash_t* user_a_hash(FILE* archivo) {
     size_t contador = 0;
 
     while(linea != EOF) {
-        heap_t* heap_user = heap_crear(comparar_afinidad); 
+        cadena[strlen(cadena)-1] = '\0';
+        heap_t* heap_user = heap_crear(comparar_afinidad);
         user_t* user = user_crear(cadena, contador, heap_user);
         hash_guardar(usuarios, cadena, user);
         contador++;
@@ -77,7 +98,7 @@ bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
         return false;
     }
     if (!hash_pertenece(users, user)){
-        fprintf(stdout, "%s", "Error: Usuario no existente\n");
+        fprintf(stdout, "%s", "Error: usuario no existente\n");
         return false;
     }
 
@@ -87,7 +108,7 @@ bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
 user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
 
     if (verificaciones_login(users, user, user_logeado) == false) {
-        return NULL;
+        return user_logeado == NULL ? NULL: user_logeado;
     }
 
     user_t* user_login = (user_t*)hash_obtener(users, user);
@@ -120,17 +141,19 @@ void* user_logout(user_t* user_logeado) {
 /* *****************************************************************
  *                     PUBLICAR UN POST
  * *****************************************************************/
-
 void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         return;
     }
-
     size_t id = hash_cantidad(publicaciones);
+    // Cambiar size_t a char* puede ser problematico
+    char str_id[CANT_MAX_POST];
+    snprintf(str_id, CANT_MAX_POST, "%zu", id);
     abb_t* likes = abb_crear(strcmp, NULL);
     publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
-    hash_guardar(publicaciones, (char*)id, publicacion);
+    hash_guardar(publicaciones, str_id, publicacion);
     publicacion_a_users(publicacion, users);
+    printf("Post publicado\n");
 }
 
 void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
@@ -199,10 +222,13 @@ bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publica
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         return false;
     }
-    if (!hash_pertenece(publicaciones, (char*)id)) {
+    char* str_id = uinttostr(id);
+    if (!hash_pertenece(publicaciones, str_id)) {
         fprintf(stdout, "%s", "Error: Post inexistente\n");
+        free(str_id);
         return false;
     }
+    free(str_id);
     return true;
 }
 
@@ -211,10 +237,10 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
     if (verificaciones_likear_post(user_logeado, id, publicaciones) == false){
         return;
     }
-
-    publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
-
+    char* str_id = uinttostr(id);
+    publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     abb_guardar(publicacion->likes, user_logeado->nombre, user_logeado);
+    free(str_id);
     fprintf(stdout, "%s", "Post likeado\n");
 }
 
@@ -227,8 +253,9 @@ bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaci
     if (verificaciones_likear_post(user_logeado, id, publicaciones) == false) {
         return false;
     }
-
-    publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
+    char* str_id = uinttostr(id);
+    publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
+    free(str_id);
     abb_t* likes = publicacion->likes;
     if (abb_cantidad(likes) == 0) {
         fprintf(stdout, "%s", "Error: Sin likes\n");
@@ -243,7 +270,9 @@ void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
         return;
     }
 
-    publicacion_t* publicacion = hash_obtener(publicaciones, (char*)id);
+    char* str_id = uinttostr(id);
+    publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
+    free(str_id);
     abb_t* likes = publicacion->likes;
     size_t cant_likes = abb_cantidad(likes);
     fprintf(stdout, "El post tiene %ld likes:\n", cant_likes);

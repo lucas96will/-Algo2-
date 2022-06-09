@@ -1,6 +1,7 @@
 #ifndef _ALGO2__ABB_H
 #define _ALGO2__ABB_H
- 
+
+#define _POSIX_C_SOURCE 200809L
 #include <stdbool.h>
 #include <stdlib.h>
 
