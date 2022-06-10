@@ -30,7 +30,9 @@ int main(int argc, char* argv[]) {
         //Si se escribe por consola publicar -> esperar que se escriba un mensaje y despues, (siendo mensaje el mensaje que se escribio por consola)
         if (strcmp(comando, "publicar") == 0 || strcmp(comando, "Publicar") == 0){
             char mensaje[TAM_MAXIMO];
-            scanf("%s", mensaje);
+            //scanf("%s", mensaje);
+            getchar(); //Limpio buffer (quedaba un \n)
+            scanf("%[^\n]", mensaje);
             publicar_post(user_logeado, users, publicaciones_totales, mensaje);
         }
 
