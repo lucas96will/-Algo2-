@@ -1,6 +1,8 @@
 #ifndef _ALGO2__USER_H
 #define _ALGO2__USER_H
-
+#define _POSIX_C_SOURCE 200809L
+#include <string.h>
+#include <stdlib.h>
 #include "heap.h"
 
 typedef struct user {

@@ -1,7 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "funciones.h"
 #include <string.h>
-#define _OPEN_SYS_ITOA_EXT
+//#define _OPEN_SYS_ITOA_EXT
 #include <stdlib.h>
 
 #define CANT_MAX_POST 10
@@ -75,7 +75,11 @@ hash_t* user_a_hash(FILE* archivo) {
     size_t contador = 0;
 
     while(linea != EOF) {
-        cadena[strlen(cadena)-1] = '\0';
+        // Remover salto de línea
+        if ((strlen(cadena) > 0) && (cadena[strlen(cadena) - 1] == '\n'))
+        {
+            cadena[strlen(cadena) - 1] = '\0';
+        }
         heap_t* heap_user = heap_crear(comparar_afinidad);
         user_t* user = user_crear(cadena, contador, heap_user);
         hash_guardar(usuarios, cadena, user);
@@ -149,6 +153,7 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
     // Cambiar size_t a char* puede ser problematico
     char str_id[CANT_MAX_POST];
     snprintf(str_id, CANT_MAX_POST, "%zu", id);
+    //itoa(id, str_id, 10);
     abb_t* likes = abb_crear(strcmp, NULL);
     publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
     hash_guardar(publicaciones, str_id, publicacion);
@@ -205,12 +210,13 @@ void ver_proximo_post(user_t* user_logeado) {
     publicacion_t* publicacion = publicacion_user->publicacion;
 
     size_t id = publicacion->id;
-    char* user_publico = publicacion->user->nombre;
-    char* mensaje = publicacion->mensaje;
+    char* user_publico = publicacion->user->nombre;//nada
+    char* mensaje = publicacion->mensaje; //usuario
     size_t cant_likes = abb_cantidad(publicacion->likes);
 
     fprintf(stdout, "Post ID %ld\n", id);
-    fprintf(stdout, "%s dijo: %s\n", user_publico, mensaje);
+    fprintf(stdout, "%s dijo: ", user_publico);
+    fprintf(stdout, "%s\n", mensaje);
     fprintf(stdout, "Likes: %ld\n", cant_likes);
 }
 
@@ -281,7 +287,7 @@ void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
 
     while (!abb_iter_in_al_final(iter)) {
         const char* nombre = abb_iter_in_ver_actual(iter);
-        fprintf(stdout, "   %s\n", nombre);
+        fprintf(stdout, "%s\n", nombre);
         abb_iter_in_avanzar(iter);
     }
 
