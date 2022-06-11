@@ -1,20 +1,25 @@
 #include "funciones.h"
 #include <string.h>
 #define TAM_MAXIMO 160
+#define ERROR_ARCHIVO 1
 
+void _flush(void){
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
 
 int main(int argc, char* argv[]) {
 
     FILE* archivo = resultado_archivo(argc, argv);
     if(!archivo){
-        return 1;
+        return ERROR_ARCHIVO;
     }
     hash_t* users = user_a_hash(archivo);
     user_t* user_logeado = NULL;
     hash_t* publicaciones_totales = hash_crear(f_destruir_publicacion);
+
     char comando[TAM_MAXIMO];
-    
-    while (scanf("%s", comando) != EOF){
+    while (fscanf(stdin, "%s", comando) > 0){
         //Si se escribe por consola login -> esperar que se escriba un nombre y despues, (siendo user el nombre que se escribio por consola)
         if (strcmp(comando, "login") == 0 || strcmp(comando, "Login") == 0){
             char user[TAM_MAXIMO];
@@ -32,7 +37,8 @@ int main(int argc, char* argv[]) {
             char mensaje[TAM_MAXIMO];
             //scanf("%s", mensaje);
             getchar(); //Limpio buffer (quedaba un \n)
-            scanf("%[^\n]", mensaje);
+            //_flush();
+            fscanf(stdin, "%[^\n]s", mensaje);
             publicar_post(user_logeado, users, publicaciones_totales, mensaje);
         }
 
@@ -54,6 +60,7 @@ int main(int argc, char* argv[]) {
             scanf("%zu", &id);
             mostrar_likes(user_logeado, id, publicaciones_totales);
         }
+
     }
 
     hash_destruir(users);

@@ -6,6 +6,11 @@
 
 #define CANT_MAX_POST 10
 
+/*
+ * Pre: -
+ * Post: devuelve una cadena de caracteres representando el numero
+ *       en memoria dinamica
+ */
 char* uinttostr(size_t num){
     char* str = malloc(sizeof(char)*CANT_MAX_POST);
     if(str == NULL){
@@ -16,10 +21,16 @@ char* uinttostr(size_t num){
     return str;
 }
 
+/*
+ * Wrapper destruir user.
+ */
 void f_destruir_user(void* user){
     user_destruir((user_t*)user);
 }
 
+/*
+ * Wrapper destruir publicacion.
+ */
 void f_destruir_publicacion(void* publicacion){
     publicacion_destruir((publicacion_t*)publicacion);
 }
@@ -29,6 +40,7 @@ size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant
     size_t afinidad = cant_user - (size_t)diferencia;
     return afinidad;
 }
+
 
 //Para el heap del feed de cada usuario
 int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2) {
@@ -126,16 +138,12 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
  * *****************************************************************/
 
 bool verificaciones_alguien_logeado(user_t* user_logeado) {
-    if(!user_logeado) {
-        return false;
-    }
-    return true;
+    return user_logeado != NULL;
 }
 
 void* user_logout(user_t* user_logeado) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
-        return NULL;
     }
 
     fprintf(stdout, "%s", "Adios\n");
@@ -152,14 +160,16 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
     }
     size_t id = hash_cantidad(publicaciones);
     // Cambiar size_t a char* puede ser problematico
-    char str_id[CANT_MAX_POST];
-    snprintf(str_id, CANT_MAX_POST, "%zu", id);
+    //char str_id[CANT_MAX_POST];
+    //snprintf(str_id, CANT_MAX_POST, "%zu", id);
     //itoa(id, str_id, 10);
+    char* str_id = uinttostr(id);
     abb_t* likes = abb_crear(strcmp, NULL);
     publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
     hash_guardar(publicaciones, str_id, publicacion);
     publicacion_a_users(publicacion, users);
-    printf("Post publicado\n");
+    fprintf(stdout, "Post publicado\n");
+    free(str_id);
 }
 
 void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
@@ -288,7 +298,7 @@ void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
 
     while (!abb_iter_in_al_final(iter)) {
         const char* nombre = abb_iter_in_ver_actual(iter);
-        fprintf(stdout, "%s\n", nombre);
+        fprintf(stdout, "%2s\n", nombre);
         abb_iter_in_avanzar(iter);
     }
 
