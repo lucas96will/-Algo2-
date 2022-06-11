@@ -30,9 +30,18 @@ int main(int argc, char* argv[]) {
     while (scanf("%s", comando) != EOF){
         //Si se escribe por consola login -> esperar que se escriba un nombre y despues, (siendo user el nombre que se escribio por consola)
         if (strcmp(comando, "login") == 0 || strcmp(comando, "Login") == 0){
-            char user[TAM_MAXIMO];
-            scanf("%s", user);
+            //char user[TAM_MAXIMO];
+            //scanf("%s", user);
+            getchar();
+            char* user = NULL;
+            size_t capacidad = 0;
+            getline(&user, &capacidad, stdin);
+            if ((strlen(user) > 0) && (user[strlen(user) - 1] == '\n'))
+            {
+                user[strlen(user) - 1] = '\0';
+            }
             user_logeado = user_login(users, user, user_logeado);
+            free(user);
         }
 
         //Si se escribe por consola logout
@@ -42,12 +51,17 @@ int main(int argc, char* argv[]) {
 
         //Si se escribe por consola publicar -> esperar que se escriba un mensaje y despues, (siendo mensaje el mensaje que se escribio por consola)
         if (strcmp(comando, "publicar") == 0 || strcmp(comando, "Publicar") == 0){
-            char mensaje[TAM_MAXIMO];
+            //char mensaje[TAM_MAXIMO];
             //scanf("%s", mensaje);
             getchar(); //Limpio buffer (quedaba un \n)
             //_flush();
-            scanf("%[^\n]s", mensaje);
-            publicar_post(user_logeado, users, publicaciones_totales, mensaje);
+            char* str = NULL;
+            size_t capacidad = 0;
+            getline(&str, &capacidad, stdin);
+            str[strlen(str)-1] = '\0';
+            //scanf("%[^\n]s", mensaje);
+            publicar_post(user_logeado, users, publicaciones_totales, str);
+            free(str);
         }
 
         //Si se escribe por consola ver_siguiente_feed
