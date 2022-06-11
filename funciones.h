@@ -12,6 +12,9 @@
  *                          FUNCIONES
  * *****************************************************************/
 
+
+hash_t* comandos_disponibles();
+
 /* WRAPPER DE DESTRUCCION DE USER_T
  * Pre: User creado
  * Post: Llama a la funcion de destruccion de user
@@ -168,6 +171,7 @@ bool verificaciones_ver_likes(size_t id, hash_t* publicaciones);
  * se imprime -> Error: Post inexistente o sin likes.
  */
 void mostrar_likes(size_t id, hash_t* publicaciones);
+
 
 
 #endif //_ALGO2__FUNCIONES_H

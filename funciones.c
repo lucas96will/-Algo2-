@@ -6,6 +6,7 @@
 
 #define CANT_MAX_POST 10
 
+
 /*
  * Pre: -
  * Post: devuelve una cadena de caracteres representando el numero

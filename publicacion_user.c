@@ -18,6 +18,5 @@ publicacion_user_t* publicacion_user_crear(publicacion_t* publicacion, size_t af
 }
 
 void publicacion_user_destruir(publicacion_user_t* publicacion_user) {
-    publicacion_destruir(publicacion_user->publicacion);
     free(publicacion_user);
 }

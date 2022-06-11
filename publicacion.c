@@ -22,7 +22,6 @@ publicacion_t* publicacion_crear(user_t* user, char* mensaje, size_t id, abb_t* 
 }
 
 void publicacion_destruir(publicacion_t* publicacion) {
-    user_destruir(publicacion->user);
     abb_destruir(publicacion->likes);
     free(publicacion->mensaje);
     free(publicacion);
