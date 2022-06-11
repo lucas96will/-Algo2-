@@ -153,8 +153,9 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
  * *****************************************************************/
 
 /*
- * Pre:
- * Post:
+ * Pre: Publicaciones: estructura creada previamente
+ * Post: Devuelve true si se hallo una publicacion con id dentro de publicaciones
+ * y tiene algun like. False en otro caso
  */
 bool verificaciones_ver_likes(size_t id, hash_t* publicaciones);
 
