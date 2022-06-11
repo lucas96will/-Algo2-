@@ -127,7 +127,6 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
 
 bool verificaciones_alguien_logeado(user_t* user_logeado) {
     if(!user_logeado) {
-        fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return false;
     }
     return true;
@@ -135,6 +134,7 @@ bool verificaciones_alguien_logeado(user_t* user_logeado) {
 
 void* user_logout(user_t* user_logeado) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
+        fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return NULL;
     }
 
@@ -147,6 +147,7 @@ void* user_logout(user_t* user_logeado) {
  * *****************************************************************/
 void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
+        fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return;
     }
     size_t id = hash_cantidad(publicaciones);
@@ -194,7 +195,6 @@ bool verificaciones_ver_proximo(user_t* user_logeado) {
     }
 
     if (heap_esta_vacio(user_logeado->feed)) {
-        fprintf(stdout, "%s", "Error: no hay mas posts para ver\n");
         return false;
     }
 
@@ -204,6 +204,7 @@ bool verificaciones_ver_proximo(user_t* user_logeado) {
 void ver_proximo_post(user_t* user_logeado) {
 
     if (verificaciones_ver_proximo(user_logeado) == false) {
+        fprintf(stdout, "%s", "Usuario no loggeado o no hay mas posts para ver\n");
         return;
     }
     publicacion_user_t* publicacion_user = heap_desencolar(user_logeado->feed);
@@ -230,7 +231,6 @@ bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publica
     }
     char* str_id = uinttostr(id);
     if (!hash_pertenece(publicaciones, str_id)) {
-        fprintf(stdout, "%s", "Error: Post inexistente\n");
         free(str_id);
         return false;
     }
@@ -241,6 +241,7 @@ bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publica
 void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
 
     if (verificaciones_likear_post(user_logeado, id, publicaciones) == false){
+        fprintf(stdout, "%s", "Error: Usuario no loggeado o Post inexistente\n");
         return;
     }
     char* str_id = uinttostr(id);
@@ -264,7 +265,6 @@ bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaci
     free(str_id);
     abb_t* likes = publicacion->likes;
     if (abb_cantidad(likes) == 0) {
-        fprintf(stdout, "%s", "Error: Sin likes\n");
         return false;
     }
 
@@ -273,6 +273,7 @@ bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaci
 
 void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
     if (verificaciones_ver_likes(user_logeado, id, publicaciones) == false){
+        fprintf(stdout, "%s", "Error: Post inexistente o sin likes\n");
         return;
     }
 
