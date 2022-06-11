@@ -144,6 +144,7 @@ bool verificaciones_alguien_logeado(user_t* user_logeado) {
 void* user_logout(user_t* user_logeado) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
+        return NULL;
     }
 
     fprintf(stdout, "%s", "Adios\n");

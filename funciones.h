@@ -92,15 +92,18 @@ void* user_logout(user_t* user_logeado);
  * *****************************************************************/
 
 /* mensaje: cadena de caracteres ingresadas por stdin
- * Pre: user_logeado, users, publicaciones creadas
- * Post: Si se pudo publicar post imprime "Post publicado"
+ * Pre: user_logeado, users, publicaciones: estructuras creadas previamente
+ * Post: Guarda en publicaciones la publicacion con los datos
+ * del user logeado.
+ * Si se pudo publicar post imprime "Post publicado"
  * en caso de que no se pudo crear imprime "Error: no habia usuario loggeado"
+ *
  */
 void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje);
 
 /*
- * Pre:
- * Post:
+ * Pre: publicacion, users: estructuras creadas previamente
+ * Post: publica a todos los users la publicacion
  */
 void publicacion_a_users(publicacion_t* publicacion, hash_t* users);
 
@@ -110,14 +113,17 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users);
  * *****************************************************************/
 
 /*
- * Pre:
- * Post:
+ * Pre: -
+ * Post: Devuelve true si hay mas publicaciones para ver del user logeado
+ * devuelve false si no hay user logeado o si no hay mas publicaciones para ver
  */
 bool verificaciones_ver_proximo(user_t* user_logeado);
 
 /*
- * Pre:
- * Post:
+ * Pre: -
+ * Post: Imprime el siguiente post (segun la afinidad del usuario)
+ * Si no hay user logeado o no hay mas posts para ver
+ * entonces imprime  "Usuario no loggeado o no hay mas posts para ver"
  */
 void ver_proximo_post(user_t* user_logeado);
 
@@ -127,14 +133,18 @@ void ver_proximo_post(user_t* user_logeado);
  * *****************************************************************/
 
 /*
- * Pre:
- * Post:
+ * Pre: Publicaciones: estructura creada previamente
+ * Post: Devuelve true si hay un user logeado y existe la publicacion
+ * con el id dentro de todas las publicaciones.
+ * Devuelve false si no hay user logeado o si no existe la publicacion
  */
 bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
 
-/*
- * Pre:
- * Post:
+/* A traves del user logeado se likea el post con el id pasado por parametro
+ * Pre: publicaciones: estructura creada previamente
+ * Post: Se likea el post con el numero id dentro del hash publicaciones.
+ * Si se pudo likear imprime -> "Post likeado"
+ * Si no hay user logeado o id incorrecto imprime -> "Error: Usuario no loggeado o Post inexistente."
  */
 void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
 
@@ -148,9 +158,13 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
  */
 bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaciones);
 
-/*
- * Pre:
- * Post:
+/* A traves del user logeado, se muestra por pantalla los usuarios que le
+ * dieron like a una publicacion con id pasado por parametro
+ * Pre: Publicaciones: Estructura creada previamente
+ * Post: Se imprimen por pantalla las personas que le dieron like
+ * a la publicacion con id pasado por parametro.
+ * Si no existe dicha publicacion o si el post no tiene likes
+ * se imprime -> Error: Post inexistente o sin likes.
  */
 void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones);
 
