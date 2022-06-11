@@ -4,6 +4,14 @@
 #include "funciones.h"
 #include <string.h>
 
+// COMANDOS DISPONIBLES
+#define LOGIN "login"
+#define LOGOUT "logout"
+#define PUBLICAR "publicar"
+#define VER_SIGUIENTE_FEED "ver_siguiente_feed"
+#define LIKEAR_POST "likear_post"
+#define MOSTRAR_LIKES "mostrar_likes"
+
 typedef struct algo_gram algo_gram_t;
 typedef struct funciones funciones_t;
 

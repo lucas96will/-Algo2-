@@ -1,13 +1,7 @@
 #include "AlgoGram.h"
 
 #define TAM_MAXIMO 160
-// COMANDOS DISPONIBLES
-#define LOGIN "login"
-#define LOGOUT "logout"
-#define PUBLICAR "publicar"
-#define VER_SIGUIENTE_FEED "ver_siguiente_feed"
-#define LIKEAR_POST "likear_post"
-#define MOSTRAR_LIKES "mostrar_likes"
+
 
 typedef enum{
     F_LOGIN = 0,
