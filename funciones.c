@@ -52,6 +52,12 @@ int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_us
     } else if(p1->afinidad > p2->afinidad) {
         return 1;
     }
+    if(p1->publicacion->id < p2->publicacion->id){
+        return 1;
+    }
+    else{
+        return -1;
+    }
     return 0;
 }
 
