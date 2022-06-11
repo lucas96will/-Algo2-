@@ -237,6 +237,7 @@ void ver_proximo_post(user_t* user_logeado) {
     fprintf(stdout, "%s dijo: ", user_publico);
     fprintf(stdout, "%s\n", mensaje);
     fprintf(stdout, "Likes: %ld\n", cant_likes);
+    publicacion_user_destruir(publicacion_user);
 }
 
 /* *****************************************************************
