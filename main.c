@@ -4,15 +4,6 @@
 #define TAM_MAXIMO 160
 #define ERROR_ARCHIVO 1
 
-void _flush(void){
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
-}
-
-
-void sig_handler(int signum){
-    return;
-}
 
 int main(int argc, char* argv[]) {
 
