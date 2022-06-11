@@ -128,10 +128,6 @@ algo_gram_t* crear_algo_gram(hash_t* users, hash_t* publicaciones){
     return algo_gram;
 }
 
-hash_t* comandos_disponibles(algo_gram_t* algo_gram){
-    return algo_gram->comandos;
-}
-
 bool comando_existe(algo_gram_t* algo_gram, char* comando){
     return hash_pertenece(algo_gram->comandos, comando);
 }

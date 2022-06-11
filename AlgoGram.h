@@ -24,12 +24,6 @@ typedef void (*func_comando_t) (algo_gram_t* algo_gram);
 algo_gram_t* crear_algo_gram(hash_t* users, hash_t* publicaciones);
 
 /*
- * Devuelve un hash con los comandos disponibles
- * hash = (clave = comando, valor = funcion)
- */
-hash_t* comandos_disponibles(algo_gram_t* algo_gram);
-
-/*
  * Pre: algo_gram previamente creado
  * Post: devuelve si el comando existe en el algo_gram
  */
