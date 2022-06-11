@@ -2,6 +2,7 @@
 #include "testing.h"
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 
 #define TAM_PRUEBA 10
@@ -21,6 +22,7 @@ int comparar_int(const void* a, const void* b) {
     }
     return 0;
 }
+
 
 //funcion aux que mezcla un arreglo (prueba volumen)
 void mezclar_arreglo(int arreglo[], size_t tam ) {
@@ -101,13 +103,13 @@ static void pruebas_heap_destruccion_automatica() {
     
     heap_t* heap = heap_crear(comparar_int);
 
-	int* n1 = malloc(sizeof(int));
-	int* n2 = malloc(sizeof(int));
-	int* n3 = malloc(sizeof(int));
+    int* n1 = malloc(sizeof(int));
+    int* n2 = malloc(sizeof(int));
+    int* n3 = malloc(sizeof(int));
     int* n4 = malloc(sizeof(int));
-	int* n5 = malloc(sizeof(int));
+    int* n5 = malloc(sizeof(int));
     int* n6 = malloc(sizeof(int));
-	*n1 = 1, *n2 = 2, *n3 = 5, *n4 = 10, *n5 = 8, *n6 = 6;
+    *n1 = 1, *n2 = 2, *n3 = 5, *n4 = 10, *n5 = 8, *n6 = 6;
 
     print_test("El heap esta vacio", heap_esta_vacio(heap));
     print_test("Encolo al elemento n1", heap_encolar(heap, n1));
@@ -123,17 +125,14 @@ static void pruebas_heap_destruccion_automatica() {
 
 static void pruebas_heap_destruccion_manual() {
     printf("\nINICIO DE PRUEBA HEAP CON DESTRUCCION MANUAL \n");
-    
     heap_t* heap = heap_crear(comparar_int);
-
-	int* n1 = malloc(sizeof(int));
-	int* n2 = malloc(sizeof(int));
-	int* n3 = malloc(sizeof(int));
-
+    int* n1 = malloc(sizeof(int));
+    int* n2 = malloc(sizeof(int));
+    int* n3 = malloc(sizeof(int));
     int* n4 = malloc(sizeof(int));
-	int* n5 = malloc(sizeof(int));
+    int* n5 = malloc(sizeof(int));
     int* n6 = malloc(sizeof(int));
-	*n1 = 1, *n2 = 2, *n3 = 5, *n4 = 10, *n5 = 8, *n6 = 6;
+    *n1 = 1, *n2 = 2, *n3 = 5, *n4 = 10, *n5 = 8, *n6 = 6;
 
     print_test("El heap esta vacio", heap_esta_vacio(heap));
     print_test("Encolo al elemento n1", heap_encolar(heap, n1));
@@ -162,9 +161,9 @@ static void prueba_volumen(size_t tam) {
 
     int datos[tam];
 
-	for (int i = 0; i < tam; i++) {
-		datos[i] = i;
-	}
+    for (int i = 0; i < tam; i++) {
+	datos[i] = i;
+    }
     int max = datos[tam - 1];
     mezclar_arreglo(datos, tam);
 
@@ -197,15 +196,15 @@ static void prueba_heap_desde_arreglo(size_t tam) {
     int numeros[tam];
     void* datos[tam];
 
-	for (int i = 0; i < tam; i++) {
-		numeros[i] = i;
-	}
+    for (int i = 0; i < tam; i++) {
+	numeros[i] = i;
+    }
     int max = numeros[tam - 1];
     mezclar_arreglo(numeros, tam);
 
     for (int i = 0; i < tam; i++) {
-		datos[i] = &numeros[i];
-	}
+	datos[i] = &numeros[i];
+    }
 
     heap_t* heap = heap_crear_arr(datos, tam, comparar_int);
 

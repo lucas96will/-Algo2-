@@ -1,10 +1,11 @@
 #include "heap.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 #define FACTOR_REDIMENSION 2
-#define TAM_INICIAL 911 
+#define TAM_INICIAL 97
 #define MULTIPLO_CANTIDAD 4
 
 
@@ -169,21 +170,10 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
     }
 
     for (size_t i = 0; i < n; i++) {
-        /*heap->datos[i] = malloc(sizeof(void*));
-        if(!heap->datos[i]){
-            for(int j = 0; j < i; j++){
-                free(heap->datos[j]);
-            }
-            free(heap->datos);
-            free(heap);
-            return NULL;
-        }
-        memcpy(heap->datos[i], arreglo[i], sizeof(void*));*/
-        heap->datos[i] = arreglo[i];
+    	heap->datos[i] = arreglo[i];
 	}
 
     heapify(heap->datos, n, cmp);
-
 
     heap->capacidad = n ;
     heap->cantidad = n;
@@ -196,9 +186,7 @@ void heap_destruir(heap_t *heap, void destruir_elemento(void *e)) {
     for(size_t i = 0; i < heap->cantidad; i++) {
         if(destruir_elemento != NULL) {
             destruir_elemento(heap->datos[i]);
-        } /*else {
-            free(heap->datos[i]);
-        }*/
+        }
     }
     free(heap->datos);
     free(heap);
@@ -219,11 +207,8 @@ bool heap_encolar(heap_t *heap, void *elem) {
         }
     }
 
-    /*heap->datos[heap->cantidad] = malloc(sizeof(void*));
-    if(!heap->datos[heap->cantidad]) return false;*/
     heap->datos[heap->cantidad] = elem;
 
-    /*memcpy(heap->datos[heap->cantidad], elem, sizeof(void*));*/
     up_heap(heap->datos, heap->cantidad, heap->cmp, heap->cantidad);
     heap->cantidad++;
 
@@ -240,13 +225,10 @@ void *heap_ver_max(const heap_t *heap) {
 void *heap_desencolar(heap_t *heap) {
     if(heap_esta_vacio(heap)) return NULL;
 
-
     void* dato = heap_ver_max(heap);
 
     //Intercambio primero y ultimo
     swap(&heap->datos[0], &heap->datos[heap->cantidad - 1]);
-
-    /*free(heap->datos[heap->cantidad-1]);*/
 
     // Disminuyo en 1 la cantidad
     heap->cantidad--;
