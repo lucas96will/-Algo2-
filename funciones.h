@@ -156,9 +156,9 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
  * Pre:
  * Post:
  */
-bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaciones);
+bool verificaciones_ver_likes(size_t id, hash_t* publicaciones);
 
-/* A traves del user logeado, se muestra por pantalla los usuarios que le
+/* Se muestra por pantalla los usuarios que le
  * dieron like a una publicacion con id pasado por parametro
  * Pre: Publicaciones: Estructura creada previamente
  * Post: Se imprimen por pantalla las personas que le dieron like
@@ -166,7 +166,7 @@ bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaci
  * Si no existe dicha publicacion o si el post no tiene likes
  * se imprime -> Error: Post inexistente o sin likes.
  */
-void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones);
+void mostrar_likes(size_t id, hash_t* publicaciones);
 
 
 #endif //_ALGO2__FUNCIONES_H

@@ -267,23 +267,19 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
  *                     MOSTRAR LIKES
  * *****************************************************************/
 
-bool verificaciones_ver_likes(user_t* user_logeado, size_t id, hash_t* publicaciones){
-    if (verificaciones_likear_post(user_logeado, id, publicaciones) == false) {
-        return false;
-    }
+bool verificaciones_ver_likes(size_t id, hash_t* publicaciones){
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     free(str_id);
-    abb_t* likes = publicacion->likes;
-    if (abb_cantidad(likes) == 0) {
+    if(publicacion == NULL || abb_cantidad(publicacion->likes) == 0){
         return false;
     }
 
     return true;
 }
 
-void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
-    if (verificaciones_ver_likes(user_logeado, id, publicaciones) == false){
+void mostrar_likes(size_t id, hash_t* publicaciones) {
+    if (verificaciones_ver_likes(id, publicaciones) == false){
         fprintf(stdout, "%s", "Error: Post inexistente o sin likes\n");
         return;
     }
@@ -299,7 +295,7 @@ void mostrar_likes(user_t* user_logeado, size_t id, hash_t* publicaciones) {
 
     while (!abb_iter_in_al_final(iter)) {
         const char* nombre = abb_iter_in_ver_actual(iter);
-        fprintf(stdout, "%2s\n", nombre);
+        fprintf(stdout, "\t%s\n", nombre);
         abb_iter_in_avanzar(iter);
     }
 

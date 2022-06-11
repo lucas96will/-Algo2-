@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
         if (strcmp(comando, "mostrar_likes") == 0){
             size_t id;
             scanf("%zu", &id);
-            mostrar_likes(user_logeado, id, publicaciones_totales);
+            mostrar_likes(id, publicaciones_totales);
         }
 
     }
