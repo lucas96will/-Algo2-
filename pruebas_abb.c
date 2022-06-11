@@ -112,6 +112,7 @@ static void prueba_abb_vacio() {
     print_test("Prueba abb crear abb vacio", abb);
     print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
     print_test("Prueba abb obtener clave A, es NULL, no existe", !abb_obtener(abb, "A"));
+    print_test("Prueba abb obtener clave NULL, es NULL, no existe", !abb_obtener(abb, NULL));
     print_test("Prueba abb pertenece clave A, es false, no existe", !abb_pertenece(abb, "A"));
     print_test("Prueba abb borrar clave A, es NULL, no existe", !abb_borrar(abb, "A"));
 
@@ -308,12 +309,14 @@ static void pruebas_iter_in() {
     char** claves = malloc(sizeof(char*) * TAM_NORMAL);
     if(!claves) {
         abb_destruir(arbol);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
     if(!iniciar_arreglo_claves(claves, TAM_NORMAL)) {
         abb_destruir(arbol);
         free(claves);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
@@ -327,6 +330,7 @@ static void pruebas_iter_in() {
         destruir_arreglo_claves(claves, TAM_NORMAL);
         free(claves);
         abb_destruir(arbol);
+        print_test("Falla inicializacion de test", false);
         return;
     }
     print_test("Iterador inorder creado", iter);
@@ -363,12 +367,14 @@ static void pruebas_volumen(const size_t tam) {
 
     char** claves = malloc(sizeof(char*)*tam);
     if(!claves) {
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
     if(!iniciar_arreglo_claves(claves, tam)) {
         abb_destruir(arbol);
         free(claves);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
@@ -405,12 +411,14 @@ static void pruebas_iterador_volumen(const size_t tam) {
     char** claves = malloc(sizeof(char*)*tam);
     if(!claves) {
         abb_destruir(arbol);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
     if(!iniciar_arreglo_claves(claves, tam)) {
         abb_destruir(arbol);
         free(claves);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
@@ -476,6 +484,7 @@ static void pruebas_iterador_inorder_interno() {
     if(!iniciar_arreglo_claves(claves, TAM_NORMAL)) {
         abb_destruir(arbol);
         free(claves);
+        print_test("Falla inicializacion de test", false);
         return;
     }
     for(int i = 0; i < TAM_NORMAL; i++) {
@@ -488,6 +497,7 @@ static void pruebas_iterador_inorder_interno() {
         destruir_arreglo_claves(claves, TAM_NORMAL);
         abb_destruir(arbol);
         free(claves);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 
@@ -496,6 +506,7 @@ static void pruebas_iterador_inorder_interno() {
         abb_destruir(arbol);
         free(claves_ord);
         free(claves);
+        print_test("Falla inicializacion de test", false);
         return;
     }
 

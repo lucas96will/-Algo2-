@@ -160,14 +160,14 @@ nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_compar
         // La clave es mayor ? -> voy al subarbol izquierdo
         return abb_obtener_nodo_misma_clave(nodo->izquierda, clave, f_comparar);
     }
-    else { // La clave es menor, por lo que busco a la derecha
-        return abb_obtener_nodo_misma_clave(nodo->derecha, clave, f_comparar);
-    }
-} // Complejidad: T(n) = T(n/2) + O(1) => complejidad O(log(n))  (Asumo que en el peor de los casos el arbol esta balanceado)
+    // La clave es menor, por lo que busco a la derecha
+    return abb_obtener_nodo_misma_clave(nodo->derecha, clave, f_comparar);
+    
+} 
 
 
 bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nodo_t* actual) {
-    
+
     if (actual == NULL) {
         nodo_t* nuevo_nodo = nodo_crear(clave, dato);
         if(!nuevo_nodo) {
@@ -189,8 +189,6 @@ bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nod
             if(arbol->f_destruir != NULL) {
                 arbol->f_destruir(actual->dato);
             }
-            free(actual->clave);
-            actual->clave = strdup(clave);
             actual->dato = dato;
             return true;
         }
@@ -198,7 +196,7 @@ bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nod
     if(arbol->f_comparar(actual->clave, clave) > 0) {
     // La clave es mayor ? -> voy al subarbol izquierdo
         return _abb_guardar(arbol, clave, dato, actual, actual->izquierda);
-    
+
     } else {
         return _abb_guardar(arbol, clave, dato, actual, actual->derecha);
     }
@@ -220,7 +218,7 @@ par_padre_hijo_t* abb_obtener_elem_a_borrar(nodo_t *padre, nodo_t* hijo, const c
     else { // La clave es menor, por lo que busco a la derecha
         return abb_obtener_elem_a_borrar(hijo, hijo->derecha, clave, f_comparar);
     }
-} // Complejidad: T(n) = T(n/2) + O(1) => complejidad O(log(n))  (Asumo que en el peor de los casos el arbol esta balanceado)
+} 
 
 nodo_t* busqueda_reemplazante(nodo_t* nodo) { //Menor de sus hijos mayores
     nodo_t* actual = nodo->derecha;
@@ -289,7 +287,6 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato) {
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     if (!arbol->raiz) {
-        //char* copia = strdup(clave);
         nodo_t* nuevo_nodo = nodo_crear(clave, dato);
         if(!nuevo_nodo) {
             return false;
@@ -310,7 +307,7 @@ void *abb_borrar(abb_t *arbol, const char *clave) {
         return NULL;
     }
     par_padre_hijo_t* par_padre_hijo = abb_obtener_elem_a_borrar(NULL, arbol->raiz, clave, arbol->f_comparar);
-    
+
     void* dato_borrado = par_padre_hijo->elem_a_borrar->dato;
 
     if (!par_padre_hijo->elem_a_borrar->izquierda && !par_padre_hijo->elem_a_borrar->derecha ) {
@@ -324,7 +321,7 @@ void *abb_borrar(abb_t *arbol, const char *clave) {
     } else if (!par_padre_hijo->elem_a_borrar->izquierda && par_padre_hijo->elem_a_borrar->derecha ) {
         //Elem a borrar tiene hijo der
         abb_borrar_1_hijo(arbol, par_padre_hijo, par_padre_hijo->elem_a_borrar->derecha);
-        
+
     } else if (par_padre_hijo->elem_a_borrar->izquierda && par_padre_hijo->elem_a_borrar->derecha ) {
         //Elem a borrar tiene dos hijos
 
@@ -335,11 +332,11 @@ void *abb_borrar(abb_t *arbol, const char *clave) {
         par_padre_hijo->elem_a_borrar->dato = dato_reemp;
         free(par_padre_hijo->elem_a_borrar->clave);
         par_padre_hijo->elem_a_borrar->clave = clave_reemp;
-        
+
     }
-    
+
     par_padre_hijo_destruir(par_padre_hijo);
-    
+
     return dato_borrado;
 }
 
@@ -353,10 +350,7 @@ void *abb_obtener(const abb_t *arbol, const char *clave) {
 }
 
 bool abb_pertenece(const abb_t *arbol, const char *clave) {
-    if(abb_obtener_nodo_misma_clave(arbol->raiz, clave, arbol->f_comparar) == NULL) {
-        return false;
-    }
-    return true;
+    return abb_obtener_nodo_misma_clave(arbol->raiz, clave, arbol->f_comparar) != NULL;
 }
 
 size_t abb_cantidad(const abb_t *arbol) {
@@ -421,7 +415,7 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol) {
 
     nodo_t* actual = arbol->raiz;
     pila_apilar_abb(iter->pila, actual);
-    
+
     return iter;
 }
 
@@ -450,10 +444,7 @@ const char *abb_iter_in_ver_actual(const abb_iter_t *iter) {
 
 
 bool abb_iter_in_al_final(const abb_iter_t *iter) {
-    if (pila_esta_vacia(iter->pila)) {
-        return true;
-    }
-    return false;
+    return pila_esta_vacia(iter->pila);
 }
 
 
