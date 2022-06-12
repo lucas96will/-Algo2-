@@ -1,5 +1,8 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "abb.h"
 #include "pila.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -157,10 +160,10 @@ nodo_t *abb_obtener_nodo_misma_clave(nodo_t *nodo, const char *clave, abb_compar
         // La clave es mayor ? -> voy al subarbol izquierdo
         return abb_obtener_nodo_misma_clave(nodo->izquierda, clave, f_comparar);
     }
-    else { // La clave es menor, por lo que busco a la derecha
-        return abb_obtener_nodo_misma_clave(nodo->derecha, clave, f_comparar);
-    }
-} // Complejidad: T(n) = T(n/2) + O(1) => complejidad O(log(n))  (Asumo que en el peor de los casos el arbol esta balanceado)
+    // La clave es menor, por lo que busco a la derecha
+    return abb_obtener_nodo_misma_clave(nodo->derecha, clave, f_comparar);
+    
+} 
 
 
 bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nodo_t* actual) {
@@ -186,8 +189,6 @@ bool _abb_guardar(abb_t* arbol, const char *clave, void*dato, nodo_t* padre, nod
             if(arbol->f_destruir != NULL) {
                 arbol->f_destruir(actual->dato);
             }
-            free(actual->clave);
-            actual->clave = strdup(clave);
             actual->dato = dato;
             return true;
         }
@@ -217,7 +218,7 @@ par_padre_hijo_t* abb_obtener_elem_a_borrar(nodo_t *padre, nodo_t* hijo, const c
     else { // La clave es menor, por lo que busco a la derecha
         return abb_obtener_elem_a_borrar(hijo, hijo->derecha, clave, f_comparar);
     }
-} // Complejidad: T(n) = T(n/2) + O(1) => complejidad O(log(n))  (Asumo que en el peor de los casos el arbol esta balanceado)
+} 
 
 nodo_t* busqueda_reemplazante(nodo_t* nodo) { //Menor de sus hijos mayores
     nodo_t* actual = nodo->derecha;
@@ -286,7 +287,6 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato) {
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato) {
     if (!arbol->raiz) {
-        //char* copia = strdup(clave);
         nodo_t* nuevo_nodo = nodo_crear(clave, dato);
         if(!nuevo_nodo) {
             return false;
@@ -350,10 +350,7 @@ void *abb_obtener(const abb_t *arbol, const char *clave) {
 }
 
 bool abb_pertenece(const abb_t *arbol, const char *clave) {
-    if(abb_obtener_nodo_misma_clave(arbol->raiz, clave, arbol->f_comparar) == NULL) {
-        return false;
-    }
-    return true;
+    return abb_obtener_nodo_misma_clave(arbol->raiz, clave, arbol->f_comparar) != NULL;
 }
 
 size_t abb_cantidad(const abb_t *arbol) {
@@ -447,10 +444,7 @@ const char *abb_iter_in_ver_actual(const abb_iter_t *iter) {
 
 
 bool abb_iter_in_al_final(const abb_iter_t *iter) {
-    if (pila_esta_vacia(iter->pila)) {
-        return true;
-    }
-    return false;
+    return pila_esta_vacia(iter->pila);
 }
 
 

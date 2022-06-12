@@ -1,6 +1,8 @@
-#include "hash.h"
 #define _POSIX_C_SOURCE 200809L
+#include "hash.h"
 #include <stdlib.h>
+#include <stdio.h>
+
 #include <string.h>
 
 #define CAPACIDAD_INICIAL 101 // 276 excelente, 292 muy bueno, 301 bueno
@@ -38,10 +40,6 @@ struct hash_iter {
 // http://www.isthe.com/chongo/tech/comp/fnv/
 unsigned int fnv_hashing(const char* str, size_t length);
 
-// Post: reserva memoria para un vector de campo_t del tamanio
-// de la capacidad
-campo_t* crear_tabla(size_t capacidad);
-
 // Pre: hash creado y la tabla creada (arreglo de campo_t)
 // Post: se inicializan todos los valores del campo en
 // estado VACIO clave NULL y dato NULL
@@ -63,21 +61,12 @@ int busqueda_tabla(const hash_t* hash, const char* clave);
 // se vuelve 0 y se guardan los elementos segun la nueva capacidad de la tabla
 bool tabla_redimensionar(hash_t* hash);
 
-
-// Completa el campo en la posicion pos con el par (clave, dato)
-// si es la misma clave entonces se aplica la funcion de destruccion correspondiente
-// y luego se guarda el par (clave, dato)
-// Pre: hash creado, pos < hash->capacidad
-// Post: se guarda el par (clave, dato) en la posicion pos dentro del hash
-void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool misma_clave);
-
-
 // Se guarda el par(clave = copia, dato) en la posicion pos
 // si no se puede guardar en la posicion pos, se busca , en este caso
 // linealmente, aquella posicion donde si se puede guardar
 // Pre: hash creado, pos < hash->capacidad
-// Post: se guarda el par (copia, dato) en una posicion vacia del hash
-bool guardar_par(hash_t* hash, char* copia, void* dato, size_t pos);
+// Post: se guarda el par (clave, dato) en una posicion vacia del hash
+bool guardar_par(hash_t* hash, char* clave, void* dato, size_t pos);
 
 // Pre: hash creado
 // Post: devuelve true si se necesita redimensionar
@@ -100,23 +89,11 @@ unsigned int fnv_hashing(const char* str, size_t length) {
 	return hash;
 }
 
-campo_t* crear_tabla(size_t capacidad) {
-    campo_t* tabla = malloc(sizeof(campo_t) * capacidad);
-    
-    if (!tabla) {
-        return NULL;
-    }
-    return tabla;
-}
-
 void asignar_tabla(hash_t* hash) {
-    size_t i = 0;
-
-    while (i < hash->capacidad) {
+    for(int i = 0; i < hash->capacidad; i++) {
         hash->tabla[i].estado = VACIO;
         hash->tabla[i].clave = NULL;
         hash->tabla[i].dato = NULL;
-        i++;
     }
 }
 
@@ -127,21 +104,22 @@ size_t clave_obtener_posicion(const hash_t* hash, const char *clave) {
 
 int busqueda_tabla(const hash_t* hash, const char* clave) {
     int pos = (int)clave_obtener_posicion(hash, clave);
-    while (pos < hash->capacidad) {
-        if (hash->tabla[pos].estado == OCUPADO && strcmp(clave, hash->tabla[pos].clave) == 0) {
-            return pos;
-        }
-        pos++; //lineal
-    }
+    int posicion_disponible = NO_ENCONTRADO;
 
-    return NO_ENCONTRADO;
+    for(;pos < hash->capacidad; pos++) {
+        if (hash->tabla[pos].estado == OCUPADO && strcmp(clave, hash->tabla[pos].clave) == 0) {
+            posicion_disponible = pos;
+            break;
+        }
+    }
+    return posicion_disponible;
 }
 
 bool tabla_redimensionar(hash_t* hash) {
     // Creo mi nueva tabla con mi nueva capacidad
     size_t nueva_capacidad = hash->capacidad * MULTIPLICADOR_REDIMENSION;
-    campo_t* nueva_tabla = crear_tabla(nueva_capacidad);
-    if (!nueva_tabla) {
+    campo_t* nueva_tabla = malloc(sizeof(campo_t)*nueva_capacidad);
+    if (nueva_tabla == NULL) {
         return false;
     }
 
@@ -169,39 +147,27 @@ bool tabla_redimensionar(hash_t* hash) {
     return true;
 }
 
-void completar_campo(hash_t* hash, char* clave, void* dato, size_t pos, bool misma_clave) {
-    if (!misma_clave) {
-        hash->tabla[pos].estado = OCUPADO;
-        hash->tabla[pos].clave = clave;
-        hash->tabla[pos].dato = dato;
-        hash->cantidad++;
-    } else { // mismo elemento
-        // Uso la funcion de destruccion indicada en los elementos (si existe) y
-        // si no libero la clave en la posicion y guardo la generada (ambas son copias)
-        if(hash->f_destruccion != NULL) {
-            hash->f_destruccion(hash->tabla[pos].dato);
-        }
-        free(hash->tabla[pos].clave);
-        hash->tabla[pos].clave = clave;
-        hash->tabla[pos].dato = dato;
-    }
-}
-
-bool guardar_par(hash_t* hash, char* copia, void* dato, size_t pos) {
-
+bool guardar_par(hash_t* hash, char* clave, void* dato, size_t pos) {
     // Recorremos la estructura hasta hallar un espacio vacio u el mismo elemento
-    while(pos < hash->capacidad) {
+    for(; pos < hash->capacidad; pos++)/*while(pos < hash->capacidad)*/ {
         if (hash->tabla[pos].estado == VACIO) {
-            completar_campo(hash, copia, dato, pos, false);
+            hash->tabla[pos].estado = OCUPADO;
+            hash->tabla[pos].clave = clave;
+            hash->tabla[pos].dato = dato;
+            hash->cantidad++;
             return true;
         }
-        else if(hash->tabla[pos].estado == OCUPADO && strcmp(copia, hash->tabla[pos].clave) == 0) {
-            completar_campo(hash, copia, dato, pos, true);
+        else if(hash->tabla[pos].estado == OCUPADO && strcmp(clave, hash->tabla[pos].clave) == 0) {
+            // Uso la funcion de destruccion indicada en los elementos (si existe) y
+            // si no libero la clave (la misma ya se encuentra almacenada)
+            if(hash->f_destruccion != NULL) {
+                hash->f_destruccion(hash->tabla[pos].dato);
+            }
+            free(clave);
+            hash->tabla[pos].dato = dato;
             return true;
         }
-        pos++;
     }
-
     return false;
 }
 
@@ -219,27 +185,27 @@ bool necesita_redimension(hash_t* hash) {
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato) {
     hash_t* hash = malloc(sizeof(hash_t));
     
-    if (!hash) {
+    if (hash == NULL) {
         return NULL;
     }
-
-    hash->tabla = crear_tabla(CAPACIDAD_INICIAL);
-    if (!hash->tabla) {
-        free (hash);
-        return NULL;
-    }
-
     hash->capacidad = CAPACIDAD_INICIAL;
     hash->cantidad = 0;
     hash->borrados = 0;
     hash->f_destruccion = destruir_dato;
+
+    hash->tabla = malloc(sizeof(campo_t) * CAPACIDAD_INICIAL);
+    if (hash->tabla == NULL) {
+        free(hash);
+        return NULL;
+    }
+
     asignar_tabla(hash);
 
     return hash;
 }
 
 
-bool hash_guardar(hash_t *hash, const char *clave, void *dato) { 
+bool hash_guardar(hash_t *hash, const char *clave, void *dato) { //continuar
     if (necesita_redimension(hash)) {
         if (!tabla_redimensionar(hash)) {
             return false;
@@ -289,10 +255,7 @@ void *hash_obtener(const hash_t *hash, const char *clave) {
 
 bool hash_pertenece(const hash_t *hash, const char *clave) {
     int posicion = busqueda_tabla(hash, clave);
-    if(posicion == NO_ENCONTRADO) {
-        return false;
-    }
-    return true;
+    return (posicion != NO_ENCONTRADO);
 }
 
 size_t hash_cantidad(const hash_t *hash) {
@@ -300,9 +263,7 @@ size_t hash_cantidad(const hash_t *hash) {
 }
 
 void hash_destruir(hash_t *hash) {
-    size_t pos =0;
-
-    while (pos < hash->capacidad) {
+    for(size_t pos = 0; pos < hash->capacidad; pos++){
         // Si la posicion esta ocupada, libero la memoria
         // usando free o la funcion de destruccion indicada
         if (hash->tabla[pos].estado == OCUPADO) {
@@ -311,7 +272,6 @@ void hash_destruir(hash_t *hash) {
             }
             free(hash->tabla[pos].clave);
         }
-        pos++;
     }
     free(hash->tabla);
     free(hash);
@@ -322,8 +282,8 @@ void hash_destruir(hash_t *hash) {
 
 // Pre: iterador creado
 // Post: posiciona el iterador en la siguiente posicion
-// con el estado OCUPADO
-void iter_buscar_ocupado(hash_iter_t* iter) {
+// con el estado OCUPADO, si no hay elemento OCUPADO se posiciona al final
+void iter_buscar_siguiente(hash_iter_t* iter) {
     while (iter->pos < iter->hash->capacidad) {
         if (iter->hash->tabla[iter->pos].estado == OCUPADO) {
             return;
@@ -341,15 +301,14 @@ void iter_buscar_ocupado(hash_iter_t* iter) {
 
 hash_iter_t *hash_iter_crear(const hash_t *hash) {
     hash_iter_t* iter = malloc(sizeof(hash_iter_t));
-    if (!iter) {
+    if (iter == NULL) {
         return NULL;
     }
     iter->hash = hash;
     iter->pos = 0;
 
     // Posiciono el iterador en el primer elemento ocupado
-    // (si no hay lugar ocupado se posiciona al final)
-    iter_buscar_ocupado(iter);
+    iter_buscar_siguiente(iter);
 
     return iter;
 }
@@ -360,12 +319,11 @@ bool hash_iter_avanzar(hash_iter_t *iter) {
     }
 
     iter->pos++;
-    iter_buscar_ocupado(iter);
+    iter_buscar_siguiente(iter);
     return true;
 }
 
 const char *hash_iter_ver_actual(const hash_iter_t *iter) {
-
     if (hash_iter_al_final(iter)){
         return NULL;
     }
@@ -374,34 +332,9 @@ const char *hash_iter_ver_actual(const hash_iter_t *iter) {
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter) {
-    return (iter->pos >= iter->hash->capacidad);
+    return (iter->pos == iter->hash->capacidad);
 }
 
 void hash_iter_destruir(hash_iter_t *iter) {
     free(iter);
-}
-
-
-//Ejs parcial
-/*Sabiendo que se tiene un hash en que los valores son cadenas, implementar la función hash_t*
-hash_invertir(const hash_t*); que devuelva un nuevo hash cuyas claves sean los valores del original
-y sus valores asociados sean listas con las claves que tenían dichos valores en el primero. Indicar la
-complejidad de la función*/
-
-
-hash_t* hash_invertir(const hash_t* hash) {
-    
-    hash_t* res = hash_crear(hash->f_destruccion);
-
-    hash_iter_t* iter = hash_iter_crear(hash);
-    
-    while (!hash_iter_al_final(iter)){
-        const char* clave = hash_iter_ver_actual(iter);
-        void* dato = hash_obtener(hash, clave);
-        void* clave_guardar = strdup(clave);
-        hash_guardar(res, (const char*) dato, clave_guardar);
-        hash_iter_avanzar(iter);
-    }
-    hash_iter_destruir(iter);
-    return res;
 }

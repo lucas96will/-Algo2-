@@ -1,7 +1,6 @@
 #ifndef _ALGO2__ABB_H
 #define _ALGO2__ABB_H
-
-#define _POSIX_C_SOURCE 200809L
+ 
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -24,14 +23,14 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato);
 
 /* Guarda un elemento en el ABB, si la clave ya se encuentra en la
  * estructura, la reemplaza. De no poder guardarlo devuelve false.
- * Pre: La estructura ABB fue inicializada
+ * Pre: La estructura ABB fue creada
  * Post: Se almacenó el nodo con el par (clave, dato)
  */
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato);
 
 /* Borra un elemento del ABB y devuelve el dato asociado.  Devuelve
  * NULL si el dato no estaba.
- * Pre: La estructura ABB fue inicializada
+ * Pre: La estructura ABB fue creada
  * Post: El elemento fue borrado de la estructura y se lo devolvió,
  * en el caso de que estuviera guardado.
  */
@@ -39,26 +38,26 @@ void *abb_borrar(abb_t *arbol, const char *clave);
 
 /* Obtiene el valor de un elemento del ABB, si la clave no se encuentra
  * devuelve NULL.
- * Pre: La estructura ABB fue inicializada
+ * Pre: La estructura ABB fue creada
  * Post: Devolvió el elemento corrrespondiente a la clave, en caso de encontrado.
  */
 void *abb_obtener(const abb_t *arbol, const char *clave);
 
 /* Determina si clave pertenece o no al ABB.
- * Pre: La estructura hash fue inicializada
+ * Pre: La estructura ABB fue creada
  * Post: Devuelve true si la clave pertenece, false en caso contrario.
  */
 bool abb_pertenece(const abb_t *arbol, const char *clave);
 
 /* Devuelve la cantidad de elementos del ABB.
- * Pre: La estructura ABB fue inicializada
+ * Pre: La estructura ABB fue creada
  * Post: Devolvio la cantidad de elementos del ABB.
  */
 size_t abb_cantidad(const abb_t *arbol);
 
 /* Destruye la estructura liberando la memoria pedida y llamando a la función
  * destruir para cada nodo con par (clave, dato).
- * Pre: La estructura ABB fue inicializada
+ * Pre: La estructura ABB fue creada
  * Post: La estructura ABB fue destruida
  */
 void abb_destruir(abb_t *arbol);

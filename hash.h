@@ -67,7 +67,7 @@ hash_iter_t *hash_iter_crear(const hash_t *hash);
 // Avanza iterador
 // Pre: el iterador fue creado
 // Post: Devuelve true si el iterador avanza a la siguiente posicion
-// en otro caso false
+// en otro caso false. Si no hay elementos en el hash se posiciona al final
 bool hash_iter_avanzar(hash_iter_t *iter);
 
 // Devuelve clave actual, esa clave no se puede modificar ni liberar.
@@ -86,7 +86,5 @@ bool hash_iter_al_final(const hash_iter_t *iter);
 // Pre: el iterador fue creado
 // Post: se libera la memoria del iterador
 void hash_iter_destruir(hash_iter_t *iter);
-
-hash_t* hash_invertir(const hash_t* hash);
 
 #endif  // HASH_H
