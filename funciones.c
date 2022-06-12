@@ -1,7 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "funciones.h"
 #include <string.h>
-//#define _OPEN_SYS_ITOA_EXT
+
 #include <stdlib.h>
 
 #define CANT_MAX_POST 10
@@ -36,7 +36,7 @@ void f_destruir_publicacion(void* publicacion){
     publicacion_destruir((publicacion_t*)publicacion);
 }
 
-size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) { //Cant_user sera hash->cantidad del hash de usuarios
+size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) {
     int diferencia = abs(((int)user1->id - (int)user2->id));
     size_t afinidad = cant_user - (size_t)diferencia;
     return afinidad;
@@ -167,10 +167,6 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
         return;
     }
     size_t id = hash_cantidad(publicaciones);
-    // Cambiar size_t a char* puede ser problematico
-    //char str_id[CANT_MAX_POST];
-    //snprintf(str_id, CANT_MAX_POST, "%zu", id);
-    //itoa(id, str_id, 10);
     char* str_id = uinttostr(id);
     abb_t* likes = abb_crear(strcmp, NULL);
     publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
@@ -186,7 +182,7 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
     hash_iter_t* iter = hash_iter_crear(users);
     size_t cant_users = hash_cantidad(users);
 
-    while (!hash_iter_al_final(iter)) { //O(u), siendo u la cantidad de usuarios
+    while (!hash_iter_al_final(iter)) { 
         const char* clave_actual = hash_iter_ver_actual(iter);
         user_t* user_actual = (user_t*)hash_obtener(users, clave_actual);
 
@@ -229,8 +225,8 @@ void ver_proximo_post(user_t* user_logeado) {
     publicacion_t* publicacion = publicacion_user->publicacion;
 
     size_t id = publicacion->id;
-    char* user_publico = publicacion->user->nombre;//nada
-    char* mensaje = publicacion->mensaje; //usuario
+    char* user_publico = publicacion->user->nombre;
+    char* mensaje = publicacion->mensaje; 
     size_t cant_likes = abb_cantidad(publicacion->likes);
 
     fprintf(stdout, "Post ID %ld\n", id);
