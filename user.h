@@ -16,20 +16,20 @@ typedef struct user {
  * *****************************************************************/
 
 /*
- * Pre:
- * Post:
+ * Pre: Recibe un nombre, un id y un heap de feed
+ * Post: Devuelve la estructura user creada
  */
 user_t* user_crear(char* nombre, size_t id, heap_t* feed);
 
 /*
- * Pre:
- * Post:
+ * Pre: Recibe un usuario y una publicacion_user
+ * Post: Actualiza el feed del usuario con la nueva publicacion_user
  */
 void user_actualizar_feed(user_t* user, void* publicacion_user);
 
 /*
- * Pre:
- * Post:
+ * Pre: La estructura user fue creada
+ * Post: La estructura user fue destruida
  */
 void user_destruir(user_t* user);
 

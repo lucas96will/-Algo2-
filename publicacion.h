@@ -16,14 +16,14 @@ typedef  struct publicacion {
  * *****************************************************************/
 
 /*
- * Pre:
- * Post:
+ * Pre: Recibe un user, un mensaje, un id y un abb
+ * Post: Devuelve la estrcutura publicacion creada
  */
 publicacion_t* publicacion_crear(user_t* user, char* mensaje, size_t id, abb_t* likes);
 
 /*
- * Pre:
- * Post:
+ * Pre: La estructura publicacion fue creada
+ * Post: La estructura publuicacion fue destruida
  */
 void publicacion_destruir(publicacion_t* publicacion);
 

@@ -14,14 +14,14 @@ typedef struct publicacion_user {
  * *****************************************************************/
 
 /*
- * Pre:
- * Post:
+ * Pre: Recibe una publicacion y el numero de afinidad
+ * Post: La estructura publicacion_user fue creada
  */
 publicacion_user_t* publicacion_user_crear(publicacion_t* publicacion, size_t afinidad);
 
 /*
- * Pre:
- * Post:
+ * Pre: La estructura publicacion_user fue creada
+ * Post: La estructura publicacion_user fue destruida
  */
 void publicacion_user_destruir(publicacion_user_t* publicacion_user);
 
