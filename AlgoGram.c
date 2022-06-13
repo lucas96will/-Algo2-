@@ -1,7 +1,5 @@
 #include "AlgoGram.h"
 
-#define TAM_MAXIMO 160
-
 
 typedef enum{
     F_LOGIN = 0,
@@ -27,6 +25,9 @@ struct algo_gram {
 
 #define CANTIDAD_COMANDOS 6
 
+/* *****************************************************************
+ *        FUNCIONES PRIMARIAS DE LA INTERFAZ (usando funciones.h)
+ * *****************************************************************/
 
 //Si se escribe por consola login -> esperar que se escriba un nombre y despues,
 // (siendo user el nombre que se escribio por consola)
@@ -35,8 +36,7 @@ void _user_login(algo_gram_t* algo_gram){
     char* user = NULL;
     size_t capacidad = 0;
     getline(&user, &capacidad, stdin);
-    if ((strlen(user) > 0) && (user[strlen(user) - 1] == '\n'))
-    {
+    if ((strlen(user) > 0) && (user[strlen(user) - 1] == '\n')){
         user[strlen(user) - 1] = '\0';
     }
     algo_gram->user_logeado = user_login(algo_gram->users, user, algo_gram->user_logeado);
@@ -82,7 +82,11 @@ void _likear_post(algo_gram_t* algo_gram){
     likear_post(algo_gram->user_logeado, id, algo_gram->publicaciones);
 }
 
-bool crear_comandos(algo_gram_t* algo_gram){
+/* *****************************************************************
+ *                          FUNCIONES AUXILIARES
+ * *****************************************************************/
+
+bool comandos_crear(algo_gram_t* algo_gram){
     hash_t* hash = hash_crear(NULL);
     funciones_t* funciones = malloc(sizeof(funciones_t) * CANTIDAD_COMANDOS);
     if(funciones == NULL) {
@@ -111,13 +115,16 @@ bool crear_comandos(algo_gram_t* algo_gram){
     return true;
 }
 
+/* *****************************************************************
+ *                          PRIMITIVAS
+ * *****************************************************************/
 
-algo_gram_t* crear_algo_gram(hash_t* users, hash_t* publicaciones){
+algo_gram_t* algo_gram_crear(hash_t* users, hash_t* publicaciones){
     algo_gram_t* algo_gram = malloc(sizeof(algo_gram_t));
     if(algo_gram == NULL){
         return NULL;
     }
-    if(crear_comandos(algo_gram) == false){
+    if(comandos_crear(algo_gram) == false){
         free(algo_gram);
         return NULL;
     }
@@ -141,7 +148,7 @@ bool ejecutar_comando(algo_gram_t* algo_gram, char* comando){
     return true;
 }
 
-void destruir_algo_gram(algo_gram_t* algo_gram){
+void algo_gram_destruir(algo_gram_t* algo_gram){
     free(algo_gram->funciones);
     hash_destruir(algo_gram->comandos);
     free(algo_gram);

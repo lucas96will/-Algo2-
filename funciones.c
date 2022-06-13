@@ -6,6 +6,14 @@
 
 #define CANT_MAX_POST 10
 
+#define MAYOR_AFINIDAD_P1 1
+#define MAYOR_AFINIDAD_P2 -1
+
+#define MENOR_ID_P1 1
+#define MENOR_ID_P2 -1
+
+#define ARCHIVO_MIN_ARGUMENTOS 2
+#define ARGUMENTO_NOMBRE_ARCHIVO 1
 
 /*
  * Pre: -
@@ -22,15 +30,19 @@ char* uinttostr(size_t num){
     return str;
 }
 
-/*
- * Wrapper destruir user.
+/* WRAPPER DE DESTRUCCION DE USER_T
+ * Pre: User creado
+ * Post: Llama a la funcion de destruccion de user
+ * libera la memoria asociada a user
  */
 void f_destruir_user(void* user){
     user_destruir((user_t*)user);
 }
 
-/*
- * Wrapper destruir publicacion.
+/* WRAPPER DE DESTRUCCION DE PUBLICACION_T
+ * Pre: Publicacion creada
+ * Post: Llama a la funcion de destruccion de publicacion
+ * libera la memoria asociada a publicacion
  */
 void f_destruir_publicacion(void* publicacion){
     publicacion_destruir((publicacion_t*)publicacion);
@@ -48,26 +60,26 @@ int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_us
     publicacion_user_t* p1 = (publicacion_user_t*) publicacion_user_1;
     publicacion_user_t* p2 = (publicacion_user_t*) publicacion_user_2;
     if(p1->afinidad < p2->afinidad) {
-        return -1;
+        return MAYOR_AFINIDAD_P1;
     } else if(p1->afinidad > p2->afinidad) {
-        return 1;
+        return MAYOR_AFINIDAD_P2;
     }
+    // Si ambas publicaciones_user tienen la misma afinidad, se ordena por id
     if(p1->publicacion->id < p2->publicacion->id){
-        return 1;
+        return MENOR_ID_P1;
     }
     else{
-        return -1;
+        return MENOR_ID_P2;
     }
-    return 0;
 }
 
 FILE* resultado_archivo(int cant_argumentos, char** argumentos) {
 
-    if (cant_argumentos < 2) {
+    if (cant_argumentos < ARCHIVO_MIN_ARGUMENTOS) {
         fprintf(stdout, "%s", "Error: Cantidad erronea de parametros\n");
         return NULL;
     }
-    char* ruta = argumentos[1];
+    char* ruta = argumentos[ARGUMENTO_NOMBRE_ARCHIVO];
 
     FILE* archivo = fopen(ruta, "r");
     if (archivo == NULL) {
@@ -115,6 +127,11 @@ hash_t* user_a_hash(FILE* archivo) {
  *                          USER LOGIN
  * *****************************************************************/
 
+/*
+ * Pre: users y user_logeado creado
+ * Post: Devuelve true si se puede logear el user (se encuentra en el hash de users
+ * y no hay user_logeado), false en otro caso
+ */
 bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
     if (user_logeado != NULL) {
         fprintf(stdout, "%s", "Error: Ya habia un usuario loggeado\n");
@@ -144,6 +161,10 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
  *                          USER LOGOUT
  * *****************************************************************/
 
+/*
+ * Pre:
+ * Post: Devuelve true si hay un user_logeado, false en otro caso
+ */
 bool verificaciones_alguien_logeado(user_t* user_logeado) {
     return user_logeado != NULL;
 }
@@ -161,28 +182,18 @@ void* user_logout(user_t* user_logeado) {
 /* *****************************************************************
  *                     PUBLICAR UN POST
  * *****************************************************************/
-void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
-        fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
-        return;
-    }
-    size_t id = hash_cantidad(publicaciones);
-    char* str_id = uinttostr(id);
-    abb_t* likes = abb_crear(strcmp, NULL);
-    publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
-    hash_guardar(publicaciones, str_id, publicacion);
-    publicacion_a_users(publicacion, users);
-    fprintf(stdout, "Post publicado\n");
-    free(str_id);
-}
 
+/*
+ * Pre: publicacion, users: estructuras creadas previamente
+ * Post: A todos los users se les guarda la publicacion
+ */
 void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
 
     user_t* user_publico = publicacion->user;
     hash_iter_t* iter = hash_iter_crear(users);
     size_t cant_users = hash_cantidad(users);
 
-    while (!hash_iter_al_final(iter)) { 
+    while (!hash_iter_al_final(iter)) {
         const char* clave_actual = hash_iter_ver_actual(iter);
         user_t* user_actual = (user_t*)hash_obtener(users, clave_actual);
 
@@ -199,10 +210,32 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
     hash_iter_destruir(iter);
 }
 
+void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje) {
+    if (verificaciones_alguien_logeado(user_logeado) == false) {
+        fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
+        return;
+    }
+    size_t id = hash_cantidad(publicaciones);
+    char* str_id = uinttostr(id);
+    abb_t* likes = abb_crear(strcmp, NULL);
+    publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
+    hash_guardar(publicaciones, str_id, publicacion);
+    publicacion_a_users(publicacion, users);
+    fprintf(stdout, "Post publicado\n");
+    free(str_id);
+}
+
+
+
 /* *****************************************************************
  *                     VER PROXIMO POST
  * *****************************************************************/
 
+/*
+ * Pre: -
+ * Post: Devuelve true si hay mas publicaciones para ver del user logeado
+ * devuelve false si no hay user logeado o si no hay mas publicaciones para ver
+ */
 bool verificaciones_ver_proximo(user_t* user_logeado) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         return false;
@@ -240,6 +273,12 @@ void ver_proximo_post(user_t* user_logeado) {
  *                     LIKEAR UN POST
  * *****************************************************************/
 
+/*
+ * Pre: Publicaciones: estructura creada previamente
+ * Post: Devuelve true si hay un user logeado y existe la publicacion
+ * con el id dentro de todas las publicaciones.
+ * Devuelve false si no hay user logeado o si no existe la publicacion
+ */
 bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
     if (verificaciones_alguien_logeado(user_logeado) == false) {
         return false;
@@ -271,6 +310,11 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
  *                     MOSTRAR LIKES
  * *****************************************************************/
 
+/*
+ * Pre: Publicaciones: estructura creada previamente
+ * Post: Devuelve true si se hallo una publicacion con id dentro de publicaciones
+ * y tiene algun like. False en otro caso
+ */
 bool verificaciones_ver_likes(size_t id, hash_t* publicaciones){
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);

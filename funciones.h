@@ -13,14 +13,13 @@
  * *****************************************************************/
 
 
-hash_t* comandos_disponibles();
 
 /* WRAPPER DE DESTRUCCION DE USER_T
  * Pre: User creado
  * Post: Llama a la funcion de destruccion de user
  * libera la memoria asociada a user
  */
-void f_user_destruir(void* user);
+void f_destruir_user(void* user);
 
 /* WRAPPER DE DESTRUCCION DE PUBLICACION_T
  * Pre: Publicacion creada
@@ -38,7 +37,10 @@ int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_us
 /*
  * Pre:
  * Post: Devuelve el archivo, si no se pudo abrir el archivo
- * (por no encontrarse la direccion o por cantidad erronea de parametros)
+ * por no encontrarse la direccion o por cantidad erronea de
+ * parametros imprime por stdout:
+ * "Error: Cantidad erronea de parametros"
+ * "Error: archivo fuente inaccesible"
  * devuelve NULL.
  */
 FILE* resultado_archivo(int cant_argumentos, char** argumentos);
@@ -47,6 +49,7 @@ FILE* resultado_archivo(int cant_argumentos, char** argumentos);
  * pasado por parametro
  * Pre: el archivo es valido (!= NULL)
  * Post: Devuelve un hashmap(clave = nombre, valor = usuario_t)
+ * y cierra el archivo
  */
 hash_t* user_a_hash(FILE* archivo);
 
@@ -54,12 +57,6 @@ hash_t* user_a_hash(FILE* archivo);
  *                          USER LOGIN
  * *****************************************************************/
 
-/*
- * Pre: users y user_logeado creado
- * Post: Devuelve true si se puede logear el user (se encuentra en el hash de users
- * y no hay user_logeado), false en otro caso
- */
-bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado);
 
 /* user = cadena de caracteres pedida por stdin
  * Pre: users creado, user_logeado creado
@@ -76,11 +73,6 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado);
  *                          USER LOGOUT
  * *****************************************************************/
 
-/*
- * Pre:
- * Post: Devuelve true si hay un user_logeado, false en otro caso
- */
-bool verificaciones_alguien_logeado(user_t* user_logeado);
 
 /*
  * Pre:
@@ -104,23 +96,11 @@ void* user_logout(user_t* user_logeado);
  */
 void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje);
 
-/*
- * Pre: publicacion, users: estructuras creadas previamente
- * Post: publica a todos los users la publicacion
- */
-void publicacion_a_users(publicacion_t* publicacion, hash_t* users);
-
 
 /* *****************************************************************
  *                     VER PROXIMO POST
  * *****************************************************************/
 
-/*
- * Pre: -
- * Post: Devuelve true si hay mas publicaciones para ver del user logeado
- * devuelve false si no hay user logeado o si no hay mas publicaciones para ver
- */
-bool verificaciones_ver_proximo(user_t* user_logeado);
 
 /*
  * Pre: -
@@ -135,14 +115,6 @@ void ver_proximo_post(user_t* user_logeado);
  *                     LIKEAR UN POST
  * *****************************************************************/
 
-/*
- * Pre: Publicaciones: estructura creada previamente
- * Post: Devuelve true si hay un user logeado y existe la publicacion
- * con el id dentro de todas las publicaciones.
- * Devuelve false si no hay user logeado o si no existe la publicacion
- */
-bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
-
 /* A traves del user logeado se likea el post con el id pasado por parametro
  * Pre: publicaciones: estructura creada previamente
  * Post: Se likea el post con el numero id dentro del hash publicaciones.
@@ -155,12 +127,6 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones);
  *                     MOSTRAR LIKES
  * *****************************************************************/
 
-/*
- * Pre: Publicaciones: estructura creada previamente
- * Post: Devuelve true si se hallo una publicacion con id dentro de publicaciones
- * y tiene algun like. False en otro caso
- */
-bool verificaciones_ver_likes(size_t id, hash_t* publicaciones);
 
 /* Se muestra por pantalla los usuarios que le
  * dieron like a una publicacion con id pasado por parametro

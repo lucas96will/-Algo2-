@@ -1,9 +1,16 @@
 #include "AlgoGram.h"
-//#include "funciones.h"
-#include<signal.h>
 #define TAM_MAXIMO 160
 #define ERROR_ARCHIVO 1
 
+
+void ejecutar_algo_gram(algo_gram_t* algo_gram){
+    char comando[TAM_MAXIMO];
+    while (scanf("%s", comando) != EOF){
+        if(comando_existe(algo_gram, comando)) {
+            ejecutar_comando(algo_gram, comando);
+        }
+    }
+}
 
 int main(int argc, char* argv[]) {
     FILE* archivo = resultado_archivo(argc, argv);
@@ -12,17 +19,12 @@ int main(int argc, char* argv[]) {
     }
     hash_t* users = user_a_hash(archivo);
     hash_t* publicaciones_totales = hash_crear(f_destruir_publicacion);
-    algo_gram_t* algo_gram = crear_algo_gram(users, publicaciones_totales);
+    algo_gram_t* algo_gram = algo_gram_crear(users, publicaciones_totales);
 
-    char comando[TAM_MAXIMO];
-    while (scanf("%s", comando) != EOF){
-        if(comando_existe(algo_gram, comando)) {
-            ejecutar_comando(algo_gram, comando);
-        }
-    }
+    ejecutar_algo_gram(algo_gram);
 
     hash_destruir(users);
     hash_destruir(publicaciones_totales);
-    destruir_algo_gram(algo_gram);
+    algo_gram_destruir(algo_gram);
     return 0;
 }
