@@ -6,11 +6,7 @@
 
 #define CANT_MAX_POST 10
 
-#define MAYOR_AFINIDAD_P1 1
-#define MAYOR_AFINIDAD_P2 -1
 
-#define MENOR_ID_P1 1
-#define MENOR_ID_P2 -1
 
 #define ARCHIVO_MIN_ARGUMENTOS 2
 #define ARGUMENTO_NOMBRE_ARCHIVO 1
@@ -30,6 +26,7 @@ char* uinttostr(size_t num){
     return str;
 }
 
+
 /* WRAPPER DE DESTRUCCION DE USER_T
  * Pre: User creado
  * Post: Llama a la funcion de destruccion de user
@@ -48,30 +45,16 @@ void f_destruir_publicacion(void* publicacion){
     publicacion_destruir((publicacion_t*)publicacion);
 }
 
-size_t calculo_afinidad(user_t* user1, user_t* user2, size_t cant_user) {
-    int diferencia = abs(((int)user1->id - (int)user2->id));
-    size_t afinidad = cant_user - (size_t)diferencia;
+/*
+ * pre: user1 y user2 creados.
+ * post: devuelve un numero que representa la afinidad entre los dos usuarios
+ * */
+size_t calculo_afinidad(user_t* user1, user_t* user2, size_t id_user) {
+    int diferencia = abs(((int)user_obtener_id(user1) - (int)user_obtener_id(user2)));
+    size_t afinidad = id_user - (size_t)diferencia;
     return afinidad;
 }
 
-
-//Para el heap del feed de cada usuario
-int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2) {
-    publicacion_user_t* p1 = (publicacion_user_t*) publicacion_user_1;
-    publicacion_user_t* p2 = (publicacion_user_t*) publicacion_user_2;
-    if(p1->afinidad < p2->afinidad) {
-        return MAYOR_AFINIDAD_P1;
-    } else if(p1->afinidad > p2->afinidad) {
-        return MAYOR_AFINIDAD_P2;
-    }
-    // Si ambas publicaciones_user tienen la misma afinidad, se ordena por id
-    if(p1->publicacion->id < p2->publicacion->id){
-        return MENOR_ID_P1;
-    }
-    else{
-        return MENOR_ID_P2;
-    }
-}
 
 FILE* resultado_archivo(int cant_argumentos, char** argumentos) {
 
@@ -111,8 +94,7 @@ hash_t* user_a_hash(FILE* archivo) {
         {
             cadena[strlen(cadena) - 1] = '\0';
         }
-        heap_t* heap_user = heap_crear(comparar_afinidad);
-        user_t* user = user_crear(cadena, contador, heap_user);
+        user_t* user = user_crear(cadena, contador);
         hash_guardar(usuarios, cadena, user);
         contador++;
         linea = getline(&cadena, &capacidad, archivo);
@@ -186,10 +168,11 @@ void* user_logout(user_t* user_logeado) {
 /*
  * Pre: publicacion, users: estructuras creadas previamente
  * Post: A todos los users se les guarda la publicacion
+ * Complejidad: O(ulogp)  u: cantidad de usuarios, p: cantidad de publicaciones
  */
 void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
 
-    user_t* user_publico = publicacion->user;
+    user_t* user_publico = publicacion_obtener_user(publicacion);
     hash_iter_t* iter = hash_iter_crear(users);
     size_t cant_users = hash_cantidad(users);
 
@@ -217,8 +200,7 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
     }
     size_t id = hash_cantidad(publicaciones);
     char* str_id = uinttostr(id);
-    abb_t* likes = abb_crear(strcmp, NULL);
-    publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id, likes);
+    publicacion_t* publicacion = publicacion_crear(user_logeado, mensaje, id);
     hash_guardar(publicaciones, str_id, publicacion);
     publicacion_a_users(publicacion, users);
     fprintf(stdout, "Post publicado\n");
@@ -241,7 +223,7 @@ bool verificaciones_ver_proximo(user_t* user_logeado) {
         return false;
     }
 
-    if (heap_esta_vacio(user_logeado->feed)) {
+    if (user_feed_vacio(user_logeado)) {
         return false;
     }
 
@@ -254,18 +236,11 @@ void ver_proximo_post(user_t* user_logeado) {
         fprintf(stdout, "%s", "Usuario no loggeado o no hay mas posts para ver\n");
         return;
     }
-    publicacion_user_t* publicacion_user = heap_desencolar(user_logeado->feed);
-    publicacion_t* publicacion = publicacion_user->publicacion;
+    publicacion_user_t* publicacion_user = user_obtener_siguiente_feed(user_logeado);
+    publicacion_t* publicacion = publicacion_user_obtener_publicacion(publicacion_user);
 
-    size_t id = publicacion->id;
-    char* user_publico = publicacion->user->nombre;
-    char* mensaje = publicacion->mensaje; 
-    size_t cant_likes = abb_cantidad(publicacion->likes);
+    publicacion_imprimir(publicacion);
 
-    fprintf(stdout, "Post ID %ld\n", id);
-    fprintf(stdout, "%s dijo: ", user_publico);
-    fprintf(stdout, "%s\n", mensaje);
-    fprintf(stdout, "Likes: %ld\n", cant_likes);
     publicacion_user_destruir(publicacion_user);
 }
 
@@ -300,7 +275,7 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
     }
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
-    abb_guardar(publicacion->likes, user_logeado->nombre, user_logeado);
+    publicacion_agregar_like(publicacion, user_logeado);
     free(str_id);
     fprintf(stdout, "%s", "Post likeado\n");
 }
@@ -319,7 +294,7 @@ bool verificaciones_ver_likes(size_t id, hash_t* publicaciones){
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     free(str_id);
-    if(publicacion == NULL || abb_cantidad(publicacion->likes) == 0){
+    if(publicacion == NULL || publicacion_cantidad_likes(publicacion) == 0){
         return false;
     }
 
@@ -335,8 +310,8 @@ void mostrar_likes(size_t id, hash_t* publicaciones) {
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     free(str_id);
-    abb_t* likes = publicacion->likes;
-    size_t cant_likes = abb_cantidad(likes);
+    abb_t* likes = publicacion_obtener_likes(publicacion);
+    size_t cant_likes = publicacion_cantidad_likes(publicacion);
     fprintf(stdout, "El post tiene %ld likes:\n", cant_likes);
 
     abb_iter_t* iter = abb_iter_in_crear(likes);

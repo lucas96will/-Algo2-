@@ -12,8 +12,6 @@
  *                          FUNCIONES
  * *****************************************************************/
 
-
-
 /* WRAPPER DE DESTRUCCION DE USER_T
  * Pre: User creado
  * Post: Llama a la funcion de destruccion de user

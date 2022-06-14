@@ -6,9 +6,7 @@
 void ejecutar_algo_gram(algo_gram_t* algo_gram){
     char comando[TAM_MAXIMO];
     while (scanf("%s", comando) != EOF){
-        if(comando_existe(algo_gram, comando)) {
-            ejecutar_comando(algo_gram, comando);
-        }
+        ejecutar_comando(algo_gram, comando);
     }
 }
 

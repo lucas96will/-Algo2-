@@ -3,10 +3,8 @@
 
 #include "publicacion.h"
 
-typedef struct publicacion_user {
-    publicacion_t* publicacion;
-    size_t afinidad;
-} publicacion_user_t;
+typedef struct publicacion_user publicacion_user_t;
+typedef struct publicacion publicacion_t;
 
 
 /* *****************************************************************
@@ -14,10 +12,22 @@ typedef struct publicacion_user {
  * *****************************************************************/
 
 /*
- * Pre: Recibe una publicacion y el numero de afinidad
+ * Pre: publicacion creada previamente
  * Post: La estructura publicacion_user fue creada
  */
 publicacion_user_t* publicacion_user_crear(publicacion_t* publicacion, size_t afinidad);
+
+/*
+ * Pre : Publicacion_user creado
+ * Post: Obtiene la publicacion del publicacion_user
+ */
+publicacion_t* publicacion_user_obtener_publicacion(publicacion_user_t* publicacion_user);
+
+/*
+ * Pre : Publicacion_user creado
+ * Post: Obtiene la afinidad de publicacion_user
+ */
+size_t publicacion_user_obtener_afinidad(publicacion_user_t* publicacion_user);
 
 /*
  * Pre: La estructura publicacion_user fue creada

@@ -140,7 +140,7 @@ bool comando_existe(algo_gram_t* algo_gram, char* comando){
 }
 
 bool ejecutar_comando(algo_gram_t* algo_gram, char* comando){
-    if(!hash_pertenece(algo_gram->comandos, comando)){
+    if(!comando_existe(algo_gram, comando)){
         return false;
     }
     funciones_t* func = hash_obtener(algo_gram->comandos, comando);
