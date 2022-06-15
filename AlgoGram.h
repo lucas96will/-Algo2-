@@ -1,6 +1,5 @@
 #ifndef _ALGO2__ALGOGRAM_H
 #define _ALGO2__ALGOGRAM_H
-
 #include "funciones.h"
 #include <string.h>
 

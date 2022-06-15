@@ -1,11 +1,8 @@
 #ifndef _ALGO2__PUBLICACION_USER_H
 #define _ALGO2__PUBLICACION_USER_H
 
-#include "publicacion.h"
-
-typedef struct publicacion_user publicacion_user_t;
-typedef struct publicacion publicacion_t;
-
+#include <stdlib.h>
+#include "structs.h"
 
 /* *****************************************************************
  *                    PRIMITIVAS PUBLICACION_USER
@@ -15,7 +12,7 @@ typedef struct publicacion publicacion_t;
  * Pre: publicacion creada previamente
  * Post: La estructura publicacion_user fue creada
  */
-publicacion_user_t* publicacion_user_crear(publicacion_t* publicacion, size_t afinidad);
+publicacion_user_t* publicacion_user_crear(void* publicacion, size_t afinidad);
 
 /*
  * Pre : Publicacion_user creado

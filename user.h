@@ -1,13 +1,9 @@
 #ifndef _ALGO2__USER_H
 #define _ALGO2__USER_H
 #define _POSIX_C_SOURCE 200809L
-#include <string.h>
-#include <stdlib.h>
 #include "heap.h"
-#include "publicacion_user.h"
+#include "structs.h"
 
-typedef struct user user_t;
-typedef struct publicacion_user publicacion_user_t;
 
 /* *****************************************************************
  *                    PRIMITIVAS USER
