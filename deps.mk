@@ -1,1 +1,1 @@
-algogram: hash.o abb.o pila.o heap.o user.o publicacion.o publicacion_user.o main.o funciones.o AlgoGram.o
+algogram: main.o AlgoGram.o funciones.o heap.o user.o pila.o abb.o publicacion.o publicacion_user.o hash.o
