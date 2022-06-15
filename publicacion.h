@@ -24,11 +24,6 @@ publicacion_t* publicacion_crear(user_t* user, char* mensaje, size_t id);
  */
 user_t* publicacion_obtener_user(publicacion_t* publicacion);
 
-/*
- * Pre : Publicacion creada
- * Post: Obtiene el user de la publicacion
- */
-char* publicacion_obtener_mensaje(publicacion_t* publicacion);
 
 /*
  * Pre : Publicacion creada

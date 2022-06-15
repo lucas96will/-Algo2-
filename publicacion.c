@@ -37,10 +37,6 @@ user_t* publicacion_obtener_user(publicacion_t* publicacion) {
     return publicacion->user;
 }
 
-char* publicacion_obtener_mensaje(publicacion_t* publicacion) {
-    return publicacion->mensaje;
-}
-
 size_t publicacion_obtener_id(publicacion_t*publicacion) {
     return publicacion->id;
 }

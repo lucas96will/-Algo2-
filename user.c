@@ -76,11 +76,6 @@ size_t user_obtener_id(user_t* user) {
     return user->id;
 }
 
-heap_t* user_obtener_feed(user_t* user) {
-    return user->feed;
-}
-
-
 void user_destruir(user_t* user) {
     heap_destruir(user->feed, _publicacion_user_destruir);
     free(user->nombre);

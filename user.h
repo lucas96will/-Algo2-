@@ -32,12 +32,6 @@ char* user_obtener_nombre(user_t* user);
 size_t user_obtener_id(user_t* user);
 
 /*
- * Pre : user creado
- * Post: Obtiene el feed del user
- */
-heap_t* user_obtener_feed(user_t* user);
-
-/*
  * Pre: Recibe un usuario y una publicacion_user
  * Post: Actualiza el feed del usuario con la nueva publicacion_user
  */
