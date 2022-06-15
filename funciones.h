@@ -1,11 +1,9 @@
 #ifndef _ALGO2__FUNCIONES_H
 #define _ALGO2__FUNCIONES_H
-
 #include "user.h"
 #include "publicacion.h"
 #include "publicacion_user.h"
 #include "hash.h"
-
 #include <stdio.h>
 
 /* *****************************************************************

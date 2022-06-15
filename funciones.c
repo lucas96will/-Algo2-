@@ -1,7 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "funciones.h"
 #include <string.h>
-
 #include <stdlib.h>
 
 #define CANT_MAX_POST 10

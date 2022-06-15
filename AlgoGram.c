@@ -1,6 +1,5 @@
 #include "AlgoGram.h"
 
-
 typedef enum{
     F_LOGIN = 0,
     F_LOGOUT,

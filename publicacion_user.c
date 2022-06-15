@@ -1,16 +1,16 @@
 #include "publicacion_user.h"
 
-
-struct publicacion_user {
+struct publicacion_user{
     publicacion_t* publicacion;
     size_t afinidad;
 };
+
 
 /* *****************************************************************
  *                    PRIMITIVAS PUBLICACION_USER
  * *****************************************************************/
 
-publicacion_user_t* publicacion_user_crear(publicacion_t* publicacion, size_t afinidad) {
+publicacion_user_t* publicacion_user_crear(void* publicacion, size_t afinidad) {
     publicacion_user_t* publicacion_user = malloc(sizeof(publicacion_user_t));
     if (!publicacion_user){
         return NULL;

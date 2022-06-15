@@ -1,17 +1,21 @@
+#define _POSIX_C_SOURCE 200809L
+#include <stdlib.h>
+#include <string.h>
 #include "user.h"
+#include "publicacion_user.h"
+#include "publicacion.h"
 
-#define MAYOR_AFINIDAD_P1 1
-#define MAYOR_AFINIDAD_P2 -1
+#define MAYOR_AFINIDAD_P1 -1
+#define MAYOR_AFINIDAD_P2 1
 
 #define MENOR_ID_P1 1
 #define MENOR_ID_P2 -1
 
-struct user {
+struct user{
     char* nombre;
     size_t id;
     heap_t* feed;
 };
-
 
 //Para el heap del feed de cada usuario
 int comparar_afinidad(const void* publicacion_user_1, const void* publicacion_user_2) {
