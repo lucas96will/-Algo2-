@@ -34,9 +34,11 @@ void _user_login(algo_gram_t* algo_gram){
     getchar();
     char* user = NULL;
     size_t capacidad = 0;
-    getline(&user, &capacidad, stdin);
-    if ((strlen(user) > 0) && (user[strlen(user) - 1] == '\n')){
-        user[strlen(user) - 1] = '\0';
+    ssize_t linea = getline(&user, &capacidad, stdin);
+    if(linea != EOF){
+        if ((strlen(user) > 0) && (user[strlen(user) - 1] == '\n')){
+            user[strlen(user) - 1] = '\0';
+        }
     }
     algo_gram->user_logeado = user_login(algo_gram->users, user, algo_gram->user_logeado);
     free(user);
@@ -53,8 +55,10 @@ void _publicar_post(algo_gram_t* algo_gram){
     getchar(); //Limpio buffer (quedaba un \n)
     char* mensaje = NULL;
     size_t capacidad = 0;
-    getline(&mensaje, &capacidad, stdin);
-    mensaje[strlen(mensaje)-1] = '\0';
+    ssize_t linea = getline(&mensaje, &capacidad, stdin);
+    if(linea != EOF){
+        mensaje[strlen(mensaje)-1] = '\0';
+    }
     publicar_post(algo_gram->user_logeado, algo_gram->users, algo_gram->publicaciones, mensaje);
     free(mensaje);
 }
@@ -68,8 +72,9 @@ void _ver_proximo_post(algo_gram_t* algo_gram){
 // (siendo id lo que se escribio por conosla)
 void _mostrar_likes(algo_gram_t* algo_gram){
     size_t id;
-    scanf("%zu", &id);
-    mostrar_likes(id, algo_gram->publicaciones);
+    if(scanf("%zu", &id) != EOF){
+        mostrar_likes(id, algo_gram->publicaciones);
+    }
 }
 
 
@@ -77,8 +82,9 @@ void _mostrar_likes(algo_gram_t* algo_gram){
 // (siendo id lo que se escribio por conosla)
 void _likear_post(algo_gram_t* algo_gram){
     size_t id;
-    scanf("%zu", &id);
-    likear_post(algo_gram->user_logeado, id, algo_gram->publicaciones);
+    if(scanf("%zu", &id) != EOF){
+        likear_post(algo_gram->user_logeado, id, algo_gram->publicaciones);
+    }
 }
 
 /* *****************************************************************

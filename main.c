@@ -10,6 +10,8 @@ void ejecutar_algo_gram(algo_gram_t* algo_gram){
     }
 }
 
+#ifndef _CORRECTOR_
+
 int main(int argc, char* argv[]) {
     FILE* archivo = resultado_archivo(argc, argv);
     if(!archivo){
@@ -26,3 +28,5 @@ int main(int argc, char* argv[]) {
     algo_gram_destruir(algo_gram);
     return 0;
 }
+
+#endif // _CORRECTOR_
