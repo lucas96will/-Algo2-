@@ -1,4 +1,4 @@
-import grafo  # O como se llame el tda grafo
+from grafo import Grafo
 
 
 # camino minimo prim
@@ -11,7 +11,7 @@ def mst_prim(grafo):
     q = heap_crear()
     for w in grafo.adyacentes(v):
         q.encolar((v, w), grafo.peso_arista(v, w))
-    arbol = grafo_crear(grafo.obtener_vertices())
+    arbol = grafo(grafo.obtener_vertices())
     while not q.esta_vacia():
         (v, w), peso = q.desencolar()
         if w in visitados:
@@ -29,7 +29,7 @@ def mst_prim(grafo):
 def mst_kruskal(grafo):
     conjuntos = conjuntos_disjuntos_crear(grafo.obtener_vertices())
     aristas = sort(obtener_aristas(grafo))
-    arbol = grafo_crear(grafo.obtener_vertices())
+    arbol = grafo(grafo.obtener_vertices())
     for a in aristas:
         v, w, peso = a
         if conjuntos.find(v) == conjuntos.find(w):
