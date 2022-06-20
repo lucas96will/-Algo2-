@@ -136,3 +136,10 @@ class Grafo:
         Post: Se devolvio la cantidad de vertices
         """
         return len(self.grafo)
+
+    def __iter__(self):
+        """Iterador del grafo
+        Pre: El grafo fue creado
+        Post: Se itera el grafo por vertices
+        """
+        return iter(self.grafo)
