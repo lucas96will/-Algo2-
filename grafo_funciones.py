@@ -7,7 +7,7 @@ import grafo  # O como se llame el tda grafo
 def mst_prim(grafo):
     v = grafo.vertice_aleatorio()
     visitados = set()
-    visitados.agregar(v)
+    visitados.add(v)
     q = heap_crear()
     for w in grafo.adyacentes(v):
         q.encolar((v, w), grafo.peso_arista(v, w))
@@ -86,6 +86,42 @@ def _dfs(grafo, v, visitados, padres, orden):
             orden[w] = orden[v] + 1
             _dfs(grafo, w, visitados, padres, orden)
     return
+
+
+def obtener_ciclo_bfs(grafo, dirigido=True):
+    visitados = {}
+    for v in grafo:
+        if v not in visitados:
+            ciclo = _obtener_ciclo_bfs(grafo, v, visitados, dirigido)
+            if ciclo is not None:
+                return ciclo
+    return None
+
+def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
+    visitados[v] = True
+    q = Cola()
+    q.encolar(v)
+    padre = {}
+    padre[v] = None
+
+    while not q.esta_vacia():
+        v = q.desencolar()
+        for w in grafo.adyacentes(v):
+            if w in visitados:
+                # si el grafo es no dirigido, entonces descontamos
+                # el caso de que el ciclo sea formado solo por el padre
+                # de un vertice y el vertice mismo
+                if(dirigido == False and padre[v] == w):
+                    continue
+                # si el vertice ya fue visitado entonces es un ciclo
+                # (en este caso trabajamos con un grafo dirigido)
+                return reconstruir_ciclo(padre, v, w)
+            else:
+                q.encolar(w)
+                visitados[v] = True
+                padre[w] = v
+
+    return None
 
 
 # reconstruye el ciclo a partir del padre, el inicio y el fin
