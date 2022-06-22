@@ -19,7 +19,8 @@ def mst_prim(grafo):
         arbol.agregar_arista(v, w, peso)
         visitados.add(w)
         for x in grafo.adyacentes(w):
-            if x not in visitados: q.encolar((w, x), grafo.peso(w, u))
+            if x not in visitados:
+                q.encolar((w, x), grafo.peso(w, u))
     return arbol
 
 
@@ -97,12 +98,12 @@ def obtener_ciclo_bfs(grafo, dirigido=True):
                 return ciclo
     return None
 
+
 def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
     visitados[v] = True
     q = Cola()
     q.encolar(v)
-    padre = {}
-    padre[v] = None
+    padre = {v: None}
 
     while not q.esta_vacia():
         v = q.desencolar()
@@ -111,7 +112,7 @@ def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
                 # si el grafo es no dirigido, entonces descontamos
                 # el caso de que el ciclo sea formado solo por el padre
                 # de un vertice y el vertice mismo
-                if(dirigido == False and padre[v] == w):
+                if dirigido is False and padre[v] == w:
                     continue
                 # si el vertice ya fue visitado entonces es un ciclo
                 # (en este caso trabajamos con un grafo dirigido)
