@@ -1,8 +1,9 @@
 #ifndef _ALGO2__PUBLICACION_H
 #define _ALGO2__PUBLICACION_H
 #include "abb.h"
-#include "structs.h"
+#include "user.h"
 
+typedef struct publicacion publicacion_t;
 
 /* *****************************************************************
  *                    PRIMITIVAS USER

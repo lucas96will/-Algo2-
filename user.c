@@ -1,8 +1,8 @@
 #define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <string.h>
-#include "user.h"
 #include "publicacion.h"
+#include "user.h"
 
 #define MAYOR_AFINIDAD_P1 -1
 #define MAYOR_AFINIDAD_P2 1
@@ -103,7 +103,8 @@ user_t* user_crear(char* nombre, size_t id) {
     return user;
 }
 
-void user_actualizar_feed(user_t* user_actual, publicacion_t* publicacion, size_t cant_users) {
+void user_actualizar_feed(user_t* user_actual, void* publicacion_v, size_t cant_users) {
+    publicacion_t* publicacion = (publicacion_t*)publicacion_v;
     user_t* user_publico = publicacion_obtener_user(publicacion);
     size_t afinidad = calculo_afinidad(user_publico, user_actual, cant_users);
     publicacion_user_t* publicacion_user = publicacion_user_crear(publicacion, afinidad);

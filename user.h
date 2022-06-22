@@ -2,7 +2,9 @@
 #define _ALGO2__USER_H
 #define _POSIX_C_SOURCE 200809L
 #include "heap.h"
-#include "structs.h"
+
+typedef struct user user_t;
+typedef struct publicacion publicacion_t;
 
 
 /* *****************************************************************
@@ -31,7 +33,7 @@ size_t user_obtener_id(user_t* user);
  * Pre: user_actual creado, publicacion creada
  * Post: Actualiza el feed del usuario con la nueva publicacion
  */
-void user_actualizar_feed(user_t* user_actual, publicacion_t* publicacion, size_t cant_users);
+void user_actualizar_feed(user_t* user_actual, void* publicacion_v, size_t cant_users);
 
 /*
  * Pre: User creado

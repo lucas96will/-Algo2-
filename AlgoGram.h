@@ -23,7 +23,7 @@ typedef void (*func_comando_t) (algo_gram_t* algo_gram);
  * Pre: users, publicaciones: estructuras creadas previamente
  * Post: crea un algo_gram!
  */
-algo_gram_t* algo_gram_crear(hash_t* users, hash_t* publicaciones);
+algo_gram_t* algo_gram_crear(int argc, char* argv[]);
 
 /*
  * Pre: algo_gram creado previamente

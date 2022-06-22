@@ -4,6 +4,8 @@
 #define ARCHIVO_MIN_ARGUMENTOS 2
 #define ARGUMENTO_NOMBRE_ARCHIVO 1
 
+#define ERROR_ARCHIVO 1
+
 typedef enum{
     F_LOGIN = 0,
     F_LOGOUT,
@@ -95,7 +97,6 @@ FILE* resultado_archivo(int cant_argumentos, char** argumentos) {
  * pasado por parametro
  * Pre: el archivo es valido (!= NULL)
  * Post: Devuelve un hashmap(clave = nombre, valor = usuario_t)
- * y cierra el archivo
  */
 hash_t* user_a_hash(FILE* archivo) {
 
@@ -123,7 +124,6 @@ hash_t* user_a_hash(FILE* archivo) {
     }
 
     free(cadena);
-    fclose(archivo);
     return usuarios;
 }
 
@@ -443,18 +443,31 @@ bool comandos_crear(algo_gram_t* algo_gram){
  *                          PRIMITIVAS
  * *****************************************************************/
 
-algo_gram_t* algo_gram_crear(hash_t* users, hash_t* publicaciones){
+algo_gram_t* algo_gram_crear(int argc, char* argv[]){
     algo_gram_t* algo_gram = malloc(sizeof(algo_gram_t));
     if(algo_gram == NULL){
+        fprintf(stderr, "No se pudo crear algo_gram correctamente");
         return NULL;
     }
     if(comandos_crear(algo_gram) == false){
         free(algo_gram);
+        fprintf(stderr, "No se pudo crear algo_gram correctamente");
         return NULL;
     }
-    algo_gram->publicaciones = publicaciones;
-    algo_gram->users = users;
+
+    FILE* archivo = resultado_archivo(argc, argv);
+    if(!archivo){
+        fprintf(stderr, "No se pudo abrir el archivo");
+        hash_destruir(algo_gram->comandos);
+        free(algo_gram->funciones);
+        return NULL;
+    }
+
+    algo_gram->users = user_a_hash(archivo);
+    algo_gram->publicaciones = hash_crear(f_destruir_publicacion);
     algo_gram->user_logeado = NULL;
+
+    fclose(archivo);
 
     return algo_gram;
 }
@@ -477,6 +490,8 @@ bool ejecutar_comando(algo_gram_t* algo_gram, char* comando){
 }
 
 void algo_gram_destruir(algo_gram_t* algo_gram){
+    hash_destruir(algo_gram->users);
+    hash_destruir(algo_gram->publicaciones);
     free(algo_gram->funciones);
     hash_destruir(algo_gram->comandos);
     free(algo_gram);
