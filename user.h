@@ -28,10 +28,10 @@ char* user_obtener_nombre(user_t* user);
 size_t user_obtener_id(user_t* user);
 
 /*
- * Pre: Recibe un usuario y una publicacion_user
- * Post: Actualiza el feed del usuario con la nueva publicacion_user
+ * Pre: user_actual creado, publicacion creada
+ * Post: Actualiza el feed del usuario con la nueva publicacion
  */
-void user_actualizar_feed(user_t* user, publicacion_user_t* publicacion_user);
+void user_actualizar_feed(user_t* user_actual, publicacion_t* publicacion, size_t cant_users);
 
 /*
  * Pre: User creado
@@ -43,7 +43,7 @@ bool user_feed_vacio(user_t* user);
  * Pre: User creado
  * Post: Devuelve la publicacion_user con mas afinidad al user
  */
-publicacion_user_t* user_obtener_siguiente_feed(user_t* user);
+publicacion_t* user_obtener_siguiente_feed(user_t* user);
 
 /*
  * Pre: La estructura user fue creada

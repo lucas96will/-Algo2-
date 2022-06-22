@@ -1,6 +1,9 @@
 #ifndef _ALGO2__ALGOGRAM_H
 #define _ALGO2__ALGOGRAM_H
-#include "funciones.h"
+#include "user.h"
+#include "publicacion.h"
+#include "hash.h"
+#include <stdio.h>
 #include <string.h>
 
 // COMANDOS DISPONIBLES
@@ -21,12 +24,6 @@ typedef void (*func_comando_t) (algo_gram_t* algo_gram);
  * Post: crea un algo_gram!
  */
 algo_gram_t* algo_gram_crear(hash_t* users, hash_t* publicaciones);
-
-/*
- * Pre: algo_gram previamente creado
- * Post: devuelve si el comando existe en el algo_gram
- */
-bool comando_existe(algo_gram_t* algo_gram, char* comando);
 
 /*
  * Pre: algo_gram creado previamente

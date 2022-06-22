@@ -4,9 +4,6 @@
 #include <stdlib.h>
 
 #define CANT_MAX_POST 10
-
-
-
 #define ARCHIVO_MIN_ARGUMENTOS 2
 #define ARGUMENTO_NOMBRE_ARCHIVO 1
 
