@@ -110,7 +110,7 @@ hash_t* user_a_hash(FILE* archivo) {
  * Post: Devuelve true si se puede logear el user (se encuentra en el hash de users
  * y no hay user_logeado), false en otro caso
  */
-bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
+bool se_puede_loggear(hash_t* users, char* user, user_t* user_logeado) {
     if (user_logeado != NULL) {
         fprintf(stdout, "%s", "Error: Ya habia un usuario loggeado\n");
         return false;
@@ -125,7 +125,7 @@ bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
 
 user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
 
-    if (verificaciones_login(users, user, user_logeado) == false) {
+    if (se_puede_loggear(users, user, user_logeado) == false) {
         return user_logeado == NULL ? NULL: user_logeado;
     }
 
@@ -143,12 +143,12 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
  * Pre:
  * Post: Devuelve true si hay un user_logeado, false en otro caso
  */
-bool verificaciones_alguien_logeado(user_t* user_logeado) {
+bool hay_user_logeado(user_t* user_logeado) {
     return user_logeado != NULL;
 }
 
 void* user_logout(user_t* user_logeado) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return NULL;
     }
@@ -190,7 +190,7 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
 }
 
 void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return;
     }
@@ -215,7 +215,7 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
  * devuelve false si no hay user logeado o si no hay mas publicaciones para ver
  */
 bool verificaciones_ver_proximo(user_t* user_logeado) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         return false;
     }
 
@@ -251,7 +251,7 @@ void ver_proximo_post(user_t* user_logeado) {
  * Devuelve false si no hay user logeado o si no existe la publicacion
  */
 bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         return false;
     }
     char* str_id = uinttostr(id);

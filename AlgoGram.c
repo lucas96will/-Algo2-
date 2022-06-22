@@ -4,8 +4,6 @@
 #define ARCHIVO_MIN_ARGUMENTOS 2
 #define ARGUMENTO_NOMBRE_ARCHIVO 1
 
-#define ERROR_ARCHIVO 1
-
 typedef enum{
     F_LOGIN = 0,
     F_LOGOUT,
@@ -31,6 +29,17 @@ struct algo_gram {
 /* *****************************************************************
  *                       FUNCIONES AUXILIARES
  * *****************************************************************/
+
+/*
+ * Pre: La cadena de caracteres termina con un \n
+ * Post: Borra el \n de la cadena de caracteres
+ */
+void borrar_salto_linea(char* str){
+    if ((strlen(str) > 0) && (str[strlen(str) - 1] == '\n'))
+    {
+        str[strlen(str) - 1] = '\0';
+    }
+}
 
 /*
  * Pre: -
@@ -112,11 +121,7 @@ hash_t* user_a_hash(FILE* archivo) {
     size_t contador = 0;
 
     while(linea != EOF) {
-        // Remover salto de línea
-        if ((strlen(cadena) > 0) && (cadena[strlen(cadena) - 1] == '\n'))
-        {
-            cadena[strlen(cadena) - 1] = '\0';
-        }
+        borrar_salto_linea(cadena);
         user_t* user = user_crear(cadena, contador);
         hash_guardar(usuarios, cadena, user);
         contador++;
@@ -136,7 +141,7 @@ hash_t* user_a_hash(FILE* archivo) {
  * Post: Devuelve true si se puede logear el user (se encuentra en el hash de users
  * y no hay user_logeado), false en otro caso
  */
-bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
+bool se_puede_loggear(hash_t* users, char* user, user_t* user_logeado) {
     if (user_logeado != NULL) {
         fprintf(stdout, "%s", "Error: Ya habia un usuario loggeado\n");
         return false;
@@ -151,8 +156,8 @@ bool verificaciones_login(hash_t* users, char* user, user_t* user_logeado) {
 
 user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
 
-    if (verificaciones_login(users, user, user_logeado) == false) {
-        return user_logeado == NULL ? NULL: user_logeado;
+    if (se_puede_loggear(users, user, user_logeado) == false) {
+        return user_logeado;
     }
 
     user_t* user_login = (user_t*)hash_obtener(users, user);
@@ -169,12 +174,12 @@ user_t* user_login(hash_t* users, char* user, user_t* user_logeado) {
  * Pre:
  * Post: Devuelve true si hay un user_logeado, false en otro caso
  */
-bool verificaciones_alguien_logeado(user_t* user_logeado) {
+bool hay_user_logeado(user_t* user_logeado) {
     return user_logeado != NULL;
 }
 
 void* user_logout(user_t* user_logeado) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return NULL;
     }
@@ -206,8 +211,7 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
             hash_iter_avanzar(iter);
             continue;
         }
-//        size_t afinidad = calculo_afinidad(user_publico, user_actual, cant_users);
-//        publicacion_user_t* publicacion_user = publicacion_user_crear(publicacion, afinidad);
+
         user_actualizar_feed(user_actual, publicacion, cant_users);
         hash_iter_avanzar(iter);
     }
@@ -216,7 +220,7 @@ void publicacion_a_users(publicacion_t* publicacion, hash_t* users) {
 }
 
 void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, char* mensaje) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         fprintf(stdout, "%s", "Error: no habia usuario loggeado\n");
         return;
     }
@@ -241,15 +245,7 @@ void publicar_post(user_t* user_logeado, hash_t* users, hash_t* publicaciones, c
  * devuelve false si no hay user logeado o si no hay mas publicaciones para ver
  */
 bool verificaciones_ver_proximo(user_t* user_logeado) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
-        return false;
-    }
-
-    if (user_feed_vacio(user_logeado)) {
-        return false;
-    }
-
-    return true;
+    return (hay_user_logeado(user_logeado) && !user_feed_vacio(user_logeado));
 }
 
 void ver_proximo_post(user_t* user_logeado) {
@@ -273,16 +269,13 @@ void ver_proximo_post(user_t* user_logeado) {
  * Devuelve false si no hay user logeado o si no existe la publicacion
  */
 bool verificaciones_likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
-    if (verificaciones_alguien_logeado(user_logeado) == false) {
+    if (hay_user_logeado(user_logeado) == false) {
         return false;
     }
     char* str_id = uinttostr(id);
-    if (!hash_pertenece(publicaciones, str_id)) {
-        free(str_id);
-        return false;
-    }
+    bool existe_post = hash_pertenece(publicaciones, str_id);
     free(str_id);
-    return true;
+    return existe_post;
 }
 
 void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
@@ -293,8 +286,8 @@ void likear_post(user_t* user_logeado, size_t id, hash_t* publicaciones) {
     }
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
-    publicacion_agregar_like(publicacion, user_logeado);
     free(str_id);
+    publicacion_agregar_like(publicacion, user_logeado);
     fprintf(stdout, "%s", "Post likeado\n");
 }
 
@@ -312,11 +305,8 @@ bool verificaciones_ver_likes(size_t id, hash_t* publicaciones){
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     free(str_id);
-    if(publicacion == NULL || publicacion_cantidad_likes(publicacion) == 0){
-        return false;
-    }
 
-    return true;
+    return (publicacion != NULL || publicacion_cantidad_likes(publicacion) >= 0);
 }
 
 void mostrar_likes(size_t id, hash_t* publicaciones) {
@@ -347,8 +337,7 @@ void mostrar_likes(size_t id, hash_t* publicaciones) {
  *        FUNCIONES PRIMARIAS (wrappers para guardar en el hash)
  * *****************************************************************/
 
-//Si se escribe por consola login -> esperar que se escriba un nombre y despues,
-// (siendo user el nombre que se escribio por consola)
+//Si se escribe por consola login
 void _user_login(algo_gram_t* algo_gram){
     getchar();
     char* user = NULL;
@@ -368,15 +357,14 @@ void _user_logout(algo_gram_t* algo_gram){
     algo_gram->user_logeado = user_logout(algo_gram->user_logeado);
 }
 
-//Si se escribe por consola publicar -> esperar que se escriba un mensaje y despues,
-// (siendo mensaje el mensaje que se escribio por consola)
+//Si se escribe por consola publicar
 void _publicar_post(algo_gram_t* algo_gram){
     getchar(); //Limpio buffer (quedaba un \n)
     char* mensaje = NULL;
     size_t capacidad = 0;
     ssize_t linea = getline(&mensaje, &capacidad, stdin);
     if(linea != EOF){
-        mensaje[strlen(mensaje)-1] = '\0';
+        borrar_salto_linea(mensaje);
     }
     publicar_post(algo_gram->user_logeado, algo_gram->users, algo_gram->publicaciones, mensaje);
     free(mensaje);
@@ -387,8 +375,7 @@ void _ver_proximo_post(algo_gram_t* algo_gram){
     ver_proximo_post(algo_gram->user_logeado);
 }
 
-//Si se escribe por consola likear_post -> esperar ID
-// (siendo id lo que se escribio por conosla)
+//Si se escribe por consola likear_post
 void _mostrar_likes(algo_gram_t* algo_gram){
     size_t id;
     if(scanf("%zu", &id) != EOF){
@@ -397,8 +384,7 @@ void _mostrar_likes(algo_gram_t* algo_gram){
 }
 
 
-//Si se escribe por consola mostrar_likes -> esperar ID
-// (siendo id lo que se escribio por conosla)
+//Si se escribe por consola mostrar_likes
 void _likear_post(algo_gram_t* algo_gram){
     size_t id;
     if(scanf("%zu", &id) != EOF){

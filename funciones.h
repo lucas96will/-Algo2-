@@ -56,12 +56,8 @@ hash_t* user_a_hash(FILE* archivo);
 
 /* user = cadena de caracteres pedida por stdin
  * Pre: users creado, user_logeado creado
- * Post: Devuelve el usuario logeado
- * Casos: 1. Hay un usuario logeado -> devuelve el usuario_logeado
- *        2. No hay un usuario logeado
- *          2.1 User es encontrado en el hashmap -> devuelve el user encontrado
- *          2.2 User no es encontrado en el hashmap -> Devuelve NULL
- *        3. No se pudo logear por otra razon -> Devuelve NULL
+ * Post: Devuelve el usuario logeado, en caso de que
+ * no haya user logeado, devuelve NULL
  */
 user_t* user_login(hash_t* users, char* user, user_t* user_logeado);
 

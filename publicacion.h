@@ -10,7 +10,7 @@ typedef struct publicacion publicacion_t;
  * *****************************************************************/
 
 /*
- * Pre: Recibe un user, un mensaje, un id y un abb
+ * Pre: Recibe un user, un mensaje, un id
  * Post: Devuelve la estrcutura publicacion creada
  */
 publicacion_t* publicacion_crear(user_t* user, char* mensaje, size_t id);

@@ -2,7 +2,6 @@
 #define _ALGO2__PUBLICACION_USER_H
 
 #include <stdlib.h>
-#include "structs.h"
 
 /* *****************************************************************
  *                    PRIMITIVAS PUBLICACION_USER
