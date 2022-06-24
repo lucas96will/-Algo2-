@@ -1,6 +1,38 @@
 from grafo import Grafo
 
 
+
+
+# grados_entrada
+def grados_entrada(grafo):
+    g_ent = {}
+    for v in grafo:
+        g_ent[v] = 0
+    for v in grafo:
+        for w in grafo.adyacentes(v):
+            g_ent[w] += 1
+    return g_ent
+
+
+def topologico_grados(grafo):
+    g_ent = grados_entrada(grafo)
+    q = Cola()
+    for v in grafo:
+        if g_ent[v] == 0:
+            q.encolar(v)
+    resultado = []
+    while not q.esta_vacia():
+        v = q.desencolar()
+        resultado.append(v)
+        for w in grafo.adyacentes(v):
+            g_ent[w] -= 1
+            if g_ent[w] == 0:
+                q.encolar(w)
+    return resultado
+
+
+
+
 # dijkstra
 def camino_minimo_dijkstra(grafo, origen):
     dist = {}
@@ -25,7 +57,7 @@ def camino_minimo_bf(grafo, origen):
     distancia = {}
     padre = {}
     for v in grafo:
-        dist[v] = float("inf")
+        distancia[v] = float("inf")
     distancia[origen] = 0
     padre[origen] = None
     aristas = obtener_aristas(grafo) # O(V+E)
@@ -93,14 +125,15 @@ def bfs(grafo):
     orden = {}
     for v in grafo.obtener_vertices():
         if v not in visitados:
+            visitados.add(v)
+            padres[v] = None
+            orden[v] = 0
             _bfs(grafo, v, visitados, padres, orden)
     return padres, orden
 
 
 def _bfs(grafo, v, visitados, padres, orden):
     q = cola_crear()
-    visitados.add(v)
-    orden[v] = len(visitados)
     while not q.esta_vacia():
         v = cola.desesencolar()
         for w in grafo.adyacentes(v):
@@ -120,14 +153,17 @@ def dfs(grafo):
     orden = {}
     for v in grafo.obtener_vertices():
         if v not in visitados:
+            visitados.add(v)
+            padres[v] = None
+            orden[v] = 0
             _dfs(grafo, v, visitados, padres, orden)
     return padres, orden
 
 
 def _dfs(grafo, v, visitados, padres, orden):
-    visitados.add(v)
     for w in grafo.adyacentes(v):
         if w not in visitados:
+            visitados.add(w)
             padres[w] = v
             orden[w] = orden[v] + 1
             _dfs(grafo, w, visitados, padres, orden)
@@ -164,7 +200,7 @@ def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
                 return reconstruir_ciclo(padre, v, w)
             else:
                 q.encolar(w)
-                visitados[v] = True
+                visitados[w] = True
                 padre[w] = v
 
     return None
