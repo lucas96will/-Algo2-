@@ -1,6 +1,51 @@
 from grafo import Grafo
 
 
+# dijkstra
+def camino_minimo_dijkstra(grafo, origen):
+    dist = {}
+    padre = {}
+    for v in grafo:
+        dist[v] = float("inf")
+    dist[origen] = 0
+    q = Heap()
+    q.encolar((0, origen))
+    while not q.esta_vacio():
+        _, v = q.desencolar()
+        for w in grafo.adyacentes(v):
+            distancia_por_aca = dist[v] + grafo.peso(v, w)
+            if distancia_por_aca < dist[w]
+                dist[w] = distancia_por_aca
+                padre[w] = v
+                q.encolar((dist[w], w))
+    return padre, dist
+
+# bellman-ford
+def camino_minimo_bf(grafo, origen):
+    distancia = {}
+    padre = {}
+    for v in grafo:
+        dist[v] = float("inf")
+    distancia[origen] = 0
+    padre[origen] = None
+    aristas = obtener_aristas(grafo) # O(V+E)
+    for i in range(len(grafo)):
+        cambio = False
+        for origen, destino, peso in aristas:
+            if distancia[origen] + peso < distancia[destino]:
+                cambio = True
+                padre[destino] = origen
+                distancia[destino] = distancia[origen] + peso
+            if not cambio:
+                break
+
+    for v, w, peso in aristas:
+        if distancia[v] + peso < distancia[w]:
+            return None # hay un ciclo negativo
+
+    return padre, distancia
+
+
 # camino minimo prim
 # pre: -
 # post: devuelve el camino minimo de un grafo
