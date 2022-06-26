@@ -121,6 +121,9 @@ class Grafo:
 
         return result
 
+    def __contains__(self, v):
+        return v in self.grafo
+
     def __str__(self):
         """
         Imprime el grafo por pantalla, representado como un diccionario de diccionarios
