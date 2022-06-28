@@ -43,9 +43,13 @@ size_t publicacion_cantidad_likes(publicacion_t* publicacion);
 
 /*
  * Pre : Publicacion creada
- * Post: Obtiene el abb de likes de la publicacion
+ * Post: Imprime por pantalla los likes, ejemplo:
+ *       El post tiene %ld likes:
+ *          laura
+ *          alan
+ *          barbara
  */
-abb_t* publicacion_obtener_likes(publicacion_t* publicacion);
+void publicacion_imprimir_likes(publicacion_t* publicacion);
 
 /*
  * Pre : Publicacion creada

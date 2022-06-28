@@ -111,7 +111,7 @@ void user_actualizar_feed(user_t* user_actual, void* publicacion_v, size_t cant_
     heap_encolar(user_actual->feed, publicacion_user);
 }
 
-publicacion_t* user_obtener_siguiente_feed(user_t* user){
+void* user_obtener_siguiente_feed(user_t* user){
     publicacion_user_t* publicacion_user = (publicacion_user_t*)heap_desencolar(user->feed);
     publicacion_t* publicacion = publicacion_user_obtener_publicacion(publicacion_user);
     publicacion_user_destruir(publicacion_user);

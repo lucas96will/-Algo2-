@@ -42,8 +42,17 @@ size_t publicacion_obtener_id(publicacion_t*publicacion) {
     return publicacion->id;
 }
 
-abb_t* publicacion_obtener_likes(publicacion_t* publicacion) {
-    return publicacion->likes;
+void publicacion_imprimir_likes(publicacion_t* publicacion) {
+    fprintf(stdout, "El post tiene %ld likes:\n", abb_cantidad(publicacion->likes));
+
+    abb_iter_t* iter = abb_iter_in_crear(publicacion->likes);
+
+    while (!abb_iter_in_al_final(iter)) {
+        const char* nombre = abb_iter_in_ver_actual(iter);
+        fprintf(stdout, "\t%s\n", nombre);
+        abb_iter_in_avanzar(iter);
+    }
+    abb_iter_in_destruir(iter);
 }
 
 bool publicacion_agregar_like(publicacion_t* publicacion, user_t* usuario) {

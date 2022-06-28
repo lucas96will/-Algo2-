@@ -4,8 +4,6 @@
 #include "heap.h"
 
 typedef struct user user_t;
-typedef struct publicacion publicacion_t;
-
 
 /* *****************************************************************
  *                    PRIMITIVAS USER
@@ -45,7 +43,7 @@ bool user_feed_vacio(user_t* user);
  * Pre: User creado
  * Post: Devuelve la publicacion_user con mas afinidad al user
  */
-publicacion_t* user_obtener_siguiente_feed(user_t* user);
+void* user_obtener_siguiente_feed(user_t* user);
 
 /*
  * Pre: La estructura user fue creada

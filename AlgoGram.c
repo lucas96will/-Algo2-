@@ -3,6 +3,7 @@
 #define CANT_MAX_POST 10
 #define ARCHIVO_MIN_ARGUMENTOS 2
 #define ARGUMENTO_NOMBRE_ARCHIVO 1
+#define TAM_MAXIMO 160
 
 typedef enum{
     F_LOGIN = 0,
@@ -254,7 +255,7 @@ void ver_proximo_post(user_t* user_logeado) {
         fprintf(stdout, "%s", "Usuario no loggeado o no hay mas posts para ver\n");
         return;
     }
-    publicacion_t* publicacion = user_obtener_siguiente_feed(user_logeado);
+    publicacion_t* publicacion = (publicacion_t*)user_obtener_siguiente_feed(user_logeado);
     publicacion_imprimir(publicacion);
 }
 
@@ -306,7 +307,7 @@ bool verificaciones_ver_likes(size_t id, hash_t* publicaciones){
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     free(str_id);
 
-    return (publicacion != NULL || publicacion_cantidad_likes(publicacion) >= 0);
+    return (publicacion != NULL && publicacion_cantidad_likes(publicacion) > 0);
 }
 
 void mostrar_likes(size_t id, hash_t* publicaciones) {
@@ -318,19 +319,7 @@ void mostrar_likes(size_t id, hash_t* publicaciones) {
     char* str_id = uinttostr(id);
     publicacion_t* publicacion = hash_obtener(publicaciones, str_id);
     free(str_id);
-    abb_t* likes = publicacion_obtener_likes(publicacion);
-    size_t cant_likes = publicacion_cantidad_likes(publicacion);
-    fprintf(stdout, "El post tiene %ld likes:\n", cant_likes);
-
-    abb_iter_t* iter = abb_iter_in_crear(likes);
-
-    while (!abb_iter_in_al_final(iter)) {
-        const char* nombre = abb_iter_in_ver_actual(iter);
-        fprintf(stdout, "\t%s\n", nombre);
-        abb_iter_in_avanzar(iter);
-    }
-
-    abb_iter_in_destruir(iter);
+    publicacion_imprimir_likes(publicacion);
 }
 
 /* *****************************************************************
@@ -344,9 +333,7 @@ void _user_login(algo_gram_t* algo_gram){
     size_t capacidad = 0;
     ssize_t linea = getline(&user, &capacidad, stdin);
     if(linea != EOF){
-        if ((strlen(user) > 0) && (user[strlen(user) - 1] == '\n')){
-            user[strlen(user) - 1] = '\0';
-        }
+        borrar_salto_linea(user);
     }
     algo_gram->user_logeado = user_login(algo_gram->users, user, algo_gram->user_logeado);
     free(user);
@@ -459,15 +446,13 @@ algo_gram_t* algo_gram_crear(int argc, char* argv[]){
 }
 
 /*
- * Pre: algo_gram previamente creado
- * Post: devuelve si el comando existe en el algo_gram
+ * Pre: algo_gram creado previamente
+ * Post: ejecuta el comando pasado por parametro.
+ * Si el comando se ejecuto devuelve true, false en otro caso
+ * (si no se encuentra en los comandos disponibles)
  */
-bool comando_existe(algo_gram_t* algo_gram, char* comando){
-    return hash_pertenece(algo_gram->comandos, comando);
-}
-
 bool ejecutar_comando(algo_gram_t* algo_gram, char* comando){
-    if(!comando_existe(algo_gram, comando)){
+    if(hash_pertenece(algo_gram->comandos, comando) == false){
         return false;
     }
     funciones_t* func = hash_obtener(algo_gram->comandos, comando);
@@ -481,4 +466,11 @@ void algo_gram_destruir(algo_gram_t* algo_gram){
     free(algo_gram->funciones);
     hash_destruir(algo_gram->comandos);
     free(algo_gram);
+}
+
+void algo_gram_iniciar(algo_gram_t* algo_gram){
+    char comando[TAM_MAXIMO];
+    while (scanf("%s", comando) != EOF){
+        ejecutar_comando(algo_gram, comando);
+    }
 }

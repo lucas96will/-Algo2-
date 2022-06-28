@@ -27,11 +27,9 @@ algo_gram_t* algo_gram_crear(int argc, char* argv[]);
 
 /*
  * Pre: algo_gram creado previamente
- * Post: ejecuta el comando pasado por parametro.
- * Si el comando se ejecuto devuelve true, false en otro caso
- * (si no se encuentra en los comandos disponibles)
+ * Post: inicia algo_gram, tomando por consola los comandos disponibles
  */
-bool ejecutar_comando(algo_gram_t* algo_gram, char* comando);
+void algo_gram_iniciar(algo_gram_t* algo_gram);
 
 /*
  * Pre: algo_gram creado previamente
