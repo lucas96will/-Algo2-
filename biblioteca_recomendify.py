@@ -55,9 +55,5 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
                 
                 if not grafo.estan_unidos(cancion_1, cancion_2):
                     grafo.agregar_arista(cancion_1, cancion_2)
+    return
 
-
-
-if __name__ == "__main__":
-    ruta = "archivo.tsv"
-    print(modelaje_grafos(ruta))

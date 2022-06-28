@@ -122,6 +122,11 @@ class Grafo:
         return result
 
     def __contains__(self, v):
+        """
+        Devuelve si v esta en el grafo
+        Pre: El grafo fue creado
+        Post: Devuelve True si v esta en el grafo, False en otro caso
+        """
         return v in self.grafo
 
     def __str__(self):

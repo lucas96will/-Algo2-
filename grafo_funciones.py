@@ -1,5 +1,5 @@
 from grafo import Grafo
-
+from Cola import Cola
 
 
 
@@ -46,7 +46,7 @@ def camino_minimo_dijkstra(grafo, origen):
         _, v = q.desencolar()
         for w in grafo.adyacentes(v):
             distancia_por_aca = dist[v] + grafo.peso(v, w)
-            if distancia_por_aca < dist[w]
+            if distancia_por_aca < dist[w]:
                 dist[w] = distancia_por_aca
                 padre[w] = v
                 q.encolar((dist[w], w))
@@ -60,7 +60,7 @@ def camino_minimo_bf(grafo, origen):
         distancia[v] = float("inf")
     distancia[origen] = 0
     padre[origen] = None
-    aristas = obtener_aristas(grafo) # O(V+E)
+    aristas = grafo.obtener_aristas() # O(V+E)
     for i in range(len(grafo)):
         cambio = False
         for origen, destino, peso in aristas:
@@ -106,7 +106,7 @@ def mst_prim(grafo):
 # post: devuelve el camino minimo de un grafo
 def mst_kruskal(grafo):
     conjuntos = conjuntos_disjuntos_crear(grafo.obtener_vertices())
-    aristas = sort(obtener_aristas(grafo))
+    aristas = sort(grafo.obtener_aristas())
     arbol = grafo(grafo.obtener_vertices())
     for a in aristas:
         v, w, peso = a
@@ -133,15 +133,15 @@ def bfs(grafo):
 
 
 def _bfs(grafo, v, visitados, padres, orden):
-    q = cola_crear()
+    q = Cola()
     while not q.esta_vacia():
-        v = cola.desesencolar()
+        v = q.desencolar()
         for w in grafo.adyacentes(v):
             if w not in visitados:
                 padres[w] = v
                 orden[w] = orden[v] + 1
                 visitados.add(w)
-                cola.encolar(w)
+                q.encolar(w)
     return
 
 
