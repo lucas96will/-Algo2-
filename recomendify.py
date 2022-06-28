@@ -48,7 +48,6 @@ def ejecutar_comando(funciones, comando):
         return False
 
 
-
 def iniciar_recomendify(argv):
     grafo_usuarios, grafo_playlists = modelaje_grafos(argv[1])
     f_disponibles = hash_funciones()

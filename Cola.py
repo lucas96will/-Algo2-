@@ -38,3 +38,5 @@ class Cola:
     def ver_primero(self):
         return self.primero
 
+    def __len__(self):
+        return self.largo
