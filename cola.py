@@ -31,9 +31,10 @@ class Cola:
         return self.primero is None
 
     def ver_frente(self):
-        if not self.frente:
+        if not self.primero:
             raise ValueError("La cola esta vacia")
         return self.primero.dato
+
 
 class _Nodo:
     def __init__(self, dato, prox=None):
