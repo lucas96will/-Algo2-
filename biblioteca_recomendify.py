@@ -57,6 +57,8 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
                 
                 if not grafo.estan_unidos(cancion_1, cancion_2):
                     grafo.agregar_arista(cancion_1, cancion_2)
+    return
+
 
 a, b = modelaje_grafos("spotify-mini.tsv")
 print(es_bipartito(a)) #Devuelve True -> el grafo es bipartito

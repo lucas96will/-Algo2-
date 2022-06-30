@@ -1,6 +1,7 @@
 from random import choice
 NO_EXISTE = None
 
+
 class Grafo:
     """
     Clase Grafo
