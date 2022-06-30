@@ -97,6 +97,24 @@ class Grafo:
         """
         return list(self.grafo)
 
+    def obtener_aristas(self):
+        """
+        Devuelve una lista con todos las aristas del grafo
+        Pre: El grafo fue creado
+        Post: Devuelve la lista, vacia si es que no hay aristas
+        """
+        aristas = []
+        visitados = set()
+        for v in self.grafo:
+            for w in self.grafo.adyacentes(v):
+                if w not in visitados:
+                    peso = self.grafo.peso_arista(v, w)
+                    aristas.append((v,w), peso)
+            if not self.dirigido:
+                visitados.add(v)
+
+        return aristas
+
     def vertice_aleatorio(self):
         """
         Se elije un vertice del grafo al azar para ser devuelto

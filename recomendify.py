@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from biblioteca_recomendify import *
+from biblioteca_recomendify import * #Cambiarlo
 import sys
 
 # Comandos disponibles

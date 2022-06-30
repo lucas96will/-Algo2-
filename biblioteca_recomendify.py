@@ -1,4 +1,6 @@
+from glob import escape
 from grafo import Grafo
+from grafo_funciones import es_bipartito
 
 
 def modelaje_grafos(ruta):
@@ -12,9 +14,9 @@ def modelaje_grafos(ruta):
 
         while linea != '':
             datos = linea.rstrip("\n").split("\t")
-            _, usuario, cancion, artista, id_playlist, _, _ = datos
+            _, usuario, cancion, artista, id_playlist, playlist, _ = datos
             cancion_artista = cancion + " - " + artista
-            confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista)
+            confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista, playlist)
             playlists_a_diccionario(diccionario_playlists, id_playlist, cancion_artista)
             linea = archivo.readline()
 
@@ -22,7 +24,7 @@ def modelaje_grafos(ruta):
     return usuarios_canciones, playlists_canciones
 
 
-def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion):
+def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if usuario not in grafo:
         grafo.agregar_vertice(usuario)
     
@@ -30,7 +32,7 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion):
         grafo.agregar_vertice(cancion)
 
     if not grafo.estan_unidos(usuario, cancion):
-        grafo.agregar_arista(usuario, cancion)
+        grafo.agregar_arista(usuario, cancion, playlist)
 
 
 def playlists_a_diccionario(diccionario, id_playlist, cancion):
@@ -55,5 +57,6 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
                 
                 if not grafo.estan_unidos(cancion_1, cancion_2):
                     grafo.agregar_arista(cancion_1, cancion_2)
-    return
 
+a, b = modelaje_grafos("spotify-mini.tsv")
+print(es_bipartito(a)) #Devuelve True -> el grafo es bipartito
