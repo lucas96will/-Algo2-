@@ -12,6 +12,7 @@ GRUPO_2 = 2
 *****************************************************************
 """
 
+
 def bfs(grafo):
     """
     Recorrido BFS
@@ -24,14 +25,17 @@ def bfs(grafo):
     for v in grafo.obtener_vertices():
         if v not in visitados:
             visitados.add(v)
-            padres[v] = None
-            orden[v] = 0
-            _bfs(grafo, v, visitados, padres, orden)
+            padres, orden = _bfs(grafo, v, visitados)
     return padres, orden
 
 
-def _bfs(grafo, v, visitados, padres, orden):
+def _bfs(grafo, v, visitados):
+    padres = {}
+    orden = {}
     q = Cola()
+    q.encolar(v)
+    padres[v] = None
+    orden[v] = 0
     while not q.esta_vacia():
         v = q.desencolar()
         for w in grafo.adyacentes(v):
@@ -40,8 +44,7 @@ def _bfs(grafo, v, visitados, padres, orden):
                 orden[w] = orden[v] + 1
                 visitados.add(w)
                 q.encolar(w)
-    return
-
+    return padres, orden
 
 
 def dfs(grafo):
@@ -71,11 +74,13 @@ def _dfs(grafo, v, visitados, padres, orden):
             _dfs(grafo, w, visitados, padres, orden)
     return
 
+
 """ 
 *****************************************************************
                          GRADOS DEL GRAFO
 *****************************************************************
 """
+
 
 def grados(grafo):
     """
@@ -89,6 +94,7 @@ def grados(grafo):
     for v in grafo:
         grado[v] = len(grafo.adyacentes(v))
     return grado
+
 
 def grados_entrada(grafo):
     """
@@ -104,6 +110,7 @@ def grados_entrada(grafo):
             g_entrada[w] += 1
     return g_entrada
 
+
 def grados_salida(grafo):
     """
     Grados de salida grafo dirigido
@@ -117,11 +124,13 @@ def grados_salida(grafo):
         g_salida[v] = len(grafo.adyacentes(v))
     return g_salida
 
+
 """ 
 *****************************************************************
                     ORDEN TOPOLOGICO DEL GRAFO
 *****************************************************************
 """
+
 
 def topologico_grados(grafo):
     """
@@ -144,6 +153,7 @@ def topologico_grados(grafo):
                 q.encolar(w)
     return resultado
 
+
 def topologico_dfs(grafo):
     """
     Orden topologico de un grafo, segun algoritmo tipo DFS
@@ -154,9 +164,10 @@ def topologico_dfs(grafo):
     pila = Pila()
     for v in grafo:
         if v not in visitados:
-            topologico_dfs(grafo, v, visitados, pila)
+            _topologico_dfs(grafo, v, visitados, pila)
 
     return pila_a_lista(pila)
+
 
 def _topologico_dfs(grafo, v, visitados, pila):
     visitados.add(v)
@@ -164,6 +175,7 @@ def _topologico_dfs(grafo, v, visitados, pila):
         if w not in visitados:
             _topologico_dfs(grafo, w, visitados, pila)
     pila.apilar(v)
+
 
 def pila_a_lista(pila):
     lista = []
@@ -173,11 +185,13 @@ def pila_a_lista(pila):
     
     return lista
 
+
 """ 
 *****************************************************************
                     CAMINOS MINIMOS DEL GRAFO
 *****************************************************************
 """
+
 
 def camino_minimo_dijkstra(grafo, origen):
     """
@@ -190,9 +204,9 @@ def camino_minimo_dijkstra(grafo, origen):
     for v in grafo:
         dist[v] = float("inf")
     dist[origen] = 0
-    q = [] #Sera un heap
+    q = []  # Sera un heap
     heappush(q, (0, origen))
-    while not q.esta_vacio():
+    while len(q) > 0:
         _, v = heappop(q)
         for w in grafo.adyacentes(v):
             distancia_por_aca = dist[v] + grafo.peso(v, w)
@@ -201,6 +215,7 @@ def camino_minimo_dijkstra(grafo, origen):
                 padre[w] = v
                 heappush(q, (dist[w], w))
     return padre, dist
+
 
 def camino_minimo_bf(grafo, origen):
     """
@@ -227,15 +242,17 @@ def camino_minimo_bf(grafo, origen):
 
     for v, w, peso in aristas:
         if distancia[v] + peso < distancia[w]:
-            return None #Hay ciclo negativo
+            return None   # Hay ciclo negativo
 
     return padre, distancia
+
 
 """ 
 *****************************************************************
                 CENTRALIDAD DE UN GRAFO (DE BETWEENNESS)
 *****************************************************************
 """
+
 
 def centralidad(grafo, camino_minimo):
     """
@@ -256,16 +273,18 @@ def centralidad(grafo, camino_minimo):
             actual = padre[w]
 
             while actual != v:
-                cent[actual] +=1
+                cent[actual] += 1
                 actual = padre[actual]
     
     return cent
-                
+
+
 """ 
 *****************************************************************
             ARBOLES DE TENDIDO MINIMO DE UN GRAFO
 *****************************************************************
 """
+
 
 def mst_prim(grafo):
     """
@@ -276,7 +295,7 @@ def mst_prim(grafo):
     v = grafo.vertice_aleatorio()
     visitados = set()
     visitados.add(v)
-    q = [] #heap
+    q = []  # heap
     for w in grafo.adyacentes(v):
         heappush(q, (grafo.peso_arista(v, w), (v, w)))
 
@@ -295,6 +314,7 @@ def mst_prim(grafo):
                 heappush(q, (grafo.peso_arista(w, x), (w, x)))
     return arbol
 
+
 def mst_kruskal(grafo):
     """
     Arbol de tendido minimo de un grafo, segun algoritmo de Kruskal
@@ -304,7 +324,7 @@ def mst_kruskal(grafo):
     conjunto = UnionFind()
     conjunto.make_set(grafo.obtener_vertices())
     aristas = grafo.obtener_aristas()
-    aristas.sort(key = lambda x: x[1])
+    aristas.sort(key=lambda x: x[1])
     arbol = Grafo()
     for v in grafo:
         arbol.agregar_vertice(v)
@@ -317,11 +337,13 @@ def mst_kruskal(grafo):
 
     return arbol
 
+
 """ 
 *****************************************************************
                 CICLO HAMILTONEANO DE UN GRAFO
 *****************************************************************
 """
+
 
 def ciclo_hamiltoneano(grafo):
     """
@@ -336,6 +358,7 @@ def ciclo_hamiltoneano(grafo):
         if camino_hamiltoneano_dfs(grafo, v, visitados, camino):
             return camino
     return None
+
 
 def camino_hamiltoneano_dfs(grafo, v, visitados, camino):
     visitados.add(v)
@@ -352,11 +375,13 @@ def camino_hamiltoneano_dfs(grafo, v, visitados, camino):
     camino.pop()
     return False
 
+
 """ 
 *****************************************************************
             PUNTOS DE ARTICULACION DE UN GRAFO
 *****************************************************************
 """
+
 
 def puntos_articulacion(grafo):
     """
@@ -371,6 +396,7 @@ def puntos_articulacion(grafo):
     
     return resul
 
+
 def dfs_puntos_articulacion(grafo, v, visitados, padre, orden, mas_bajo, ptos, es_raiz):
     
     hijos = 0
@@ -378,7 +404,7 @@ def dfs_puntos_articulacion(grafo, v, visitados, padre, orden, mas_bajo, ptos, e
     for w in grafo.adyacentes(v):
         if w not in visitados:
             hijos += 1
-            orden[w]  = orden[v] + 1
+            orden[w] = orden[v] + 1
             padre[w] = v
             visitados.add(w)
             dfs_puntos_articulacion(grafo, w, visitados, padre, orden, mas_bajo, ptos, False)
@@ -392,11 +418,13 @@ def dfs_puntos_articulacion(grafo, v, visitados, padre, orden, mas_bajo, ptos, e
     if es_raiz and hijos > 1:
         ptos.add(v)
 
+
 """ 
 *****************************************************************
         COMPONENTES FUERTEMENTE CONEXAS DE UN GRAFO
 *****************************************************************
 """
+
 
 def cfcs_grafo(grafo):
     """
@@ -412,6 +440,7 @@ def cfcs_grafo(grafo):
 
     return resultados
 
+
 def dfs_cfc(grafo, v, visitados, orden, mas_bajo, pila, apilados, cfcs, contador_global):
 
     orden[v] = mas_bajo[v] = contador_global[0]
@@ -424,7 +453,7 @@ def dfs_cfc(grafo, v, visitados, orden, mas_bajo, pila, apilados, cfcs, contador
         if w not in visitados:
             dfs_cfc(grafo, w, visitados, orden, mas_bajo, pila, apilados, cfcs, contador_global)
 
-        if  w in apilados:
+        if w in apilados:
             mas_bajo[v] = min(mas_bajo[v], mas_bajo[w])
 
     if orden[v] == mas_bajo[v]:
@@ -438,11 +467,13 @@ def dfs_cfc(grafo, v, visitados, orden, mas_bajo, pila, apilados, cfcs, contador
 
         cfcs.append(nueva_cfc)
 
+
 """ 
 *****************************************************************
                         OTRAS FUNCIONES
 *****************************************************************
 """
+
 
 def obtener_ciclo_bfs(grafo, dirigido=True):
     """
@@ -476,8 +507,8 @@ def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
                 q.encolar(w)
                 visitados[w] = True
                 padre[w] = v
-
     return None
+
 
 def reconstruir_ciclo(padre, inicio, fin):
     """
@@ -507,6 +538,7 @@ def es_bipartito(grafo):
                 return False
     
     return True
+
 
 def _esbipartito(grafo, v, grupos):
     grupos[v] = GRUPO_1
