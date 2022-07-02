@@ -1,4 +1,5 @@
-from biblioteca_recomendify import modelaje_grafos
+from biblioteca_recomendify import es_cancion, modelaje_grafos
+from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, imprimir_camino_minimo, reconstruir_camino
 
 COMANDO_POR_INPUT = 1
 
@@ -19,7 +20,7 @@ class Recomendify:
     """
     def __init__(self, ruta):
         try:
-            self.grafo_usuarios, self_grafo_playlists = modelaje_grafos(ruta)
+            self.grafo_usuarios, self._grafo_playlists, self.canciones_, self.usuarios = modelaje_grafos(ruta)
             self.inicializacion_correcta = True
             self.funciones = self._hash_funciones()
         except FileNotFoundError:
@@ -57,11 +58,28 @@ class Recomendify:
 
     """
     """
-    def camino_mas_corto(self, entrada: str):
+    def camino_mas_corto(self, cancion_1, cancion_2):
         """ejemplo de entrada: camino Don't Go Away - Oasis >>>> Quitter - Eminem
         """
 
-        pass
+        if not es_cancion(self.canciones, cancion_1) or not es_cancion(self.canciones, cancion_2):
+            print("Tanto el origen como el destino deben ser canciones")
+            return False
+
+        result_bfs = bfs_origen_destino(self.grafo_usuarios, cancion_1, cancion_2)
+        if result_bfs is None:
+            print("No se encontro recorrido")
+            return False
+
+        padres = result_bfs
+        camino, aristas = reconstruir_camino(self.grafo_usuarios, padres, cancion_1, cancion_2)
+
+        imprimir_camino_minimo(camino, aristas)
+        return True
+
+        
+
+        
 
     """
     """
@@ -75,11 +93,20 @@ class Recomendify:
 
     """
     """
-    def ciclo_canciones(self, entrada: str):
-        pass
+    def ciclo_canciones(self, n, cancion):
+        if not es_cancion(self.canciones, cancion):
+            print("Debe pasar una cancion")
+            return False
+    
 
     """
     """
-    def todas_en_rango(self, entrada: str):
-        pass
+    def todas_en_rango(self, n, cancion):
+        
+        if not es_cancion(self.canciones, cancion):
+            print("Debe pasar una cancion")
+            return False
 
+        print(bfs_vertices_a_distancia(self._grafo_playlists, cancion, n))
+        
+        return True

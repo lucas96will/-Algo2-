@@ -12,7 +12,6 @@ GRUPO_2 = 2
 *****************************************************************
 """
 
-
 def bfs(grafo):
     """
     Recorrido BFS
@@ -45,6 +44,60 @@ def _bfs(grafo, v, visitados):
                 visitados.add(w)
                 q.encolar(w)
     return padres, orden
+
+def bfs_origen_destino(grafo, origen, destino):
+    """
+    Recorrido BFS desde un origen hasta llegar a un destino
+    Pre: recibe un grafo
+    Post: los padres de un grafo (desde origen hasta destino como maximo). None si no es conexo origen con destino 
+    """
+    visitados = set()
+    padres = {}
+    padres[origen] = None
+    visitados.add(origen)
+
+    q = Cola()
+    q.encolar(origen)
+    while not q.esta_vacia():
+        v = q.desencolar()
+        for w in grafo.adyacentes(v):
+            if w not in visitados:
+                padres[w] = v
+                visitados.add(w)
+                q.encolar(w)
+                if w == destino:
+                    return padres
+
+    return None
+
+def bfs_vertices_a_distancia(grafo, origen, n):
+    """
+    Recorrido BFS desde un origen, viendo distancias
+    Pre: recibe un grafo
+    Post: la cantidad de vertices a n distancia del origen
+    """
+    visitados = set()
+    orden = {}
+    orden[origen] = 0
+    visitados.add(origen)
+    contador = 0
+
+    q = Cola()
+    q.encolar(origen)
+    while not q.esta_vacia():
+        v = q.desencolar()
+        for w in grafo.adyacentes(v):
+            if w not in visitados:
+                orden[w] = orden[v] + 1
+                visitados.add(w)
+                q.encolar(w)
+                if orden[w] == n:
+                    contador += 1
+
+                if orden[w] > n:
+                    return contador
+
+    return contador
 
 
 def dfs(grafo):
@@ -340,16 +393,16 @@ def mst_kruskal(grafo):
 
 """ 
 *****************************************************************
-                CICLO HAMILTONEANO DE UN GRAFO
+                CAMINO HAMILTONEANO DE UN GRAFO
 *****************************************************************
 """
 
 
-def ciclo_hamiltoneano(grafo):
+def camino_hamiltoneano(grafo):
     """
-    Ciclo Hamiltoneano
+    Camino Hamiltoneano
     Pre: recibe un grafo no dirigido
-    Post: devuelve un ciclo hamiltoneano, si es que hay
+    Post: devuelve un camno hamiltoneano, si es que hay
     """
     camino = []
     visitados = set()
@@ -502,7 +555,7 @@ def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
             if w in visitados:
                 if dirigido is False and padre[v] == w:
                     continue
-                return reconstruir_ciclo(padre, v, w)
+                return reconstruir_camino(padre, v, w)
             else:
                 q.encolar(w)
                 visitados[w] = True
@@ -510,7 +563,7 @@ def _obtener_ciclo_bfs(grafo, v, visitados, dirigido):
     return None
 
 
-def reconstruir_ciclo(padre, inicio, fin):
+def reconstruir_camino(grafo, padre, inicio, fin):
     """
     Reconstruye el ciclo a partir del padre, el inicio y el fin
     Pre: hay un ciclo, cada vertice tiene un padre
@@ -518,12 +571,16 @@ def reconstruir_ciclo(padre, inicio, fin):
     """
     v = fin
     camino = []
+    aristas = []
     while v != inicio:
         camino.append(v)
         v = padre[v]
     camino.append(inicio)
-    return camino.reverse()
+    camino.reverse()
+    for i in range(0, len(camino) - 1):
+        aristas.append(grafo.peso_arista(camino[i], camino[i + 1]))
 
+    return camino, aristas
 
 def es_bipartito(grafo):
     """
@@ -538,7 +595,6 @@ def es_bipartito(grafo):
                 return False
     
     return True
-
 
 def _esbipartito(grafo, v, grupos):
     grupos[v] = GRUPO_1
@@ -557,3 +613,19 @@ def _esbipartito(grafo, v, grupos):
                 cola.encolar(w)
 
     return True
+
+def imprimir_camino_minimo(camino, aristas):
+    cadena = ''
+    for i, vertice in enumerate(camino):
+        if i == len(camino) - 1:
+                break
+
+        if i % 2 == 0: #Canciones
+            cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
+        
+        else: #Usuarios
+            cadena += vertice + ' --> tiene una playlist --> ' + aristas[i] + ' --> donde aparece --> '
+    
+    cadena += camino[-1]
+    
+    print(cadena)

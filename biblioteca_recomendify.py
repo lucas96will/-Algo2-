@@ -1,12 +1,15 @@
 from glob import escape
 from grafo import Grafo
-from grafo_funciones import es_bipartito
+from grafo_funciones import bfs_origen_destino, reconstruir_camino, imprimir_camino_minimo, bfs_vertices_a_distancia
 
 
 def modelaje_grafos(ruta):
     usuarios_canciones = Grafo()
     playlists_canciones = Grafo()
     diccionario_playlists = {}
+    canciones = set()
+    usuarios = set()
+
 
     with open(ruta) as archivo:
         linea = archivo.readline() # Primer linea no contiene informacion
@@ -16,13 +19,14 @@ def modelaje_grafos(ruta):
             datos = linea.rstrip("\n").split("\t")
             _, usuario, cancion, artista, id_playlist, playlist, _ = datos
             cancion_artista = cancion + " - " + artista
+            canciones.add(cancion_artista)
+            usuarios.add(usuario)
             confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista, playlist)
             playlists_a_diccionario(diccionario_playlists, id_playlist, cancion_artista)
             linea = archivo.readline()
 
     confeccion_grafo_playlists_canciones(playlists_canciones, diccionario_playlists)
-    return usuarios_canciones, playlists_canciones
-
+    return usuarios_canciones, playlists_canciones, canciones, usuarios
 
 def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if usuario not in grafo:
@@ -34,13 +38,11 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if not grafo.estan_unidos(usuario, cancion):
         grafo.agregar_arista(usuario, cancion, playlist)
 
-
 def playlists_a_diccionario(diccionario, id_playlist, cancion):
     if id_playlist not in diccionario:
         diccionario[id_playlist] = set()
     
     diccionario[id_playlist].add(cancion)
-
 
 def confeccion_grafo_playlists_canciones(grafo, diccionario):
     for canciones in diccionario.values():
@@ -59,6 +61,13 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
                     grafo.agregar_arista(cancion_1, cancion_2)
     return
 
+def es_cancion(canciones, cancion):
+    if cancion in canciones:
+        return True
+    return False
 
-a, b = modelaje_grafos("spotify-mini.tsv")
-print(es_bipartito(a)) #Devuelve True -> el grafo es bipartito
+def es_usuario(usuarios, usuario):
+    if usuario in usuarios:
+        return True
+    return False
+
