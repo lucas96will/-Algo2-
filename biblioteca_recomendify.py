@@ -3,6 +3,11 @@ from grafo import Grafo
 
 
 def modelaje_grafos(ruta):
+    """
+    Dada una ruta de un archivo, procesa los datos creando dos grafos para el modelaje de Recomendify
+    Pre: Recibe una ruta existente
+    Post: Devuelve ambos grafos
+    """
     usuarios_canciones = Grafo()
     playlists_canciones = Grafo()
     diccionario_playlists = {}
@@ -28,6 +33,9 @@ def modelaje_grafos(ruta):
 
 
 def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
+    """
+    Dado un grafo, un usuario, una cancion y una playlist crea vertices y aristas para el grafo pasado
+    """
     if usuario not in grafo:
         grafo.agregar_vertice(usuario)
     
@@ -39,6 +47,9 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
 
 
 def playlists_a_diccionario(diccionario, id_playlist, cancion):
+    """
+    Dado un diccionario, un id de playlist y una cancion, agrega esta ultima a la clave(id playlist) a la que pertenece dentro del diccionario
+    """
     if id_playlist not in diccionario:
         diccionario[id_playlist] = set()
     
@@ -46,6 +57,9 @@ def playlists_a_diccionario(diccionario, id_playlist, cancion):
 
 
 def confeccion_grafo_playlists_canciones(grafo, diccionario):
+    """
+    Dado un grafo y un diccionario crea vertices y aristas para el grafo pasado
+    """
     for playlist in diccionario.values():
         for cancion_1 in playlist:
             if cancion_1 not in grafo:
@@ -64,12 +78,18 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
 
 
 def es_cancion(canciones, cancion):
+    """
+    Devuelve True si la cancion pasada por parametro es efectivamente una cancion del grafo, False en caso contrario
+    """
     if cancion in canciones:
         return True
     return False
 
 
 def es_usuario(usuarios, usuario):
+    """
+    Devuelve True si el usuario pasado por parametro es efectivamente un usuario del grafo, False en caso contrario
+    """
     if usuario in usuarios:
         return True
     return False
@@ -99,3 +119,31 @@ def imprimir_camino_minimo(camino, aristas):
 
 def rank_canciones(grafo, cantidad):
     ranking = []
+
+def procesamiento_entrada_camino_minimo(entrada):
+    """
+    Recibe la entrada para el comando de camino minimo y devuelve una tupla de ambas canciones, o None si la entrada es incorrecta
+    """
+    datos = entrada.split(" >>>> ")
+    if len(datos) != 2:
+        return None
+
+    cancion_1, cancion_2 = datos[0], datos[1]
+
+    return cancion_1, cancion_2
+
+def procesamiento_entrada_numero_cancion(entrada):
+    """
+    Recibe la entrada que deberia contener un numero y una cancion, y devuelve una tupla de ambas cosas, o None si la entrada es incorrecta
+    """
+    datos = entrada.split(" ")
+    numero = datos[0]
+    cancion = ""
+    for i in range(1, len(datos) - 1):
+        cancion += datos[i] + " "
+
+    cancion += datos[-1]
+    if cancion == "":
+        return None
+
+    return numero, cancion
