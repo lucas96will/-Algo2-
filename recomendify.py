@@ -1,5 +1,5 @@
-from biblioteca_recomendify import es_cancion, modelaje_grafos
-from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, imprimir_camino_minimo, reconstruir_camino
+from biblioteca_recomendify import es_cancion, modelaje_grafos, imprimir_camino_minimo
+from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino
 
 COMANDO_POR_INPUT = 1
 
@@ -59,7 +59,10 @@ class Recomendify:
     """
     """
     def camino_mas_corto(self, cancion_1, cancion_2):
-        """ejemplo de entrada: camino Don't Go Away - Oasis >>>> Quitter - Eminem
+        """
+        Imprime una lista con la cual se conecta una canción con otra, en la menor cantidad de pasos
+        Pre: Se reciben dos canciones
+        Post: Se imprime el camino, de ser posible
         """
 
         if not es_cancion(self.canciones, cancion_1) or not es_cancion(self.canciones, cancion_2):
@@ -94,16 +97,34 @@ class Recomendify:
     """
     """
     def ciclo_canciones(self, n, cancion):
-        if not es_cancion(self.canciones, cancion):
-            print("Debe pasar una cancion")
+        """
+        Permite obtener un ciclo de largo n (dentro de la red de canciones) que comience en la canción indicada
+        Pre: Se recibe un largo y una cancion
+        Post: Imprime el ciclo si existe
+        """
+        if not es_cancion(self.canciones, cancion) or not n.isnumeric():
+            print("Debe pasar un numero y una cancion")
             return False
+
+        camino = ciclo_origen_y_largo(self._grafo_playlists, cancion, n)
+        if camino is None:
+            print("No se encontro recorrido")
+            return False
+        
+        imprimir_camino(camino)
+        return True
     
 
     """
     """
     def todas_en_rango(self, n, cancion):
+        """
+        Permite obtener la cantidad de canciones que se encuenten a exactamente n saltos desde la cancion pasada por parámetro
+        Pre: Recibe el numero de saltos y la cancion
+        Post: Imprime la cantidad de canciones encontradas
+        """
         
-        if not es_cancion(self.canciones, cancion):
+        if not es_cancion(self.canciones, cancion) or not n.isnumeric():
             print("Debe pasar una cancion")
             return False
 

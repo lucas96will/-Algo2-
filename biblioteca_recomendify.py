@@ -1,6 +1,6 @@
 from glob import escape
 from grafo import Grafo
-from grafo_funciones import bfs_origen_destino, reconstruir_camino, imprimir_camino_minimo, bfs_vertices_a_distancia
+
 
 
 def modelaje_grafos(ruta):
@@ -45,12 +45,12 @@ def playlists_a_diccionario(diccionario, id_playlist, cancion):
     diccionario[id_playlist].add(cancion)
 
 def confeccion_grafo_playlists_canciones(grafo, diccionario):
-    for canciones in diccionario.values():
-        for cancion_1 in canciones:
+    for playlist in diccionario.values():
+        for cancion_1 in playlist:
             if cancion_1 not in grafo:
                 grafo.agregar_vertice(cancion_1)
             
-            for cancion_2 in canciones:
+            for cancion_2 in playlist:
                 if cancion_1 == cancion_2:
                     continue
 
@@ -71,3 +71,23 @@ def es_usuario(usuarios, usuario):
         return True
     return False
 
+def imprimir_camino_minimo(camino, aristas):
+    """
+    Imprime un camino (de canciones) y las aristas (playlists) que lo conecta
+    Pre: Recibe el camino y la lista de aristas
+    Post: Imprime en formato
+    """
+    cadena = ''
+    for i, vertice in enumerate(camino):
+        if i == len(camino) - 1:
+                break
+
+        if i % 2 == 0: #Canciones
+            cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
+        
+        else: #Usuarios
+            cadena += vertice + ' --> tiene una playlist --> ' + aristas[i] + ' --> donde aparece --> '
+    
+    cadena += camino[-1]
+    
+    print(cadena)

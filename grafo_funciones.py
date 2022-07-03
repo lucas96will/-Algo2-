@@ -428,13 +428,11 @@ def camino_hamiltoneano_dfs(grafo, v, visitados, camino):
     camino.pop()
     return False
 
-
 """ 
 *****************************************************************
             PUNTOS DE ARTICULACION DE UN GRAFO
 *****************************************************************
 """
-
 
 def puntos_articulacion(grafo):
     """
@@ -614,18 +612,46 @@ def _esbipartito(grafo, v, grupos):
 
     return True
 
-def imprimir_camino_minimo(camino, aristas):
-    cadena = ''
-    for i, vertice in enumerate(camino):
-        if i == len(camino) - 1:
-                break
 
-        if i % 2 == 0: #Canciones
-            cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
-        
-        else: #Usuarios
-            cadena += vertice + ' --> tiene una playlist --> ' + aristas[i] + ' --> donde aparece --> '
-    
+def ciclo_origen_y_largo(grafo, origen, n):
+    """
+    Halla un ciclo desde el origen de largo n
+    Pre: Recibe un grafo, un origen y un numero n
+    Post: Devuelve el ciclo de ser hallado
+    """
+    camino = []
+    visitados = set()
+    if _ciclo_origen_y_largo(grafo, origen, n, camino, visitados, origen):
+        return camino
+
+    return None
+
+def _ciclo_origen_y_largo(grafo, v, n, camino, visitados, origen):
+    visitados.add(v)
+    camino.append(v)
+
+    for w in grafo.adyacentes(v):
+        if w == origen and len(camino) == n:
+            camino.append(origen)
+            return True
+
+        if w not in visitados and len(camino) < n:
+            if _ciclo_origen_y_largo(grafo, w, n, camino, visitados, origen):
+                return True
+
+    visitados.remove(v)
+    camino.pop()
+    return False
+
+def imprimir_camino(camino):
+    """
+    Imprime un camino
+    Pre: Recibe los vertices que componen el camino
+    Post: Se imprimio el camino
+    """
+    cadena = ''
+    for i in range(camino - 1):
+        cadena += camino[i] + ' --> '
+
     cadena += camino[-1]
-    
     print(cadena)
