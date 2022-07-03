@@ -651,7 +651,6 @@ def _ciclo_origen_y_largo(grafo, v, n, camino, visitados, origen):
     camino.pop()
     return False
 
-
 def imprimir_camino(camino):
     """
     Imprime un camino
