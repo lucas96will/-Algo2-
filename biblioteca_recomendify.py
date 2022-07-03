@@ -10,7 +10,7 @@ def modelaje_grafos(ruta):
     usuarios = set()
 
     with open(ruta) as archivo:
-        linea = archivo.readline() # Primer linea no contiene informacion
+        linea = archivo.readline()  # Primer linea no contiene informacion
         linea = archivo.readline()
 
         while linea != '':
@@ -84,7 +84,7 @@ def imprimir_camino_minimo(camino, aristas):
     cadena = ''
     for i, vertice in enumerate(camino):
         if i == len(camino) - 1:
-                break
+            break
 
         if i % 2 == 0:  # Canciones
             cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
