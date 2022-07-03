@@ -12,6 +12,7 @@ GRUPO_2 = 2
 *****************************************************************
 """
 
+
 def bfs(grafo):
     """
     Recorrido BFS
@@ -45,6 +46,7 @@ def _bfs(grafo, v, visitados):
                 q.encolar(w)
     return padres, orden
 
+
 def bfs_origen_destino(grafo, origen, destino):
     """
     Recorrido BFS desde un origen hasta llegar a un destino
@@ -69,6 +71,7 @@ def bfs_origen_destino(grafo, origen, destino):
                     return padres
 
     return None
+
 
 def bfs_vertices_a_distancia(grafo, origen, n):
     """
@@ -428,11 +431,13 @@ def camino_hamiltoneano_dfs(grafo, v, visitados, camino):
     camino.pop()
     return False
 
+
 """ 
 *****************************************************************
             PUNTOS DE ARTICULACION DE UN GRAFO
 *****************************************************************
 """
+
 
 def puntos_articulacion(grafo):
     """
@@ -580,6 +585,7 @@ def reconstruir_camino(grafo, padre, inicio, fin):
 
     return camino, aristas
 
+
 def es_bipartito(grafo):
     """
     Determina si un grafo es bipartito, o no
@@ -593,6 +599,7 @@ def es_bipartito(grafo):
                 return False
     
     return True
+
 
 def _esbipartito(grafo, v, grupos):
     grupos[v] = GRUPO_1
@@ -626,6 +633,7 @@ def ciclo_origen_y_largo(grafo, origen, n):
 
     return None
 
+
 def _ciclo_origen_y_largo(grafo, v, n, camino, visitados, origen):
     visitados.add(v)
     camino.append(v)
@@ -642,6 +650,7 @@ def _ciclo_origen_y_largo(grafo, v, n, camino, visitados, origen):
     visitados.remove(v)
     camino.pop()
     return False
+
 
 def imprimir_camino(camino):
     """
