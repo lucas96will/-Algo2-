@@ -2,14 +2,12 @@ from glob import escape
 from grafo import Grafo
 
 
-
 def modelaje_grafos(ruta):
     usuarios_canciones = Grafo()
     playlists_canciones = Grafo()
     diccionario_playlists = {}
     canciones = set()
     usuarios = set()
-
 
     with open(ruta) as archivo:
         linea = archivo.readline() # Primer linea no contiene informacion
@@ -28,6 +26,7 @@ def modelaje_grafos(ruta):
     confeccion_grafo_playlists_canciones(playlists_canciones, diccionario_playlists)
     return usuarios_canciones, playlists_canciones, canciones, usuarios
 
+
 def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if usuario not in grafo:
         grafo.agregar_vertice(usuario)
@@ -38,11 +37,13 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if not grafo.estan_unidos(usuario, cancion):
         grafo.agregar_arista(usuario, cancion, playlist)
 
+
 def playlists_a_diccionario(diccionario, id_playlist, cancion):
     if id_playlist not in diccionario:
         diccionario[id_playlist] = set()
     
     diccionario[id_playlist].add(cancion)
+
 
 def confeccion_grafo_playlists_canciones(grafo, diccionario):
     for playlist in diccionario.values():
@@ -61,15 +62,18 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
                     grafo.agregar_arista(cancion_1, cancion_2)
     return
 
+
 def es_cancion(canciones, cancion):
     if cancion in canciones:
         return True
     return False
 
+
 def es_usuario(usuarios, usuario):
     if usuario in usuarios:
         return True
     return False
+
 
 def imprimir_camino_minimo(camino, aristas):
     """
@@ -82,12 +86,16 @@ def imprimir_camino_minimo(camino, aristas):
         if i == len(camino) - 1:
                 break
 
-        if i % 2 == 0: #Canciones
+        if i % 2 == 0:  # Canciones
             cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
         
-        else: #Usuarios
+        else:  # Usuarios
             cadena += vertice + ' --> tiene una playlist --> ' + aristas[i] + ' --> donde aparece --> '
     
     cadena += camino[-1]
     
     print(cadena)
+
+
+def rank_canciones(grafo, cantidad):
+    ranking = []

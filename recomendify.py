@@ -20,18 +20,19 @@ class Recomendify:
     """
     def __init__(self, ruta):
         try:
-            self.grafo_usuarios, self._grafo_playlists, self.canciones_, self.usuarios = modelaje_grafos(ruta)
+            self.grafo_usuarios, self._grafo_playlists, self.canciones, self.usuarios = modelaje_grafos(ruta)
             self.inicializacion_correcta = True
             self.funciones = self._hash_funciones()
+            self.ranking = []
         except FileNotFoundError:
             print("No se encontro el archivo!")
             self.incializacion_correcta = False
 
-    """
-    Post: devuelve un diccionario donde cada clave es un comando y el valor 
-    la funcione correspondiente
-    """
     def _hash_funciones(self):
+        """
+        Post: devuelve un diccionario donde cada clave es un comando y el valor
+        la funcione correspondiente
+        """
         funciones = {
             CAMINO_MAS_CORTO: self.camino_mas_corto,
             CANCIONES_MAS_IMPORTANTES: self.canciones_mas_importantes,
@@ -41,10 +42,10 @@ class Recomendify:
         }
         return funciones
 
-    """
-    Inicia el programa recomendify, tomando por consola el input de comandos
-    """
     def iniciar_recomendify(self):
+        """
+        Inicia el programa recomendify, tomando por consola el input de comandos
+        """
         while self.inicializacion_correcta:
             texto = input()
             if texto == '':
@@ -56,8 +57,6 @@ class Recomendify:
                 self.funciones[comando](texto)
         return
 
-    """
-    """
     def camino_mas_corto(self, cancion_1, cancion_2):
         """
         Imprime una lista con la cual se conecta una canción con otra, en la menor cantidad de pasos
@@ -80,20 +79,20 @@ class Recomendify:
         imprimir_camino_minimo(camino, aristas)
         return True
 
-        
-
-        
-
     """
     """
     def canciones_mas_importantes(self, entrada: str):
-        pass
+        cantidad_ranking_pedida = int(entrada.split(' ')[1])
 
+        if len(self.ranking) < cantidad_ranking_pedida:
+            self.ranking = rank_canciones(self._grafo_playlists, cantidad_ranking_pedida)
+
+        for i in range(cantidad_ranking_pedida):
+            print(self.ranking[i])
     """
     """
     def recomendacion(self, entrada: str):
         pass
-
     """
     """
     def ciclo_canciones(self, n, cancion):
@@ -110,24 +109,21 @@ class Recomendify:
         if camino is None:
             print("No se encontro recorrido")
             return False
-        
+
         imprimir_camino(camino)
         return True
-    
 
-    """
-    """
     def todas_en_rango(self, n, cancion):
         """
         Permite obtener la cantidad de canciones que se encuenten a exactamente n saltos desde la cancion pasada por parámetro
         Pre: Recibe el numero de saltos y la cancion
         Post: Imprime la cantidad de canciones encontradas
         """
-        
+
         if not es_cancion(self.canciones, cancion) or not n.isnumeric():
             print("Debe pasar una cancion")
             return False
 
         print(bfs_vertices_a_distancia(self._grafo_playlists, cancion, n))
-        
+
         return True
