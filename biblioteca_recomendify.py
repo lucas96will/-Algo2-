@@ -116,10 +116,6 @@ def imprimir_camino_minimo(camino, aristas):
     
     print(cadena)
 
-
-def rank_canciones(grafo, cantidad):
-    ranking = []
-
 def procesamiento_entrada_camino_minimo(entrada):
     """
     Recibe la entrada para el comando de camino minimo y devuelve una tupla de ambas canciones, o None si la entrada es incorrecta
@@ -147,3 +143,42 @@ def procesamiento_entrada_numero_cancion(entrada):
         return None
 
     return numero, cancion
+
+def calculo_pagerank(grafo, interacciones, d, grados):
+    """
+    Dado un grafo, un numero de interacciones, un coeficiente de amortiguacion y un diccionario de grados devuelve el PageRank de cada vertice
+    Pre: Recibe un grafo, un numero(interacciones), un numero(coeficiente de amortiguacion) y un diccionario de grados del grafo
+    Post: Devuelve un diccionario con los PageRank calculados
+    """
+    pagerank = {}
+    cant_vertices = len(grafo)
+    valor_inicial = (1 - d) / cant_vertices
+    for v in grafo:
+        pagerank[v] = valor_inicial
+
+    for _ in range(interacciones):
+        nuevo_pagerank = {}
+        for v in grafo:
+            nuevo_pagerank[v] = pagerank[v]
+            for w in grafo.adyacentes(v):
+                if v == w:
+                    continue
+                nuevo_pagerank[v] += d* (pagerank[w] / grados[w])
+        
+        pagerank = nuevo_pagerank
+
+    return pagerank
+
+def imprimir_mas_importantes(pagerank, n):
+    """
+    Imprime las n canciones mas importantes del grafo, segun pagerank
+    Pre: Recibe el pagerank ordenado de menor a mayor y un numero
+    Post: Imprime en formato
+    """
+    cadena = ""
+    largo = len(pagerank) - 1
+    for i in range(n - 1):
+        cadena += pagerank[largo - i][0] + "; "
+
+    cadena += pagerank[largo - n][0]
+    print(cadena)
