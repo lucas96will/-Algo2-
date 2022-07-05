@@ -85,9 +85,13 @@ class Recomendify:
         imprimir_camino_minimo(camino, aristas)
         return True
 
-    """
-    """
     def canciones_mas_importantes(self, entrada: str):
+        """
+        Imprime las canciones mas importantes
+        Pre: obtiene de la entrada un numero n mayor a 0
+        Post: muestra por pantalla las n canciones mas importantes
+        ordenadas de mayor a menor importancia
+        """
         cantidad_ranking_pedida = int(entrada.split(' ')[1])
 
         if len(self.ranking) < cantidad_ranking_pedida:
@@ -95,12 +99,25 @@ class Recomendify:
 
         for i in range(cantidad_ranking_pedida):
             print(self.ranking[i])
-    """
-    """
+
     def recomendacion(self, entrada: str):
-        pass
-    """
-    """
+        """
+        Permite obtener un listado de n canciones/usuarios a partir de una lista de canciones
+        Pre: Recibe una entrada indicando usuarios o canciones seguido de una lista de canciones
+        ejemplo: canciones 10 Love Story - Taylor Swift >>>> Toxic - Britney Spears  (lista de 2 canciones)
+        Post: Devuelve una lista de n elementos de canciones/usuarios recomendados
+        """
+
+        """ lista_canciones: set()
+            opcion_elegida: int
+            cantidad: int
+            recomendados: []
+        """
+        opcion_elegida, cantidad, lista_canciones = recomendacion_obtener_datos(entrada)
+        recomendados = pagerank_personalizado(self.grafo_usuarios, opcion_elegida, cantidad, lista_canciones)
+
+        return recomendados
+
     def ciclo_canciones(self, entrada):
         """
         Permite obtener un ciclo de largo n (dentro de la red de canciones) que comience en la canción indicada
