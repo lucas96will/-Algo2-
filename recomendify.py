@@ -10,6 +10,9 @@ RECOMENDACION = "recomendacion"
 CICLO = "ciclo"
 RANGO = "rango"
 
+INTERACCIONES = 20
+COEF_AMORTIGUACION = 0.85
+
 
 class Recomendify:
     """
@@ -85,8 +88,6 @@ class Recomendify:
         imprimir_camino_minimo(camino, aristas)
         return True
 
-    """
-    """
     def canciones_mas_importantes(self, entrada):
         """
         Imprime las canciones mas importantes del grafo
@@ -97,17 +98,14 @@ class Recomendify:
 
         if self.ranking == []:
             grados_grafo = grados(self._grafo_playlists)
-            pagerank = calculo_pagerank(self._grafo_playlists, 20, 0.85, grados_grafo)
+            pagerank = calculo_pagerank(self._grafo_playlists, INTERACCIONES, COEF_AMORTIGUACION, grados_grafo)
             self.ranking = sorted(pagerank.items(), key=lambda x: x[1])
 
         imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
 
-        
-    
     def recomendacion(self, entrada: str):
         pass
-    """
-    """
+
     def ciclo_canciones(self, entrada):
         """
         Permite obtener un ciclo de largo n (dentro de la red de canciones) que comience en la canción indicada

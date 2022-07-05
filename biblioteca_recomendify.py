@@ -116,6 +116,7 @@ def imprimir_camino_minimo(camino, aristas):
     
     print(cadena)
 
+
 def procesamiento_entrada_camino_minimo(entrada):
     """
     Recibe la entrada para el comando de camino minimo y devuelve una tupla de ambas canciones, o None si la entrada es incorrecta
@@ -127,6 +128,7 @@ def procesamiento_entrada_camino_minimo(entrada):
     cancion_1, cancion_2 = datos[0], datos[1]
 
     return cancion_1, cancion_2
+
 
 def procesamiento_entrada_numero_cancion(entrada):
     """
@@ -143,6 +145,7 @@ def procesamiento_entrada_numero_cancion(entrada):
         return None
 
     return numero, cancion
+
 
 def calculo_pagerank(grafo, interacciones, d, grados):
     """
@@ -168,6 +171,7 @@ def calculo_pagerank(grafo, interacciones, d, grados):
         pagerank = nuevo_pagerank
 
     return pagerank
+
 
 def imprimir_mas_importantes(pagerank, n):
     """
