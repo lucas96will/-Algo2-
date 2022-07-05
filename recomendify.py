@@ -1,5 +1,5 @@
-from biblioteca_recomendify import es_cancion, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion
-from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino
+from biblioteca_recomendify import calculo_pagerank, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion
+from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
 
@@ -62,7 +62,7 @@ class Recomendify:
     def camino_mas_corto(self, entrada):
         """
         Imprime una lista con la cual se conecta una canción con otra, en la menor cantidad de pasos
-        Pre: Se reciben dos canciones
+        Pre: Recibe datos de entrada
         Post: Se imprime el camino, de ser posible
         """
         canciones = procesamiento_entrada_camino_minimo(entrada)
@@ -85,43 +85,33 @@ class Recomendify:
         imprimir_camino_minimo(camino, aristas)
         return True
 
-    def canciones_mas_importantes(self, entrada: str):
+    """
+    """
+    def canciones_mas_importantes(self, entrada):
         """
-        Imprime las canciones mas importantes
-        Pre: obtiene de la entrada un numero n mayor a 0
-        Post: muestra por pantalla las n canciones mas importantes
-        ordenadas de mayor a menor importancia
+        Imprime las canciones mas importantes del grafo
+        Pre: Recibe una entrada
+        Post: Devuelve las n canciones mas importantes (segun cuantas quiera ver el usuario)
         """
-        cantidad_ranking_pedida = int(entrada.split(' ')[1])
+        cantidad_ranking_pedida = int(entrada.split(' ')[0])
 
-        if len(self.ranking) < cantidad_ranking_pedida:
-            self.ranking = rank_canciones(self._grafo_playlists, cantidad_ranking_pedida)
+        if self.ranking == []:
+            grados_grafo = grados(self._grafo_playlists)
+            pagerank = calculo_pagerank(self._grafo_playlists, 20, 0.85, grados_grafo)
+            self.ranking = sorted(pagerank.items(), key=lambda x: x[1])
 
-        for i in range(cantidad_ranking_pedida):
-            print(self.ranking[i])
+        imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
 
+        
+    
     def recomendacion(self, entrada: str):
-        """
-        Permite obtener un listado de n canciones/usuarios a partir de una lista de canciones
-        Pre: Recibe una entrada indicando usuarios o canciones seguido de una lista de canciones
-        ejemplo: canciones 10 Love Story - Taylor Swift >>>> Toxic - Britney Spears  (lista de 2 canciones)
-        Post: Devuelve una lista de n elementos de canciones/usuarios recomendados
-        """
-
-        """ lista_canciones: set()
-            opcion_elegida: int
-            cantidad: int
-            recomendados: []
-        """
-        opcion_elegida, cantidad, lista_canciones = recomendacion_obtener_datos(entrada)
-        recomendados = pagerank_personalizado(self.grafo_usuarios, opcion_elegida, cantidad, lista_canciones)
-
-        return recomendados
-
+        pass
+    """
+    """
     def ciclo_canciones(self, entrada):
         """
         Permite obtener un ciclo de largo n (dentro de la red de canciones) que comience en la canción indicada
-        Pre: Se recibe un largo y una cancion
+        Pre: Recibe datos de entrada
         Post: Imprime el ciclo si existe
         """
         datos = procesamiento_entrada_numero_cancion(entrada)
@@ -133,6 +123,7 @@ class Recomendify:
         if not es_cancion(self.canciones, cancion) or not n.isnumeric():
             print("Debe pasar un numero y una cancion")
             return False
+        n = int(n)
 
         camino = ciclo_origen_y_largo(self._grafo_playlists, cancion, n)
         if camino is None:
@@ -145,7 +136,7 @@ class Recomendify:
     def todas_en_rango(self, entrada):
         """
         Permite obtener la cantidad de canciones que se encuenten a exactamente n saltos desde la cancion pasada por parámetro
-        Pre: Recibe el numero de saltos y la cancion
+        Pre: Recibe datos de entrada
         Post: Imprime la cantidad de canciones encontradas
         """
         datos = procesamiento_entrada_numero_cancion(entrada)
@@ -157,7 +148,7 @@ class Recomendify:
         if not es_cancion(self.canciones, cancion) or not n.isnumeric():
             print("Debe pasar una cancion")
             return False
-
+        n = int(n)
         print(bfs_vertices_a_distancia(self._grafo_playlists, cancion, n))
 
         return True

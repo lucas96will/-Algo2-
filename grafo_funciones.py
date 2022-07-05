@@ -658,7 +658,7 @@ def imprimir_camino(camino):
     Post: Se imprimio el camino
     """
     cadena = ''
-    for i in range(camino - 1):
+    for i in range(len(camino) - 1):
         cadena += camino[i] + ' --> '
 
     cadena += camino[-1]
