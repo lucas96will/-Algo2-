@@ -9,10 +9,10 @@ class Grafo:
     Implementada como diccionario de diccionarios
     """
     def __init__(self, dirigido=False):
-        self.grafo = {} #Diccionario de diccionarios
+        self.grafo = {}  # Diccionario de diccionarios
         self.dirigido = dirigido
 
-    def agregar_vertice(self, v): #Terminado
+    def agregar_vertice(self, v):
         """
         Agrega un vertice al grafo. Devuelve True si se agrego, False si ya estaba en el grafo
         Pre: El grafo fue creado
@@ -23,7 +23,7 @@ class Grafo:
         self.grafo[v] = {}
         return True
 
-    def borrar_vertice(self, v): #Terminado
+    def borrar_vertice(self, v):
         """
         Borra el vertice del grafo si es que fue agregado antes
         Pre: El grafo fue creado
@@ -40,7 +40,7 @@ class Grafo:
 
         return True
 
-    def agregar_arista(self, v, w, peso=1): #Terminado
+    def agregar_arista(self, v, w, peso=1):
         """
         Agrega una arista entre dos vertices del grafo. Por defecto el peso sera de 1
         Pre: El grafo fue creado
@@ -58,7 +58,7 @@ class Grafo:
         
         return True
     
-    def borrar_arista(self, v, w): #Terminado
+    def borrar_arista(self, v, w):
         """
         Borra una arista entre vertices del grafo
         Pre: El grafo fue creado
@@ -72,7 +72,7 @@ class Grafo:
             return False
         return True
 
-    def estan_unidos(self, v, w): #Terminado
+    def estan_unidos(self, v, w):
         """
         Indica si w  esta unido a v
         Pre: El grafo fue creado
@@ -80,7 +80,7 @@ class Grafo:
         """
         return w in self.grafo[v]
     
-    def peso_arista(self, v, w): #Terminado
+    def peso_arista(self, v, w):
         """
         Devuelve el peso de la arista desde v hasta w
         Pre: El grafo fue creado
@@ -90,7 +90,7 @@ class Grafo:
             return NO_EXISTE
         return self.grafo[v][w]
 
-    def obtener_vertices(self): #Terminado
+    def obtener_vertices(self):
         """
         Devuelve una lista con todos los vertices del grafo
         Pre: El grafo fue creado

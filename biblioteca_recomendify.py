@@ -1,6 +1,7 @@
 from glob import escape
 from grafo import Grafo
 
+RECORRIDOS_PRANK_PERSONALIZADO = 10
 
 def modelaje_grafos(ruta):
     """
@@ -186,3 +187,39 @@ def imprimir_mas_importantes(pagerank, n):
 
     cadena += pagerank[largo - n][0]
     print(cadena)
+
+
+def procesamiento_recomendacion(entrada):
+    """
+    Procesa la entrada por consola de la funcion recomendacion
+    Si la opcion elegida o la cantidad no son validos, eleva un SyntaxError
+    """
+    opcion_elegida = entrada.split(' ')[0]
+    cantidad = entrada.split(' ')[1]
+    opciones_validas = ["canciones", "usuarios"]
+
+    if not cantidad.isnumeric() or opcion_elegida not in opciones_validas:
+        raise ValueError
+
+    canciones = entrada[len(cantidad + opcion_elegida) + 2:]
+    lista_canciones = canciones.split(" >>>> ")
+
+    return opcion_elegida, cantidad, lista_canciones
+
+
+def pagerank_personalizado(grafo_usuarios, grafo_playlist, cantidad, lista_canciones):
+    """
+    Dado un grafo, una cantidad y una lista de canciones favoritas, se calcula el pagerank personalizado
+    para todos los vertices del grafo y se devuelve una lista de las canciones / usuarios recomendados
+    Pre: recibe un grafo, una cantidad y una lista de canciones
+    Post: devuelve una lista de canciones / usuarios recomendados
+    """
+
+    pagerank_acumulado = {} # clave vertice, valor pagerank!
+    probabilidad_
+
+    for _ in range(RECORRIDOS_PRANK_PERSONALIZADO):
+
+
+
+    pass
