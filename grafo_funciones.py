@@ -3,6 +3,7 @@ from cola import Cola
 from pila import Pila
 from heapq import heappush, heappop
 from union_find import UnionFind
+import random
 GRUPO_1 = 1
 GRUPO_2 = 2
 
@@ -651,6 +652,7 @@ def _ciclo_origen_y_largo(grafo, v, n, camino, visitados, origen):
     camino.pop()
     return False
 
+
 def imprimir_camino(camino):
     """
     Imprime un camino
@@ -663,3 +665,43 @@ def imprimir_camino(camino):
 
     cadena += camino[-1]
     print(cadena)
+
+
+def random_walk(grafo, v_actual, largo_recorrido, resultado=None):
+    """
+    Algoritmo del random_walk (personalizado)
+    Empezando desde un vertice, visito un vecino aleatorio y le sumo un valor dado
+    por la cantidad de adyacentes.
+    Pre: Grafo no dirigido, v_actual vertice pertenece al grafo, largo_recorrido > 0 (Mientras mas grande, mas
+    exacto es el resultado),
+    Post: devuelve un hash de clave: vertices y valor: valor acumulado (int)
+    """
+    if resultado is None:
+        resultado = {v_actual: 0}
+
+    if largo_recorrido == 0:
+        return resultado
+
+    v_inicial_adyacentes = grafo.adyacentes(v_actual)
+
+    v_aleatorio = obtener_vertice_aleatorio(v_inicial_adyacentes)
+
+    if v_aleatorio not in resultado:
+        resultado[v_aleatorio] = 0
+
+    if resultado[v_actual] != 0:
+        resultado[v_aleatorio] += resultado[v_actual] / len(v_inicial_adyacentes)
+    else:
+        resultado[v_aleatorio] += 1/len(v_inicial_adyacentes)
+
+    return random_walk(grafo, v_aleatorio, largo_recorrido - 1, resultado)
+
+
+def obtener_vertice_aleatorio(vertices):
+    """
+    Pre: vertices es una lista de vertices
+    Post: Devuelve un vertice aleatorio dentro de vertices
+    """
+    rand = random.uniform(0, len(vertices) - 1)
+    indice_vecino = round(rand)
+    return vertices[indice_vecino]

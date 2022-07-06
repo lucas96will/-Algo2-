@@ -1,7 +1,9 @@
 from glob import escape
 from grafo import Grafo
+from grafo_funciones import random_walk
 
-RECORRIDOS_PRANK_PERSONALIZADO = 10
+RECORRIDOS_PRANK_PERSONALIZADO = 50
+PRANK_LARGO_RECORRIDO = 200
 
 def modelaje_grafos(ruta):
     """
@@ -15,7 +17,7 @@ def modelaje_grafos(ruta):
     canciones = set()
     usuarios = set()
 
-    with open(ruta) as archivo:
+    with open(ruta, encoding="utf-8") as archivo:
         linea = archivo.readline()  # Primer linea no contiene informacion
         linea = archivo.readline()
 
@@ -72,7 +74,7 @@ def confeccion_grafo_playlists_canciones(grafo, diccionario):
 
                 if cancion_2 not in grafo:
                     grafo.agregar_vertice(cancion_2)
-                
+
                 if not grafo.estan_unidos(cancion_1, cancion_2):
                     grafo.agregar_arista(cancion_1, cancion_2)
     return
@@ -204,22 +206,78 @@ def procesamiento_recomendacion(entrada):
     canciones = entrada[len(cantidad + opcion_elegida) + 2:]
     lista_canciones = canciones.split(" >>>> ")
 
-    return opcion_elegida, cantidad, lista_canciones
+    return opcion_elegida, int(cantidad), lista_canciones
 
 
-def pagerank_personalizado(grafo_usuarios, grafo_playlist, cantidad, lista_canciones):
+def calcular_recomendados(grafo_usuarios, lista_canciones):
     """
-    Dado un grafo, una cantidad y una lista de canciones favoritas, se calcula el pagerank personalizado
-    para todos los vertices del grafo y se devuelve una lista de las canciones / usuarios recomendados
+    Dado un grafo, una lista de canciones favoritas, se calcula el random_walk
+    para todas las canciones en la lista que se encuentren dentro del grafo y se devuelve
+    una lista de las canciones / usuarios recomendados
     Pre: recibe un grafo, una cantidad y una lista de canciones
     Post: devuelve una lista de canciones / usuarios recomendados
     """
 
-    pagerank_acumulado = {} # clave vertice, valor pagerank!
-    probabilidad_
+    random_walks = {}  # diccionario de diccionarios
+    suma_total = {}
+    contador = {}
+    promedio = {}
 
-    for _ in range(RECORRIDOS_PRANK_PERSONALIZADO):
+    for n in range(RECORRIDOS_PRANK_PERSONALIZADO):
+        for cancion in lista_canciones:
+            random_walks[cancion] = random_walk(grafo_usuarios, cancion, PRANK_LARGO_RECORRIDO)
+        sumar_valores_recomendados(random_walks, suma_total, contador)
+
+    for vertice in suma_total:
+        promedio[vertice] = suma_total[vertice] / contador[vertice]
+
+    promedios_ordenados = sorted(promedio.items(), key=lambda x: x[1], reverse=True)
+    return promedios_ordenados
 
 
+def sumar_valores_recomendados(random_walks, suma_total, contador):
+    """
+    Permite sumar valores recomendados, resultado de los random walks de diferentes canciones.
+    Pre: random_walks es un diccionario de diccionarios, clave: canciones, valor: diccionario
+    suma_total es un diccionario con clave: cancion, valor: int
+    contador es un diccionario con clave: cancion, valor: int
+    Post: suma_total y contador son actualizados con nuevos valores
+    """
+    for recorrido in random_walks:
+        for vertice in random_walks[recorrido]:
 
-    pass
+            if vertice not in contador:
+                contador[vertice] = 0
+            if vertice not in suma_total:
+                suma_total[vertice] = 0
+
+            contador[vertice] += 1
+            suma_total[vertice] += random_walks[recorrido][vertice]
+
+
+def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantidad, opcion):
+    """
+    Permite obtener una lista de vertices recomendados. Si la opcion es canciones, la lista sera
+    de canciones, lo mismo si la opcion es de usuarios.
+    Pre: vertices_resultados es un diccionario con clave: vertice, valor: valor de los random walks de
+    usuarios y canciones sets, cantidad > 0
+    Post: devuelve una lista con la cantidad pedida de usuarios o canciones recomendadas
+    """
+    recomendados = []
+
+    for vertice in vertices_resultados:
+        if len(recomendados) < cantidad:
+            if opcion == "canciones":
+                if vertice[0] in canciones:
+                    recomendados.append(vertice[0])
+                else:
+                    continue
+            else:
+                if vertice[0] in usuarios:
+                    recomendados.append(vertice[0])
+                else:
+                    continue
+        else:
+            break
+
+    return recomendados

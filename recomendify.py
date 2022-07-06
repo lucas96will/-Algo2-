@@ -1,4 +1,4 @@
-from biblioteca_recomendify import procesamiento_recomendacion, calculo_pagerank, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion
+from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, calculo_pagerank, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion
 from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
@@ -111,18 +111,20 @@ class Recomendify:
         Ej: usuarios 10 Love Story - Taylor Swift >>>> Toxic - Britney Spears >>>> I wanna be yours - Arctic Monkeys
         Post: Devuelve una lista de usuarios o canciones recomendados, de largo pedido
         """
-        opcion = str, cantidad = int
-        canciones = []
+
+        datos = None
         try:
-            opcion, cantidad, lista_canciones = procesamiento_recomendacion(entrada)
+            datos = procesamiento_recomendacion(entrada)
         except ValueError:
             print("La cantidad pedida o la opcion a recomendar no es valida!")
+            return False
 
-        lista_recomendados = pagerank_personalizado(self.grafo_usuarios, self._grafo_playlists, cantidad, canciones)
+        opcion, cantidad, lista_canciones = datos
+        vertices_resultados = calcular_recomendados(self.grafo_usuarios, lista_canciones)
+        recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion)
 
-
-        for elemento in lista_recomendados:
-            print(elemento + ";")
+        for elemento in recomendados:
+            print(elemento, end="; ")
 
     def ciclo_canciones(self, entrada):
         """
