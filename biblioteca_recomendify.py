@@ -2,8 +2,8 @@ from glob import escape
 from grafo import Grafo
 from grafo_funciones import random_walk
 
-RECORRIDOS_PRANK_PERSONALIZADO = 50
-PRANK_LARGO_RECORRIDO = 200
+RECORRIDOS_PRANK_PERSONALIZADO = 200
+PRANK_LARGO_RECORRIDO = 50
 
 def modelaje_grafos(ruta):
     """
@@ -255,7 +255,7 @@ def sumar_valores_recomendados(random_walks, suma_total, contador):
             suma_total[vertice] += random_walks[recorrido][vertice]
 
 
-def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantidad, opcion):
+def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantidad, opcion, lista_canciones):
     """
     Permite obtener una lista de vertices recomendados. Si la opcion es canciones, la lista sera
     de canciones, lo mismo si la opcion es de usuarios.
@@ -268,7 +268,7 @@ def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantida
     for vertice in vertices_resultados:
         if len(recomendados) < cantidad:
             if opcion == "canciones":
-                if vertice[0] in canciones:
+                if vertice[0] in canciones and vertice[0] not in lista_canciones:
                     recomendados.append(vertice[0])
                 else:
                     continue

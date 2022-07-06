@@ -121,7 +121,7 @@ class Recomendify:
 
         opcion, cantidad, lista_canciones = datos
         vertices_resultados = calcular_recomendados(self.grafo_usuarios, lista_canciones)
-        recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion)
+        recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion, lista_canciones)
 
         for elemento in recomendados:
             print(elemento, end="; ")
