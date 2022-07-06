@@ -1,7 +1,10 @@
+#!/usr/bin/python3
+import sys
 from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, calculo_pagerank, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion
 from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
+ARG_ARCHIVO_PROCESADO = 1
 
 # Comandos disponibles
 CAMINO_MAS_CORTO = "camino"
@@ -170,3 +173,9 @@ class Recomendify:
         print(bfs_vertices_a_distancia(self._grafo_playlists, cancion, n))
 
         return True
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        recomendify = Recomendify(sys.argv[ARG_ARCHIVO_PROCESADO])
+        recomendify.iniciar_recomendify()

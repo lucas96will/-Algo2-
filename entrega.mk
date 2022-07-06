@@ -1,3 +1,3 @@
-recomendify: main.py recomendify.py biblioteca_recomendify.py grafo.py grafo_funciones.py
-    cp recomendify.py recomendify
-    chmod +x recomendify
+recomendify: recomendify.py biblioteca_recomendify.py funciones_grafo_individual.py grafo.py
+	cp recomendify.py recomendify
+	chmod +x recomendify
