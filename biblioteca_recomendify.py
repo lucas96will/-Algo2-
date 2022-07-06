@@ -2,8 +2,8 @@ from glob import escape
 from grafo import Grafo
 from grafo_funciones import random_walk
 
-RECORRIDOS_PRANK_PERSONALIZADO = 200
-PRANK_LARGO_RECORRIDO = 50
+RECORRIDOS_PRANK_PERSONALIZADO = 100
+PRANK_LARGO_RECORRIDO = 100
 
 def modelaje_grafos(ruta):
     """

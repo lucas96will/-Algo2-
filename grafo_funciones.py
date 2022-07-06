@@ -682,19 +682,22 @@ def random_walk(grafo, v_actual, largo_recorrido, resultado=None):
     if largo_recorrido == 0:
         return resultado
 
-    v_inicial_adyacentes = grafo.adyacentes(v_actual)
+    for n in range(largo_recorrido):
+        v_inicial_adyacentes = grafo.adyacentes(v_actual)
+        v_aleatorio = obtener_vertice_aleatorio(v_inicial_adyacentes)
 
-    v_aleatorio = obtener_vertice_aleatorio(v_inicial_adyacentes)
+        if v_aleatorio not in resultado:
+            resultado[v_aleatorio] = 0
 
-    if v_aleatorio not in resultado:
-        resultado[v_aleatorio] = 0
+        if resultado[v_actual] != 0:
+            resultado[v_aleatorio] += resultado[v_actual] / len(v_inicial_adyacentes)
+        else:
+            resultado[v_aleatorio] += 1/len(v_inicial_adyacentes)
 
-    if resultado[v_actual] != 0:
-        resultado[v_aleatorio] += resultado[v_actual] / len(v_inicial_adyacentes)
-    else:
-        resultado[v_aleatorio] += 1/len(v_inicial_adyacentes)
+        v_actual = v_aleatorio
 
-    return random_walk(grafo, v_aleatorio, largo_recorrido - 1, resultado)
+    return resultado
+
 
 
 def obtener_vertice_aleatorio(vertices):
