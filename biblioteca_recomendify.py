@@ -2,8 +2,8 @@ from glob import escape
 from grafo import Grafo
 from grafo_funciones import random_walk
 
-RECORRIDOS_PRANK_PERSONALIZADO = 100
-PRANK_LARGO_RECORRIDO = 100
+RECORRIDOS_PRANK_PERSONALIZADO = 50000
+PRANK_LARGO_RECORRIDO = 10
 
 def modelaje_grafos(ruta):
     """
@@ -191,7 +191,7 @@ def imprimir_mas_importantes(pagerank, n):
     print(cadena)
 
 
-def procesamiento_recomendacion(entrada):
+def procesamiento_recomendacion(entrada, canciones_disponibles):
     """
     Procesa la entrada por consola de la funcion recomendacion
     Si la opcion elegida o la cantidad no son validos, eleva un SyntaxError
@@ -205,8 +205,11 @@ def procesamiento_recomendacion(entrada):
 
     canciones = entrada[len(cantidad + opcion_elegida) + 2:]
     lista_canciones = canciones.split(" >>>> ")
-
-    return opcion_elegida, int(cantidad), lista_canciones
+    lista_canciones_a_recomendar = []
+    for cancion in lista_canciones:
+        if cancion in canciones_disponibles:
+            lista_canciones_a_recomendar.append(cancion)
+    return opcion_elegida, int(cantidad), lista_canciones_a_recomendar
 
 
 def calcular_recomendados(grafo_usuarios, lista_canciones):
@@ -218,15 +221,14 @@ def calcular_recomendados(grafo_usuarios, lista_canciones):
     Post: devuelve una lista de canciones / usuarios recomendados
     """
 
-    random_walks = {}  # diccionario de diccionarios
+    pesos_acumulados = {}  # diccionario de diccionarios
     suma_total = {}
     contador = {}
     promedio = {}
 
-    for n in range(RECORRIDOS_PRANK_PERSONALIZADO):
-        for cancion in lista_canciones:
-            random_walks[cancion] = random_walk(grafo_usuarios, cancion, PRANK_LARGO_RECORRIDO)
-        sumar_valores_recomendados(random_walks, suma_total, contador)
+    for cancion in lista_canciones:
+        pesos_acumulados[cancion] = random_walk(grafo_usuarios, cancion, PRANK_LARGO_RECORRIDO, RECORRIDOS_PRANK_PERSONALIZADO)
+    sumar_valores_recomendados(pesos_acumulados, suma_total, contador)
 
     for vertice in suma_total:
         promedio[vertice] = suma_total[vertice] / contador[vertice]
@@ -243,8 +245,8 @@ def sumar_valores_recomendados(random_walks, suma_total, contador):
     contador es un diccionario con clave: cancion, valor: int
     Post: suma_total y contador son actualizados con nuevos valores
     """
-    for recorrido in random_walks:
-        for vertice in random_walks[recorrido]:
+    for cancion in random_walks:
+        for vertice in random_walks[cancion]:
 
             if vertice not in contador:
                 contador[vertice] = 0
@@ -252,7 +254,7 @@ def sumar_valores_recomendados(random_walks, suma_total, contador):
                 suma_total[vertice] = 0
 
             contador[vertice] += 1
-            suma_total[vertice] += random_walks[recorrido][vertice]
+            suma_total[vertice] += random_walks[cancion][vertice]
 
 
 def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantidad, opcion, lista_canciones):

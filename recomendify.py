@@ -27,12 +27,12 @@ class Recomendify:
     def __init__(self, ruta):
         try:
             self.grafo_usuarios, self._grafo_playlists, self.canciones, self.usuarios = modelaje_grafos(ruta)
-            self.inicializacion_correcta = True
+            self.inicializacion = True
             self.funciones = self._hash_funciones()
             self.ranking = []
         except FileNotFoundError:
             print("No se encontro el archivo!")
-            self.incializacion_correcta = False
+            self.incializacion = False
 
     def _hash_funciones(self):
         """
@@ -52,10 +52,15 @@ class Recomendify:
         """
         Inicia el programa recomendify, tomando por consola el input de comandos
         """
-        while self.inicializacion_correcta:
-            texto = input()
-            if texto == '':
-                break
+        while self.inicializacion:
+            texto: str
+            try:
+                texto = input()
+            except EOFError as e:
+                print("Saliendo del programa...")
+                self.inicializacion = False
+                continue
+
             comando = texto.split(' ')[COMANDO_POR_INPUT]
             if comando not in self.funciones:
                 print("")
@@ -117,17 +122,22 @@ class Recomendify:
 
         datos = None
         try:
-            datos = procesamiento_recomendacion(entrada)
+            datos = procesamiento_recomendacion(entrada, self.canciones)
         except ValueError:
             print("La cantidad pedida o la opcion a recomendar no es valida!")
             return False
 
         opcion, cantidad, lista_canciones = datos
+
+        if len(lista_canciones) == 0:
+            print("No se encontraron las canciones favoritas, por favor ingrese nuevamente otras canciones")
+
         vertices_resultados = calcular_recomendados(self.grafo_usuarios, lista_canciones)
         recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion, lista_canciones)
 
         for elemento in recomendados:
             print(elemento, end="; ")
+        print()
 
     def ciclo_canciones(self, entrada):
         """

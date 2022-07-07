@@ -667,44 +667,47 @@ def imprimir_camino(camino):
     print(cadena)
 
 
-def random_walk(grafo, v_actual, largo_recorrido, resultado=None):
+def random_walk(grafo, v_actual, largo_recorrido, iteraciones):
     """
     Algoritmo del random_walk (personalizado)
-    Empezando desde un vertice, visito un vecino aleatorio y le sumo un valor dado
-    por la cantidad de adyacentes.
-    Pre: Grafo no dirigido, v_actual vertice pertenece al grafo, largo_recorrido > 0 (Mientras mas grande, mas
-    exacto es el resultado),
+    Empezando desde un vertice, visito un vecino aleatorio y le sumo un valor dado por la cantidad
+    de adyacentes del vertice inicial, repitiendo esto por el largo del recorrido y
+    por la cantidad de iteraciones. Por cada random walk que se ejecuta, guardo los valores en un
+    diccionario de valor acumulado y en otro diccionario la cantidad de veces que aparece ese vertice.
+    Al terminar todas las iteraciones promedio los valores acumulados
+    Pre: Grafo no dirigido, v_actual vertice pertenece al grafo, largo_recorrido > 0 , iteraciones >>> 0
     Post: devuelve un hash de clave: vertices y valor: valor acumulado (int)
     """
-    if resultado is None:
+
+    valor_acumulado = {}
+    contador = {}
+
+    for _ in range(iteraciones):
+        vertice_inicial = v_actual
         resultado = {v_actual: 0}
+        for n in range(largo_recorrido):
+            v_inicial_adyacentes = grafo.adyacentes(vertice_inicial)
+            v_aleatorio = random.choice(v_inicial_adyacentes)
 
-    if largo_recorrido == 0:
-        return resultado
+            if v_aleatorio not in resultado:
+                resultado[v_aleatorio] = 0
 
-    for n in range(largo_recorrido):
-        v_inicial_adyacentes = grafo.adyacentes(v_actual)
-        v_aleatorio = obtener_vertice_aleatorio(v_inicial_adyacentes)
+            if v_aleatorio not in valor_acumulado:
+                valor_acumulado[v_aleatorio] = 0
+            if v_aleatorio not in contador:
+                contador[v_aleatorio] = 0
 
-        if v_aleatorio not in resultado:
-            resultado[v_aleatorio] = 0
+            if resultado[vertice_inicial] != 0:
+                resultado[v_aleatorio] += resultado[vertice_inicial] / len(v_inicial_adyacentes)
+            else:
+                resultado[v_aleatorio] += 1/len(v_inicial_adyacentes)
 
-        if resultado[v_actual] != 0:
-            resultado[v_aleatorio] += resultado[v_actual] / len(v_inicial_adyacentes)
-        else:
-            resultado[v_aleatorio] += 1/len(v_inicial_adyacentes)
+            valor_acumulado[v_aleatorio] += resultado[v_aleatorio]
+            contador[v_aleatorio] += 1
 
-        v_actual = v_aleatorio
+            vertice_inicial = v_aleatorio
 
-    return resultado
+    for vertice in valor_acumulado:
+        valor_acumulado[vertice] /= contador[vertice]
 
-
-
-def obtener_vertice_aleatorio(vertices):
-    """
-    Pre: vertices es una lista de vertices
-    Post: Devuelve un vertice aleatorio dentro de vertices
-    """
-    rand = random.uniform(0, len(vertices) - 1)
-    indice_vecino = round(rand)
-    return vertices[indice_vecino]
+    return valor_acumulado
