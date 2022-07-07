@@ -56,7 +56,7 @@ class Recomendify:
             texto: str
             try:
                 texto = input()
-            except EOFError as e:
+            except EOFError:
                 print("Saliendo del programa...")
                 self.inicializacion = False
                 continue
@@ -111,7 +111,7 @@ class Recomendify:
 
         imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
 
-    def recomendacion(self, entrada: str):
+    def recomendacion(self, entrada):
         """
         Permite obtener una recomendacion de canciones/usuarios a partir de un listado de n canciones favoritas
         Pre: la entrada indica si se quiere recomendar usuarios o canciones, la cantidad de canciones a recomendar
@@ -120,7 +120,6 @@ class Recomendify:
         Post: Devuelve una lista de usuarios o canciones recomendados, de largo pedido
         """
 
-        datos = None
         try:
             datos = procesamiento_recomendacion(entrada, self.canciones)
         except ValueError:

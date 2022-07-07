@@ -2,8 +2,9 @@ from glob import escape
 from grafo import Grafo
 from grafo_funciones import random_walk
 
-RECORRIDOS_PRANK_PERSONALIZADO = 50000
+RECORRIDOS_PRANK_PERSONALIZADO = 5000
 PRANK_LARGO_RECORRIDO = 10
+
 
 def modelaje_grafos(ruta):
     """
@@ -179,6 +180,7 @@ def calculo_pagerank(grafo, interacciones, d, grados):
         pagerank = nuevo_pagerank
 
     return pagerank
+
 
 def imprimir_mas_importantes(pagerank, n):
     """
