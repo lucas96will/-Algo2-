@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys
-from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, calculo_pagerank, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion
+from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank
 from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
@@ -13,8 +13,8 @@ RECOMENDACION = "recomendacion"
 CICLO = "ciclo"
 RANGO = "rango"
 
-INTERACCIONES = 20
-COEF_AMORTIGUACION = 0.85
+INTERACCIONES = 3
+COEF_AMORTIGUACION = 0.05
 
 
 class Recomendify:
@@ -102,7 +102,7 @@ class Recomendify:
         if self.ranking == []:
             grados_grafo = grados(self._grafo_playlists)
             pagerank = calculo_pagerank(self._grafo_playlists, INTERACCIONES, COEF_AMORTIGUACION, grados_grafo)
-            self.ranking = sorted(pagerank.items(), key=lambda x: x[1])
+            self.ranking = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
 
         imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
 
