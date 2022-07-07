@@ -2,7 +2,7 @@ from glob import escape
 from grafo import Grafo
 from grafo_funciones import random_walk
 
-RECORRIDOS_PRANK_PERSONALIZADO = 5000
+RECORRIDOS_PRANK_PERSONALIZADO = 10000
 PRANK_LARGO_RECORRIDO = 10
 
 
