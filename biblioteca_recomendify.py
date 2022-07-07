@@ -23,6 +23,9 @@ def modelaje_grafos(ruta):
 
         while linea != '':
             datos = linea.rstrip("\n").split("\t")
+            if len(datos) != 7:
+                linea = archivo.readline()
+                continue
             _, usuario, cancion, artista, id_playlist, playlist, _ = datos
             cancion_artista = cancion + " - " + artista
             canciones.add(cancion_artista)
@@ -151,30 +154,31 @@ def procesamiento_entrada_numero_cancion(entrada):
 
 
 def calculo_pagerank(grafo, interacciones, d, grados):
-    """
-    Dado un grafo, un numero de interacciones, un coeficiente de amortiguacion y un diccionario de grados devuelve el PageRank de cada vertice
+    
+    """Dado un grafo, un numero de interacciones, un coeficiente de amortiguacion y un diccionario de grados devuelve el PageRank de cada vertice
     Pre: Recibe un grafo, un numero(interacciones), un numero(coeficiente de amortiguacion) y un diccionario de grados del grafo
     Post: Devuelve un diccionario con los PageRank calculados
     """
     pagerank = {}
     cant_vertices = len(grafo)
-    valor_inicial = (1 - d) / cant_vertices
+    valor_inicial = 1 / cant_vertices
     for v in grafo:
         pagerank[v] = valor_inicial
 
     for _ in range(interacciones):
         nuevo_pagerank = {}
         for v in grafo:
+            suma = 0
             nuevo_pagerank[v] = pagerank[v]
             for w in grafo.adyacentes(v):
                 if v == w:
                     continue
-                nuevo_pagerank[v] += d* (pagerank[w] / grados[w])
+                suma += pagerank[w] / grados[w]
+            nuevo_pagerank[v] += suma * d
         
         pagerank = nuevo_pagerank
 
     return pagerank
-
 
 def imprimir_mas_importantes(pagerank, n):
     """
@@ -185,9 +189,9 @@ def imprimir_mas_importantes(pagerank, n):
     cadena = ""
     largo = len(pagerank) - 1
     for i in range(n - 1):
-        cadena += pagerank[largo - i][0] + "; "
+        cadena += pagerank[i][0] + "; "
 
-    cadena += pagerank[largo - n][0]
+    cadena += pagerank[n - 1][0]
     print(cadena)
 
 
