@@ -31,10 +31,9 @@ def modelaje_grafos(ruta):
             canciones.add(cancion_artista)
             usuarios.add(usuario)
             confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista, playlist)
-            playlists_a_diccionario(diccionario_playlists, id_playlist, cancion_artista)
+            confeccion_grafo_playlist(playlists_canciones, diccionario_playlists, cancion_artista, id_playlist)
             linea = archivo.readline()
 
-    confeccion_grafo_playlists_canciones(playlists_canciones, diccionario_playlists)
     return usuarios_canciones, playlists_canciones, canciones, usuarios
 
 
@@ -52,36 +51,21 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
         grafo.agregar_arista(usuario, cancion, playlist)
 
 
-def playlists_a_diccionario(diccionario, id_playlist, cancion):
+def confeccion_grafo_playlist(grafo, diccionario, cancion, id_playlist):
     """
-    Dado un diccionario, un id de playlist y una cancion, agrega esta ultima a la clave(id playlist) a la que pertenece dentro del diccionario
+    Dado un grafo,un diccionario, una cancion y una playlist crea vertices y aristas para el grafo pasado
     """
     if id_playlist not in diccionario:
         diccionario[id_playlist] = set()
-    
+
+    if cancion not in grafo:
+        grafo.agregar_vertice(cancion)
+        
+    for canciones in diccionario[id_playlist]:
+        if not grafo.estan_unidos(cancion, canciones):
+            grafo.agregar_arista(cancion, canciones)
+        
     diccionario[id_playlist].add(cancion)
-
-
-def confeccion_grafo_playlists_canciones(grafo, diccionario):
-    """
-    Dado un grafo y un diccionario crea vertices y aristas para el grafo pasado
-    """
-    for playlist in diccionario.values():
-        for cancion_1 in playlist:
-            if cancion_1 not in grafo:
-                grafo.agregar_vertice(cancion_1)
-            
-            for cancion_2 in playlist:
-                if cancion_1 == cancion_2:
-                    continue
-
-                if cancion_2 not in grafo:
-                    grafo.agregar_vertice(cancion_2)
-
-                if not grafo.estan_unidos(cancion_1, cancion_2):
-                    grafo.agregar_arista(cancion_1, cancion_2)
-    return
-
 
 def es_cancion(canciones, cancion):
     """
@@ -287,3 +271,4 @@ def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantida
             break
 
     return recomendados
+
