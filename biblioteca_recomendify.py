@@ -1,19 +1,22 @@
+from glob import escape
 from grafo import Grafo
 from grafo_funciones import random_walk
 
 RECORRIDOS_PRANK_PERSONALIZADO = 10000
 PRANK_LARGO_RECORRIDO = 10
 
-
+""" 
+*****************************************************************
+                MODELAJE Y CREACION DE ESTRUCTURAS
+*****************************************************************
+"""
 def modelaje_grafos(ruta):
     """
-    Dada una ruta de un archivo, procesa los datos creando dos grafos para el modelaje de Recomendify
+    Dada una ruta de un archivo, procesa los datos creando un grafo para el modelaje de Recomendify
     Pre: Recibe una ruta existente
-    Post: Devuelve ambos grafos
+    Post: Devuelve un grafo, un set de usuarios y otro de canciones
     """
     usuarios_canciones = Grafo()
-    playlists_canciones = Grafo()
-    diccionario_playlists = {}
     canciones = set()
     usuarios = set()
 
@@ -23,14 +26,33 @@ def modelaje_grafos(ruta):
 
         while linea != '':
             datos = linea.rstrip("\n").split("\t")
-            _, usuario, cancion, artista, id_playlist, playlist, _ = datos
+            _, usuario, cancion, artista, _, playlist, _ = datos
             cancion_artista = cancion + " - " + artista
             canciones.add(cancion_artista)
             usuarios.add(usuario)
             confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista, playlist)
-            confeccion_grafo_playlist(playlists_canciones, diccionario_playlists, cancion_artista, usuario)
             linea = archivo.readline()
-    return usuarios_canciones, playlists_canciones, canciones, usuarios 
+    return usuarios_canciones, canciones, usuarios 
+
+def proyeccion_grafo_bipartito(grafo, canciones):
+    """"
+    Dado un grafo bipartito, realiza otro que sera su proyeccion
+    Pre: Recibe un grafo y un set de canciones
+    Post: Devuelve un nuevo grafo
+    """
+    grafo_proyeccion = Grafo()
+    for cancion in canciones:
+        grafo_proyeccion.agregar_vertice(cancion)
+
+    for v in grafo:
+        if v in canciones:
+            continue
+        for w in grafo.adyacentes(v):
+            for w2 in grafo.adyacentes(v):
+                if not grafo_proyeccion.estan_unidos(w, w2):
+                    grafo_proyeccion.agregar_arista(w, w2)
+    return grafo_proyeccion
+
 
 def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     """
@@ -45,23 +67,11 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if not grafo.estan_unidos(usuario, cancion):
         grafo.agregar_arista(usuario, cancion, playlist)
 
-
-def confeccion_grafo_playlist(grafo, diccionario, cancion, id_playlist):
-    """
-    Dado un grafo,un diccionario, una cancion y una playlist crea vertices y aristas para el grafo pasado
-    """
-    if id_playlist not in diccionario:
-        diccionario[id_playlist] = set()
-
-    if cancion not in grafo:
-        grafo.agregar_vertice(cancion)
-
-    for canciones in diccionario[id_playlist]:
-        if not grafo.estan_unidos(cancion, canciones):
-            grafo.agregar_arista(cancion, canciones)
-
-    diccionario[id_playlist].add(cancion)
-
+""" 
+*****************************************************************
+                    VALIDACIONES DE DATOS
+*****************************************************************
+"""
 def es_cancion(canciones, cancion):
     """
     Devuelve True si la cancion pasada por parametro es efectivamente una cancion del grafo, False en caso contrario
@@ -79,59 +89,11 @@ def es_usuario(usuarios, usuario):
         return True
     return False
 
-
-def imprimir_camino_minimo(camino, aristas):
-    """
-    Imprime un camino (de canciones) y las aristas (playlists) que lo conecta
-    Pre: Recibe el camino y la lista de aristas
-    Post: Imprime en formato
-    """
-    cadena = ''
-    for i, vertice in enumerate(camino):
-        if i == len(camino) - 1:
-            break
-
-        if i % 2 == 0:  # Canciones
-            cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
-        
-        else:  # Usuarios
-            cadena += vertice + ' --> tiene una playlist --> ' + aristas[i] + ' --> donde aparece --> '
-    
-    cadena += camino[-1]
-    
-    print(cadena)
-
-
-def procesamiento_entrada_camino_minimo(entrada):
-    """
-    Recibe la entrada para el comando de camino minimo y devuelve una tupla de ambas canciones, o None si la entrada es incorrecta
-    """
-    datos = entrada.split(" >>>> ")
-    if len(datos) != 2:
-        return None
-
-    cancion_1, cancion_2 = datos[0], datos[1]
-
-    return cancion_1, cancion_2
-
-
-def procesamiento_entrada_numero_cancion(entrada):
-    """
-    Recibe la entrada que deberia contener un numero y una cancion, y devuelve una tupla de ambas cosas, o None si la entrada es incorrecta
-    """
-    datos = entrada.split(" ")
-    numero = datos[0]
-    cancion = ""
-    for i in range(1, len(datos) - 1):
-        cancion += datos[i] + " "
-
-    cancion += datos[-1]
-    if cancion == "":
-        return None
-
-    return numero, cancion
-
-
+""" 
+*****************************************************************
+                    FUNCIONES PARA COMANDOS
+*****************************************************************
+"""
 def calculo_pagerank(grafo, interacciones, d, grados):
     
     """Dado un grafo, un numero de interacciones, un coeficiente de amortiguacion y un diccionario de grados devuelve el PageRank de cada vertice
@@ -158,41 +120,6 @@ def calculo_pagerank(grafo, interacciones, d, grados):
         pagerank = nuevo_pagerank
 
     return pagerank
-
-def imprimir_mas_importantes(pagerank, n):
-    """
-    Imprime las n canciones mas importantes del grafo, segun pagerank
-    Pre: Recibe el pagerank ordenado de menor a mayor y un numero
-    Post: Imprime en formato
-    """
-    cadena = ""
-    largo = len(pagerank) - 1
-    for i in range(n - 1):
-        cadena += pagerank[i][0] + "; "
-
-    cadena += pagerank[n - 1][0]
-    print(cadena)
-
-
-def procesamiento_recomendacion(entrada, canciones_disponibles):
-    """
-    Procesa la entrada por consola de la funcion recomendacion
-    Si la opcion elegida o la cantidad no son validos, eleva un SyntaxError
-    """
-    opcion_elegida = entrada.split(' ')[0]
-    cantidad = entrada.split(' ')[1]
-    opciones_validas = ["canciones", "usuarios"]
-
-    if not cantidad.isnumeric() or opcion_elegida not in opciones_validas:
-        return False
-
-    canciones = entrada[len(cantidad + opcion_elegida) + 2:]
-    lista_canciones = canciones.split(" >>>> ")
-    lista_canciones_a_recomendar = []
-    for cancion in lista_canciones:
-        if cancion in canciones_disponibles:
-            lista_canciones_a_recomendar.append(cancion)
-    return opcion_elegida, int(cantidad), lista_canciones_a_recomendar
 
 
 def calcular_recomendados(grafo_usuarios, lista_canciones):
@@ -266,3 +193,116 @@ def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantida
             break
 
     return recomendados
+
+""" 
+*****************************************************************
+                FUNCIONES PROCESAMIENTO DE DATOS
+*****************************************************************
+"""
+
+def procesamiento_entrada_camino_minimo(entrada):
+    """
+    Recibe la entrada para el comando de camino minimo y devuelve una tupla de ambas canciones, o None si la entrada es incorrecta
+    """
+    datos = entrada.split(" >>>> ")
+    if len(datos) != 2:
+        return None
+
+    cancion_1, cancion_2 = datos[0], datos[1]
+
+    return cancion_1, cancion_2
+
+
+def procesamiento_entrada_numero_cancion(entrada):
+    """
+    Recibe la entrada que deberia contener un numero y una cancion, y devuelve una tupla de ambas cosas, o None si la entrada es incorrecta
+    """
+    datos = entrada.split(" ")
+    numero = datos[0]
+    cancion = ""
+    for i in range(1, len(datos) - 1):
+        cancion += datos[i] + " "
+
+    cancion += datos[-1]
+    if cancion == "":
+        return None
+
+    return numero, cancion
+
+
+def procesamiento_recomendacion(entrada, canciones_disponibles):
+    """
+    Procesa la entrada por consola de la funcion recomendacion
+    Si la opcion elegida o la cantidad no son validos, eleva un SyntaxError
+    """
+    opcion_elegida = entrada.split(' ')[0]
+    cantidad = entrada.split(' ')[1]
+    opciones_validas = ["canciones", "usuarios"]
+
+    if not cantidad.isnumeric() or opcion_elegida not in opciones_validas:
+        raise ValueError
+
+    canciones = entrada[len(cantidad + opcion_elegida) + 2:]
+    lista_canciones = canciones.split(" >>>> ")
+    lista_canciones_a_recomendar = []
+    for cancion in lista_canciones:
+        if cancion in canciones_disponibles:
+            lista_canciones_a_recomendar.append(cancion)
+    return opcion_elegida, int(cantidad), lista_canciones_a_recomendar
+
+
+""" 
+*****************************************************************
+                    FUNCIONES PARA IMPRIMIR
+*****************************************************************
+"""
+
+def imprimir_camino_minimo(camino, aristas):
+    """
+    Imprime un camino (de canciones) y las aristas (playlists) que lo conecta
+    Pre: Recibe el camino y la lista de aristas
+    Post: Imprime en formato
+    """
+    cadena = ''
+    for i, vertice in enumerate(camino):
+        if i == len(camino) - 1:
+            break
+
+        if i % 2 == 0:  # Canciones
+            cadena += vertice + ' --> aparece en playlist --> ' + aristas[i] + ' --> de --> '
+        
+        else:  # Usuarios
+            cadena += vertice + ' --> tiene una playlist --> ' + aristas[i] + ' --> donde aparece --> '
+    
+    cadena += camino[-1]
+    
+    print(cadena)
+
+
+def imprimir_mas_importantes(pagerank, n):
+    """
+    Imprime las n canciones mas importantes del grafo, segun pagerank
+    Pre: Recibe el pagerank ordenado de menor a mayor y un numero
+    Post: Imprime en formato
+    """
+    cadena = ""
+    largo = len(pagerank) - 1
+    for i in range(n - 1):
+        cadena += pagerank[i][0] + "; "
+
+    cadena += pagerank[n - 1][0]
+    print(cadena)
+
+
+def imprimir_recomendaciones(recomendados):
+    """
+    Dada una lista de recomendados, imprime segun el formato establecido en la consigna
+    Pre: Recibe la lista de recomendados
+    Post: Imprime en formato
+    """
+    cadena = ""
+    for i in range(len(recomendados) - 1):
+        cadena += recomendados[i] + "; "
+
+    cadena += recomendados[-1]
+    print(cadena)

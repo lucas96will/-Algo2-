@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys
-from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank
+from biblioteca_recomendify import imprimir_recomendaciones, obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank, proyeccion_grafo_bipartito
 from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
@@ -26,7 +26,8 @@ class Recomendify:
     """
     def __init__(self, ruta):
         try:
-            self.grafo_usuarios, self._grafo_playlists, self.canciones, self.usuarios = modelaje_grafos(ruta)
+            self.grafo_usuarios, self.canciones, self.usuarios = modelaje_grafos(ruta)
+            self.grafo_proyeccion = None
             self.inicializacion = True
             self.funciones = self._hash_funciones()
             self.ranking = []
@@ -122,9 +123,10 @@ class Recomendify:
         Post: Devuelve una lista de usuarios o canciones recomendados, de largo pedido
         """
 
-        datos = procesamiento_recomendacion(entrada, self.canciones)
-        if not datos:
-            # print("La cantidad pedida o la opcion a recomendar no es valida!")
+        try:
+            datos = procesamiento_recomendacion(entrada, self.canciones)
+        except ValueError:
+            print("La cantidad pedida o la opcion a recomendar no es valida!")
             return False
 
         opcion, cantidad, lista_canciones = datos
@@ -135,9 +137,7 @@ class Recomendify:
         vertices_resultados = calcular_recomendados(self.grafo_usuarios, lista_canciones)
         recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion, lista_canciones)
 
-        for elemento in recomendados[:-1]:
-            print(elemento, end="; ")
-        print(recomendados[-1])
+        imprimir_recomendaciones(recomendados)
 
     def ciclo_canciones(self, entrada):
         """
@@ -155,8 +155,9 @@ class Recomendify:
             print("Debe pasar un numero y una cancion")
             return False
         n = int(n)
-
-        camino = ciclo_origen_y_largo(self._grafo_playlists, cancion, n)
+        if not self.grafo_proyeccion:
+            self.grafo_proyeccion = proyeccion_grafo_bipartito(self.grafo_usuarios, self.canciones)
+        camino = ciclo_origen_y_largo(self.grafo_proyeccion, cancion, n)
         if camino is None:
             print("No se encontro recorrido")
             return False
@@ -180,7 +181,9 @@ class Recomendify:
             print("Debe pasar una cancion")
             return False
         n = int(n)
-        print(bfs_vertices_a_distancia(self._grafo_playlists, cancion, n))
+        if not self.grafo_proyeccion:
+            self.grafo_proyeccion = proyeccion_grafo_bipartito(self.grafo_usuarios, self.canciones)
+        print(bfs_vertices_a_distancia(self.grafo_proyeccion, cancion, n))
 
         return True
 
