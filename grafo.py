@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 from random import choice
 NO_EXISTE = None
 

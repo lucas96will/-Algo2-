@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 from grafo import Grafo
 from grafo_funciones import random_walk
 

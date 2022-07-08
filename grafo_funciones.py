@@ -1,5 +1,5 @@
 from grafo import Grafo
-from cola import Cola
+from Cola import Cola
 from pila import Pila
 from heapq import heappush, heappop
 from union_find import UnionFind
