@@ -10,6 +10,8 @@ PRANK_LARGO_RECORRIDO = 10
                 MODELAJE Y CREACION DE ESTRUCTURAS
 *****************************************************************
 """
+
+
 def modelaje_grafos(ruta):
     """
     Dada una ruta de un archivo, procesa los datos creando un grafo para el modelaje de Recomendify
@@ -33,6 +35,7 @@ def modelaje_grafos(ruta):
             confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista, playlist)
             linea = archivo.readline()
     return usuarios_canciones, canciones, usuarios 
+
 
 def proyeccion_grafo_bipartito(grafo, canciones):
     """"
@@ -67,33 +70,14 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     if not grafo.estan_unidos(usuario, cancion):
         grafo.agregar_arista(usuario, cancion, playlist)
 
-""" 
-*****************************************************************
-                    VALIDACIONES DE DATOS
-*****************************************************************
-"""
-def es_cancion(canciones, cancion):
-    """
-    Devuelve True si la cancion pasada por parametro es efectivamente una cancion del grafo, False en caso contrario
-    """
-    if cancion in canciones:
-        return True
-    return False
-
-
-def es_usuario(usuarios, usuario):
-    """
-    Devuelve True si el usuario pasado por parametro es efectivamente un usuario del grafo, False en caso contrario
-    """
-    if usuario in usuarios:
-        return True
-    return False
 
 """ 
 *****************************************************************
                     FUNCIONES PARA COMANDOS
 *****************************************************************
 """
+
+
 def calculo_pagerank(grafo, interacciones, d, grados):
     
     """Dado un grafo, un numero de interacciones, un coeficiente de amortiguacion y un diccionario de grados devuelve el PageRank de cada vertice
@@ -194,11 +178,13 @@ def obtener_lista_recomendados(vertices_resultados, usuarios, canciones, cantida
 
     return recomendados
 
+
 """ 
 *****************************************************************
                 FUNCIONES PROCESAMIENTO DE DATOS
 *****************************************************************
 """
+
 
 def procesamiento_entrada_camino_minimo(entrada):
     """
@@ -233,18 +219,23 @@ def procesamiento_entrada_numero_cancion(entrada):
 def procesamiento_recomendacion(entrada, canciones_disponibles):
     """
     Procesa la entrada por consola de la funcion recomendacion
-    Si la opcion elegida o la cantidad no son validos, eleva un SyntaxError
+    Si la opcion elegida o la cantidad no son validos, devuelve False
+    Pre: entrada por consola, canciones disponibles
+    Post: Devuelve la opcion_elegida (usuarios o canciones), la cantidad pedida y la lista de canciones
+    favoritas.
+    *Solo se toman en cuenta las canciones que estan disponibles*
     """
     opcion_elegida = entrada.split(' ')[0]
     cantidad = entrada.split(' ')[1]
     opciones_validas = ["canciones", "usuarios"]
 
     if not cantidad.isnumeric() or opcion_elegida not in opciones_validas:
-        raise ValueError
+        return False
 
     canciones = entrada[len(cantidad + opcion_elegida) + 2:]
     lista_canciones = canciones.split(" >>>> ")
     lista_canciones_a_recomendar = []
+
     for cancion in lista_canciones:
         if cancion in canciones_disponibles:
             lista_canciones_a_recomendar.append(cancion)
