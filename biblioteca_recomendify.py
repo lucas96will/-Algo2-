@@ -24,19 +24,14 @@ def modelaje_grafos(ruta):
 
         while linea != '':
             datos = linea.rstrip("\n").split("\t")
-            if len(datos) != 7:
-                linea = archivo.readline()
-                continue
             _, usuario, cancion, artista, id_playlist, playlist, _ = datos
             cancion_artista = cancion + " - " + artista
             canciones.add(cancion_artista)
             usuarios.add(usuario)
             confeccion_grafo_usuarios_canciones(usuarios_canciones, usuario, cancion_artista, playlist)
-            confeccion_grafo_playlist(playlists_canciones, diccionario_playlists, cancion_artista, id_playlist)
+            confeccion_grafo_playlist(playlists_canciones, diccionario_playlists, cancion_artista, usuario)
             linea = archivo.readline()
-
-    return usuarios_canciones, playlists_canciones, canciones, usuarios
-
+    return usuarios_canciones, playlists_canciones, canciones, usuarios 
 
 def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
     """
