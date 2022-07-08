@@ -120,10 +120,9 @@ class Recomendify:
         Post: Devuelve una lista de usuarios o canciones recomendados, de largo pedido
         """
 
-        try:
-            datos = procesamiento_recomendacion(entrada, self.canciones)
-        except ValueError:
-            print("La cantidad pedida o la opcion a recomendar no es valida!")
+        datos = procesamiento_recomendacion(entrada, self.canciones)
+        if not datos:
+            # print("La cantidad pedida o la opcion a recomendar no es valida!")
             return False
 
         opcion, cantidad, lista_canciones = datos
@@ -134,9 +133,9 @@ class Recomendify:
         vertices_resultados = calcular_recomendados(self.grafo_usuarios, lista_canciones)
         recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion, lista_canciones)
 
-        for elemento in recomendados:
+        for elemento in recomendados[:-1]:
             print(elemento, end="; ")
-        print()
+        print(recomendados[-1])
 
     def ciclo_canciones(self, entrada):
         """

@@ -1,4 +1,4 @@
-from glob import escape
+#!/usr/bin/python3
 from grafo import Grafo
 from grafo_funciones import random_walk
 
@@ -190,7 +190,7 @@ def procesamiento_recomendacion(entrada, canciones_disponibles):
     opciones_validas = ["canciones", "usuarios"]
 
     if not cantidad.isnumeric() or opcion_elegida not in opciones_validas:
-        raise ValueError
+        return False
 
     canciones = entrada[len(cantidad + opcion_elegida) + 2:]
     lista_canciones = canciones.split(" >>>> ")
