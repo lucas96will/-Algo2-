@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 import sys
-from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank
+from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank
 from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
 ARG_ARCHIVO_PROCESADO = 1
+CANT_ARGUMENTOS_VALIDOS = 2
 
 # Comandos disponibles
 CAMINO_MAS_CORTO = "camino"
@@ -80,7 +81,7 @@ class Recomendify:
             return False
         cancion_1, cancion_2 = canciones
         
-        if not es_cancion(self.canciones, cancion_1) or not es_cancion(self.canciones, cancion_2):
+        if cancion_1 not in self.canciones or cancion_2 not in self.canciones:
             print("Tanto el origen como el destino deben ser canciones")
             return False
 
@@ -108,7 +109,7 @@ class Recomendify:
             pagerank = calculo_pagerank(self.grafo_usuarios, INTERACCIONES, COEF_AMORTIGUACION, grados_grafo)
             ranking = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
             for v in ranking:
-                if es_cancion(self.canciones, v[0]):
+                if v[0] in self.canciones:
                     self.ranking.append(v)
 
         imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
@@ -124,7 +125,6 @@ class Recomendify:
 
         datos = procesamiento_recomendacion(entrada, self.canciones)
         if not datos:
-            # print("La cantidad pedida o la opcion a recomendar no es valida!")
             return False
 
         opcion, cantidad, lista_canciones = datos
@@ -151,7 +151,7 @@ class Recomendify:
 
         n, cancion = datos
         
-        if not es_cancion(self.canciones, cancion) or not n.isnumeric():
+        if cancion not in self.canciones or not n.isnumeric():
             print("Debe pasar un numero y una cancion")
             return False
         n = int(n)
@@ -176,7 +176,7 @@ class Recomendify:
 
         n, cancion = datos
 
-        if not es_cancion(self.canciones, cancion) or not n.isnumeric():
+        if cancion not in self.canciones or not n.isnumeric():
             print("Debe pasar una cancion")
             return False
         n = int(n)
@@ -186,6 +186,6 @@ class Recomendify:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+    if len(sys.argv) == CANT_ARGUMENTOS_VALIDOS:
         recomendify = Recomendify(sys.argv[ARG_ARCHIVO_PROCESADO])
         recomendify.iniciar_recomendify()

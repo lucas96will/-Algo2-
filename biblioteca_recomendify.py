@@ -46,38 +46,38 @@ def confeccion_grafo_usuarios_canciones(grafo, usuario, cancion, playlist):
         grafo.agregar_arista(usuario, cancion, playlist)
 
 
-def confeccion_grafo_playlist(grafo, diccionario, cancion, id_playlist):
+def confeccion_grafo_playlist(grafo, diccionario, cancion, usuario):
     """
     Dado un grafo,un diccionario, una cancion y una playlist crea vertices y aristas para el grafo pasado
     """
-    if id_playlist not in diccionario:
-        diccionario[id_playlist] = set()
+    if usuario not in diccionario:
+        diccionario[usuario] = set()
 
     if cancion not in grafo:
         grafo.agregar_vertice(cancion)
 
-    for canciones in diccionario[id_playlist]:
+    for canciones in diccionario[usuario]:
         if not grafo.estan_unidos(cancion, canciones):
             grafo.agregar_arista(cancion, canciones)
 
-    diccionario[id_playlist].add(cancion)
+    diccionario[usuario].add(cancion)
 
-def es_cancion(canciones, cancion):
-    """
-    Devuelve True si la cancion pasada por parametro es efectivamente una cancion del grafo, False en caso contrario
-    """
-    if cancion in canciones:
-        return True
-    return False
-
-
-def es_usuario(usuarios, usuario):
-    """
-    Devuelve True si el usuario pasado por parametro es efectivamente un usuario del grafo, False en caso contrario
-    """
-    if usuario in usuarios:
-        return True
-    return False
+# def es_cancion(canciones, cancion):
+#     """
+#     Devuelve True si la cancion pasada por parametro es efectivamente una cancion del grafo, False en caso contrario
+#     """
+#     if cancion in canciones:
+#         return True
+#     return False
+#
+#
+# def es_usuario(usuarios, usuario):
+#     """
+#     Devuelve True si el usuario pasado por parametro es efectivamente un usuario del grafo, False en caso contrario
+#     """
+#     if usuario in usuarios:
+#         return True
+#     return False
 
 
 def imprimir_camino_minimo(camino, aristas):
@@ -223,7 +223,7 @@ def calcular_recomendados(grafo_usuarios, lista_canciones):
 def sumar_valores_recomendados(random_walks, suma_total, contador):
     """
     Permite sumar valores recomendados, resultado de los random walks de diferentes canciones.
-    Pre: random_walks es un diccionario de diccionarios, clave: canciones, valor: diccionario
+    Pre: random_walks es un diccionario de diccionarios, clave: canciones, valor: diccionario de canciones en el recorrido
     suma_total es un diccionario con clave: cancion, valor: int
     contador es un diccionario con clave: cancion, valor: int
     Post: suma_total y contador son actualizados con nuevos valores
