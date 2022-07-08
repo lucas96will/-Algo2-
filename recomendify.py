@@ -13,8 +13,8 @@ RECOMENDACION = "recomendacion"
 CICLO = "ciclo"
 RANGO = "rango"
 
-INTERACCIONES = 3
-COEF_AMORTIGUACION = 0.05
+INTERACCIONES = 20
+COEF_AMORTIGUACION = 0.85
 
 
 class Recomendify:
@@ -57,7 +57,6 @@ class Recomendify:
             try:
                 texto = input()
             except EOFError:
-                print("Saliendo del programa...")
                 self.inicializacion = False
                 continue
 
@@ -105,9 +104,12 @@ class Recomendify:
         cantidad_ranking_pedida = int(entrada.split(' ')[0])
 
         if self.ranking == []:
-            grados_grafo = grados(self._grafo_playlists)
-            pagerank = calculo_pagerank(self._grafo_playlists, INTERACCIONES, COEF_AMORTIGUACION, grados_grafo)
-            self.ranking = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
+            grados_grafo = grados(self.grafo_usuarios)
+            pagerank = calculo_pagerank(self.grafo_usuarios, INTERACCIONES, COEF_AMORTIGUACION, grados_grafo)
+            ranking = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
+            for v in ranking:
+                if es_cancion(self.canciones, v[0]):
+                    self.ranking.append(v)
 
         imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
 
