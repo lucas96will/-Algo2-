@@ -1,5 +1,5 @@
 from grafo import Grafo
-from Cola import Cola
+from cola import Cola
 from pila import Pila
 from heapq import heappush, heappop
 from union_find import UnionFind
@@ -94,12 +94,11 @@ def bfs_vertices_a_distancia(grafo, origen, n):
             if w not in visitados:
                 orden[w] = orden[v] + 1
                 visitados.add(w)
-                q.encolar(w)
                 if orden[w] == n:
                     contador += 1
-
                 if orden[w] > n:
-                    return contador
+                    break
+                q.encolar(w)
 
     return contador
 

@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 import sys
-from biblioteca_recomendify import obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank
+from biblioteca_recomendify import imprimir_recomendaciones, obtener_lista_recomendados, calcular_recomendados, procesamiento_recomendacion, es_cancion, imprimir_mas_importantes, modelaje_grafos, imprimir_camino_minimo, procesamiento_entrada_camino_minimo, procesamiento_entrada_numero_cancion, calculo_pagerank, proyeccion_grafo_bipartito
 from grafo_funciones import bfs_origen_destino, bfs_vertices_a_distancia, ciclo_origen_y_largo, reconstruir_camino, imprimir_camino, grados
 
 COMANDO_POR_INPUT = 0
 ARG_ARCHIVO_PROCESADO = 1
-CANT_ARGUMENTOS_VALIDOS = 2
 
 # Comandos disponibles
 CAMINO_MAS_CORTO = "camino"
@@ -27,7 +26,8 @@ class Recomendify:
     """
     def __init__(self, ruta):
         try:
-            self.grafo_usuarios, self._grafo_playlists, self.canciones, self.usuarios = modelaje_grafos(ruta)
+            self.grafo_usuarios, self.canciones, self.usuarios = modelaje_grafos(ruta)
+            self.grafo_proyeccion = None
             self.inicializacion = True
             self.funciones = self._hash_funciones()
             self.ranking = []
@@ -81,7 +81,7 @@ class Recomendify:
             return False
         cancion_1, cancion_2 = canciones
         
-        if cancion_1 not in self.canciones or cancion_2 not in self.canciones:
+        if not es_cancion(self.canciones, cancion_1) or not es_cancion(self.canciones, cancion_2):
             print("Tanto el origen como el destino deben ser canciones")
             return False
 
@@ -109,7 +109,7 @@ class Recomendify:
             pagerank = calculo_pagerank(self.grafo_usuarios, INTERACCIONES, COEF_AMORTIGUACION, grados_grafo)
             ranking = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
             for v in ranking:
-                if v[0] in self.canciones:
+                if es_cancion(self.canciones, v[0]):
                     self.ranking.append(v)
 
         imprimir_mas_importantes(self.ranking, cantidad_ranking_pedida)
@@ -123,8 +123,10 @@ class Recomendify:
         Post: Devuelve una lista de usuarios o canciones recomendados, de largo pedido
         """
 
-        datos = procesamiento_recomendacion(entrada, self.canciones)
-        if not datos:
+        try:
+            datos = procesamiento_recomendacion(entrada, self.canciones)
+        except ValueError:
+            print("La cantidad pedida o la opcion a recomendar no es valida!")
             return False
 
         opcion, cantidad, lista_canciones = datos
@@ -135,9 +137,7 @@ class Recomendify:
         vertices_resultados = calcular_recomendados(self.grafo_usuarios, lista_canciones)
         recomendados = obtener_lista_recomendados(vertices_resultados, self.usuarios, self.canciones, cantidad, opcion, lista_canciones)
 
-        for elemento in recomendados[:-1]:
-            print(elemento, end="; ")
-        print(recomendados[-1])
+        imprimir_recomendaciones(recomendados)
 
     def ciclo_canciones(self, entrada):
         """
@@ -151,12 +151,13 @@ class Recomendify:
 
         n, cancion = datos
         
-        if cancion not in self.canciones or not n.isnumeric():
+        if not es_cancion(self.canciones, cancion) or not n.isnumeric():
             print("Debe pasar un numero y una cancion")
             return False
         n = int(n)
-
-        camino = ciclo_origen_y_largo(self._grafo_playlists, cancion, n)
+        if not self.grafo_proyeccion:
+            self.grafo_proyeccion = proyeccion_grafo_bipartito(self.grafo_usuarios, self.canciones)
+        camino = ciclo_origen_y_largo(self.grafo_proyeccion, cancion, n)
         if camino is None:
             print("No se encontro recorrido")
             return False
@@ -176,16 +177,18 @@ class Recomendify:
 
         n, cancion = datos
 
-        if cancion not in self.canciones or not n.isnumeric():
+        if not es_cancion(self.canciones, cancion) or not n.isnumeric():
             print("Debe pasar una cancion")
             return False
         n = int(n)
-        print(bfs_vertices_a_distancia(self._grafo_playlists, cancion, n))
+        if not self.grafo_proyeccion:
+            self.grafo_proyeccion = proyeccion_grafo_bipartito(self.grafo_usuarios, self.canciones)
+        print(bfs_vertices_a_distancia(self.grafo_proyeccion, cancion, n))
 
         return True
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == CANT_ARGUMENTOS_VALIDOS:
+    if len(sys.argv) == 2:
         recomendify = Recomendify(sys.argv[ARG_ARCHIVO_PROCESADO])
         recomendify.iniciar_recomendify()
